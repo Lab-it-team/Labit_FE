@@ -1,4 +1,125 @@
 @import "tailwindcss";
+@import url("https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css");
+
+@theme {
+  /* Font */
+  --font-sans: "Pretendard", -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
+
+  /* Base */
+  --color-black: #000000;
+  --color-white: #FFFFFF;
+
+  /* Neutral */
+  --color-neutral-5:  #FCFCFC;
+  --color-neutral-10: #F4F5F8;
+  --color-neutral-15: #F0F1F4;
+  --color-neutral-20: #EAEBEE;
+  --color-neutral-25: #E0E1E4;
+  --color-neutral-30: #D4D5D8;
+  --color-neutral-40: #B4B5B8;
+  --color-neutral-50: #8A8B8E;
+  --color-neutral-60: #6C6D70;
+  --color-neutral-70: #4E4F52;
+  --color-neutral-80: #303134;
+  --color-neutral-90: #1C1D20;
+
+  /* Primary Blue */
+  --color-blue-10:  #F1F7FF;
+  --color-blue-50:  #E9EFFE;
+  --color-blue-100: #CBD7FB;
+  --color-blue-200: #A2B8F9;
+  --color-blue-300: #7797F6;
+  --color-blue-400: #4E78F3;
+  --color-blue-500: #275AF0;
+  --color-blue-600: #214DCC;
+  --color-blue-700: #1C40AA;
+  --color-blue-800: #163389;
+  --color-blue-900: #12286C;
+
+  /* Light Blue */
+  --color-light-blue-50:  #E8F6FF;
+  --color-light-blue-100: #C8E8FE;
+  --color-light-blue-200: #9DD6FD;
+  --color-light-blue-300: #6FC3FC;
+  --color-light-blue-400: #43B1FC;
+  --color-light-blue-500: #1AA0FB;
+  --color-light-blue-600: #1688D5;
+  --color-light-blue-700: #1272B2;
+  --color-light-blue-800: #0F5B8F;
+  --color-light-blue-900: #0C4871;
+
+  /* Mint */
+  --color-mint-50:  #F0FBF9;
+  --color-mint-100: #DAF4F0;
+  --color-mint-200: #BDECE4;
+  --color-mint-300: #9EE3D7;
+  --color-mint-400: #81DACB;
+  --color-mint-500: #65D2C0;
+  --color-mint-600: #56B3A3;
+  --color-mint-700: #489588;
+  --color-mint-800: #3A786D;
+  --color-mint-900: #2D5E56;
+
+  /* Violet */
+  --color-violet-50:  #F2EDFC;
+  --color-violet-100: #D6C8F5;
+  --color-violet-200: #C3AEF1;
+  --color-violet-300: #A789EA;
+  --color-violet-400: #9672E6;
+  --color-violet-500: #7C4FE0;
+  --color-violet-600: #7148CC;
+  --color-violet-700: #58389F;
+  --color-violet-800: #442B7B;
+  --color-violet-900: #34215E;
+
+  /* Pink */
+  --color-pink-50:  #FDF0F9;
+  --color-pink-100: #FBDAF0;
+  --color-pink-200: #F7BDE5;
+  --color-pink-300: #F49FD9;
+  --color-pink-400: #F082CD;
+  --color-pink-500: #ED66C2;
+  --color-pink-600: #C957A5;
+  --color-pink-700: #A8488A;
+  --color-pink-800: #873A6F;
+  --color-pink-900: #6B2E57;
+
+  /* Red */
+  --color-red-50:  #FCECEC;
+  --color-red-100: #F5C5C5;
+  --color-red-200: #F1A9A9;
+  --color-red-300: #EA8282;
+  --color-red-400: #E66969;
+  --color-red-500: #E04444;
+  --color-red-600: #CC3E3E;
+  --color-red-700: #9F3030;
+  --color-red-800: #7B2525;
+  --color-red-900: #5E1D1D;
+
+  /* Orange */
+  --color-orange-50:  #FEF2EA;
+  --color-orange-100: #FAD6BF;
+  --color-orange-200: #F8C29F;
+  --color-orange-300: #F5A774;
+  --color-orange-400: #F39559;
+  --color-orange-500: #F07B2F;
+  --color-orange-600: #DA702B;
+  --color-orange-700: #AA5721;
+  --color-orange-800: #84441A;
+  --color-orange-900: #653414;
+
+  /* Yellow */
+  --color-yellow-50:  #FEF9E9;
+  --color-yellow-100: #FCEBBB;
+  --color-yellow-200: #FAE29B;
+  --color-yellow-300: #F8D56D;
+  --color-yellow-400: #F7CD51;
+  --color-yellow-500: #F5C025;
+  --color-yellow-600: #DFAF22;
+  --color-yellow-700: #AE881A;
+  --color-yellow-800: #876A14;
+  --color-yellow-900: #675110;
+}
 
 * {
   box-sizing: border-box;
@@ -7,6 +128,9 @@
 }
 
 body {
+  font-family: var(--font-sans);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  color: var(--color-neutral-90);
+  background: var(--color-white);
 }
