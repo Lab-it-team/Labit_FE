@@ -119,6 +119,78 @@
   --color-yellow-700: #AE881A;
   --color-yellow-800: #876A14;
   --color-yellow-900: #675110;
+
+  /* Background */
+  --color-bg-color:   #F1F7FF;
+  --color-bg-normal:  #F4F5F8;
+  --color-bg-elevate: #F0F1F4;
+  --color-bg-dark:    #303134;
+
+  /* Text */
+  --color-text-normal:   #4E4F52;
+  --color-text-strong:   #1C1D20;
+  --color-text-disabled: #D4D5D8;
+  --color-text-light:    #FFFFFF;
+
+  /* Border */
+  --color-border-normal: #EAEBEE;
+  --color-border-light:  #F0F1F4;
+  --color-border-strong: #D4D5D8;
+
+  /* Element/Normal */
+  --color-element-normal-blue:   #1AA0FB;
+  --color-element-normal-red:    #E04444;
+  --color-element-normal-orange: #F07B2F;
+  --color-element-normal-yellow: #F5C025;
+  --color-element-normal-mint:   #65D2C0;
+  --color-element-normal-violet: #7C4FE0;
+  --color-element-normal-pink:   #ED66C2;
+
+  /* Element/Light */
+  --color-element-light-blue:   #E9EFFE;
+  --color-element-light-red:    #FCECEC;
+  --color-element-light-orange: #FEF2EA;
+  --color-element-light-yellow: #FEF9E9;
+  --color-element-light-mint:   #F0FBF9;
+  --color-element-light-violet: #F2EDFC;
+  --color-element-light-pink:   #FDF0F9;
+
+  /* Display */
+  --text-display-lg: 56px / 78px;
+  --text-display-sm: 40px / 60px;
+
+  /* Heading */
+  --text-heading-xl: 36px / 46px;
+  --text-heading-lg: 32px / 40px;
+  --text-heading-md: 24px / 30px;
+  --text-heading-sm: 16px / 22px;
+
+  /* Body */
+  --text-body-xl: 20px / 32px;
+  --text-body-lg: 18px / 26px;
+  --text-body-md: 16px / 25px;
+  --text-body-sm: 15px / 24px;
+  --text-body-xs: 14px / 24px;
+
+  /* Label */
+  --text-label-xl: 15px / 22px;
+  --text-label-lg: 14px / 20px;
+  --text-label-md: 13px / 18px;
+  --text-label-sm: 12px / 16px;
+
+  /* Caption */
+  --text-caption-lg: 13px / 18px;
+  --text-caption-sm: 12px / 17px;
+
+  /* Font Weight */
+  --font-weight-regular:   400;
+  --font-weight-medium:    500;
+  --font-weight-semibold:  600;
+  --font-weight-bold:      700;
+
+  /* Letter Spacing */
+  --tracking-default: 0em;
+  --tracking-tight:   -0.005em;
 }
 
 * {
@@ -131,6 +203,6 @@ body {
   font-family: var(--font-sans);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  color: var(--color-neutral-90);
+  color: var(--color-text-normal);
   background: var(--color-white);
 }
