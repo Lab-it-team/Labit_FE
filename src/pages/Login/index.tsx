@@ -4,19 +4,21 @@ import logoSvg from "@/assets/figma-export/logo.svg";
 import backIconSvg from "@/assets/figma-export/icon-back.svg";
 import kakaoIconSvg from "@/assets/figma-export/kakao-icon.svg";
 
-const kakaoAuthParams = new URLSearchParams({
-  client_id: import.meta.env.VITE_KAKAO_REST_API_KEY ?? '',
-  redirect_uri: import.meta.env.VITE_KAKAO_REDIRECT_URI ?? '',
-  response_type: 'code',
-})
-
-const KAKAO_AUTH_URL = `https://kauth.kakao.com/oauth/authorize?${kakaoAuthParams}`
-
 export default function Login() {
   const navigate = useNavigate();
 
   const handleKakaoLogin = () => {
-    window.location.href = KAKAO_AUTH_URL;
+    const state = crypto.randomUUID();
+    sessionStorage.setItem("kakao_oauth_state", state);
+
+    const params = new URLSearchParams({
+      client_id: import.meta.env.VITE_KAKAO_REST_API_KEY ?? "",
+      redirect_uri: import.meta.env.VITE_KAKAO_REDIRECT_URI ?? "",
+      response_type: "code",
+      state,
+    });
+
+    window.location.href = `https://kauth.kakao.com/oauth/authorize?${params}`;
   };
 
   return (
