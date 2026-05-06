@@ -5,12 +5,12 @@ import { useAuthStore } from '@/stores/authStore'
 
 export const useKakaoLogin = () => {
   const navigate = useNavigate()
-  const setAuth = useAuthStore((s) => s.setAuth)
+  const setTokens = useAuthStore((s) => s.setTokens)
 
   return useMutation({
     mutationFn: kakaoLogin,
-    onSuccess: ({ user, accessToken }) => {
-      setAuth(user, accessToken)
+    onSuccess: ({ access_token, refresh_token }) => {
+      setTokens(access_token, refresh_token)
       navigate('/')
     },
   })
