@@ -4,6 +4,7 @@ import Layout from '@/components/layout/Layout'
 
 const Home = lazy(() => import('@/pages/Home'))
 const Login = lazy(() => import('@/pages/Login'))
+const KakaoCallback = lazy(() => import('@/pages/KakaoCallback'))
 const Onboarding = lazy(() => import('@/pages/Onboarding'))
 const IonicConcept = lazy(() => import('@/pages/IonicConcept'))
 const IonicLab = lazy(() => import('@/pages/IonicLab'))
@@ -16,6 +17,7 @@ export default function AppRoutes() {
     <Suspense fallback={null}>
       <Routes>
         <Route path="/login" element={<Login />} />
+        <Route path="/auth/kakao/callback" element={<KakaoCallback />} />
         <Route path="/onboarding" element={<Onboarding />} />
         <Route element={<Layout />}>
           <Route path="/" element={<Home />} />

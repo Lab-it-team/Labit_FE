@@ -22,6 +22,6 @@ export const useAuthStore = create<AuthState>()(
       setAuth: (user, accessToken) => set({ user, accessToken }),
       clearAuth: () => set({ user: null, accessToken: null }),
     }),
-    { name: 'auth' },
+    { name: 'auth', partialize: (state) => ({ user: state.user }) },
   ),
 )
