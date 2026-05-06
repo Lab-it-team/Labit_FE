@@ -1,8 +1,8 @@
 import { useNavigate } from "react-router";
-import mascot from "@/assets/figma-export/mascot.png";
-import logoSvg from "@/assets/figma-export/logo.svg";
-import backIconSvg from "@/assets/figma-export/icon-back.svg";
-import kakaoIconSvg from "@/assets/figma-export/kakao-icon.svg";
+import mascot from "@/assets/icon/mascot.png";
+import logoSvg from "@/assets/icon/logo.svg";
+import backIconSvg from "@/assets/icon/icon-back.svg";
+import kakaoIconSvg from "@/assets/icon/kakao-icon.svg";
 
 export default function Login() {
   const navigate = useNavigate();
