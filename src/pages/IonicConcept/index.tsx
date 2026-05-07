@@ -1,67 +1,38 @@
-import { useState } from 'react'
-import { useNavigate } from 'react-router'
-import rightSvg from '@/assets/Icon/right.svg'
-import LessonHeader from '@/components/lesson/LessonHeader'
+import { useState } from "react";
+import { useNavigate } from "react-router";
+import LessonHeader from "@/components/lesson/LessonHeader";
+import LessonFooter from "@/components/lesson/LessonFooter";
+import ContentTab from "@/components/lesson/ContentTab";
 
-const TOTAL_PAGES = 4
+const TOTAL_PAGES = 4;
 
 const studyContent = {
-  title: '이온 결합이란?',
+  title: "이온 결합이란?",
   body: [
-    '양이온과 음이온이 정전기적 인력(쿨롱 힘)에 의해 서로 끌어당겨 결합하는 것입니다.',
-    '주로 금속 원소와 비금속 원소 사이에서 형성됩니다.',
-    '금속 원자는 전자를 잃어 양이온이 되고, 비금속 원자는 전자를 얻어 음이온이 됩니다.',
-    '이 두 이온이 만나면 강한 인력이 발생하며 안정한 화합물을 이룹니다.',
+    "양이온과 음이온이 정전기적 인력(쿨롱 힘)에 의해 서로 끌어당겨 결합하는 것입니다.",
+    "주로 금속 원소와 비금속 원소 사이에서 형성됩니다.",
+    "금속 원자는 전자를 잃어 양이온이 되고, 비금속 원자는 전자를 얻어 음이온이 됩니다.",
+    "이 두 이온이 만나면 강한 인력이 발생하며 안정한 화합물을 이룹니다.",
   ],
   tip: {
-    label: '핵심 원리',
-    text: '반대 전하는 서로를 끌어당깁니다. (+)와 (-)가 가까워질수록 더 강한 인력이 작용하며, 이것이 이온 결합의 본질입니다.',
+    label: "핵심 원리",
+    text: "반대 전하는 서로를 끌어당깁니다. (+)와 (-)가 가까워질수록 더 강한 인력이 작용하며, 이것이 이온 결합의 본질입니다.",
   },
-}
-
-function ContentTab({
-  active,
-  onChange,
-}: {
-  active: 'learn' | 'practice'
-  onChange: (v: 'learn' | 'practice') => void
-}) {
-  return (
-    <div className="flex items-center bg-neutral-10 rounded-lg p-1.5 self-center">
-      <button
-        type="button"
-        onClick={() => onChange('learn')}
-        className={`px-4 py-1.5 rounded-lg text-label-lg font-semibold transition-all ${
-          active === 'learn'
-            ? 'bg-white shadow-sm text-text-strong'
-            : 'text-neutral-50'
-        }`}
-      >
-        학습하기
-      </button>
-      <button
-        type="button"
-        onClick={() => onChange('practice')}
-        className={`px-4 py-1.5 rounded-lg text-label-lg font-semibold transition-all ${
-          active === 'practice'
-            ? 'bg-white shadow-sm text-text-strong'
-            : 'text-neutral-50'
-        }`}
-      >
-        실습하기
-      </button>
-    </div>
-  )
-}
+};
 
 function StudyCard() {
   return (
     <div className="bg-white border border-border-light rounded-3xl p-6 flex flex-col gap-6 w-full">
       <div className="flex flex-col gap-4">
-        <h2 className="text-heading-md font-bold text-text-strong">{studyContent.title}</h2>
+        <h2 className="text-heading-md font-bold text-text-strong">
+          {studyContent.title}
+        </h2>
         <div className="flex flex-col gap-0">
           {studyContent.body.map((line, i) => (
-            <p key={i} className="text-body-md font-medium text-text-normal leading-[25px]">
+            <p
+              key={i}
+              className="text-body-md font-medium text-text-normal leading-[25px]"
+            >
               {line}
             </p>
           ))}
@@ -69,55 +40,31 @@ function StudyCard() {
       </div>
 
       <div className="bg-bg-color rounded-xl px-4 py-3 flex flex-col gap-1.5">
-        <p className="text-caption-lg text-neutral-50">{studyContent.tip.label}</p>
-        <p className="text-label-xl font-semibold text-blue-500">{studyContent.tip.text}</p>
+        <p className="text-caption-lg text-neutral-50">
+          {studyContent.tip.label}
+        </p>
+        <p className="text-label-xl font-semibold text-blue-500">
+          {studyContent.tip.text}
+        </p>
       </div>
     </div>
-  )
-}
-
-function PageIndicator({
-  current,
-  total,
-  onPageChange,
-}: {
-  current: number
-  total: number
-  onPageChange: (page: number) => void
-}) {
-  return (
-    <div className="flex items-center gap-3">
-      {Array.from({ length: total }).map((_, i) => (
-        <button
-          key={i}
-          type="button"
-          onClick={() => onPageChange(i + 1)}
-          className={`w-6 h-6 rounded-md flex items-center justify-center text-label-sm font-medium transition-colors ${
-            i + 1 === current
-              ? 'bg-neutral-90 text-white'
-              : 'bg-neutral-10 text-neutral-50'
-          }`}
-        >
-          {i + 1}
-        </button>
-      ))}
-    </div>
-  )
+  );
 }
 
 export default function IonicConcept() {
-  const navigate = useNavigate()
-  const [activeTab, setActiveTab] = useState<'learn' | 'practice'>('learn')
-  const [currentPage, setCurrentPage] = useState(1)
-  const [showProgressBadge, setShowProgressBadge] = useState(true)
-  const [completed, setCompleted] = useState(false)
+  const navigate = useNavigate();
+  const [activeTab, setActiveTab] = useState<"learn" | "practice">("learn");
+  const [currentPage, setCurrentPage] = useState(1);
+  const [showProgressBadge, setShowProgressBadge] = useState(true);
+  const [completed, setCompleted] = useState(false);
 
-  const progressPercent = completed ? 100 : Math.round(((currentPage - 1) / TOTAL_PAGES) * 100)
-  const progressWidth = `${progressPercent}%`
+  const progressPercent = completed
+    ? 100
+    : Math.round(((currentPage - 1) / TOTAL_PAGES) * 100);
+  const progressWidth = `${progressPercent}%`;
 
   return (
     <div className="min-h-screen flex flex-col bg-neutral-5">
-
       <LessonHeader
         lessonLabel="2-1."
         lessonTitle="이온 결합 학습"
@@ -125,14 +72,14 @@ export default function IonicConcept() {
         progressPercent={progressPercent}
         showProgressBadge={showProgressBadge}
         onCloseProgressBadge={() => setShowProgressBadge(false)}
-        nextLesson={{ label: '공유 결합 학습', path: '/covalent-concept' }}
+        nextLesson={{ label: "공유 결합 학습", path: "/covalent-concept" }}
       />
 
       {/* ── Main Content ── */}
       <main className="flex-1 flex flex-col items-center pt-[80px] pb-[80px] px-4 sm:px-10 md:px-20 lg:px-[270px]">
         <div className="w-full max-w-[900px] flex flex-col gap-14 pt-10">
           <ContentTab active={activeTab} onChange={setActiveTab} />
-          {activeTab === 'learn' ? (
+          {activeTab === "learn" ? (
             <StudyCard />
           ) : (
             <div className="bg-white border border-border-light rounded-3xl p-6 text-text-normal text-body-md">
@@ -142,41 +89,20 @@ export default function IonicConcept() {
         </div>
       </main>
 
-      {/* ── Bottom Navigation ── */}
-      <footer className="fixed bottom-0 left-0 right-0 z-20 border-t border-border-normal bg-white/95 backdrop-blur-sm">
-        <div className="flex items-center gap-6 px-6 h-[60px]">
-          <button
-            type="button"
-            onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
-            disabled={currentPage === 1}
-            className={`flex-1 flex items-center justify-center py-2 rounded-lg text-label-xl font-semibold transition-colors ${
-              currentPage === 1
-                ? 'text-neutral-50'
-                : 'text-text-normal hover:text-blue-500'
-            }`}
-          >
-            이전
-          </button>
-
-          <PageIndicator current={currentPage} total={TOTAL_PAGES} onPageChange={setCurrentPage} />
-
-          <button
-            type="button"
-            onClick={() => {
-              if (currentPage < TOTAL_PAGES) {
-                setCurrentPage(p => p + 1)
-              } else {
-                setCompleted(true)
-                setTimeout(() => navigate('/'), 600)
-              }
-            }}
-            className="flex-1 flex items-center justify-center gap-1 py-2 rounded-lg text-label-xl font-semibold text-text-normal hover:text-blue-500 transition-colors"
-          >
-            다음
-            <img src={rightSvg} alt="" width={24} height={24} />
-          </button>
-        </div>
-      </footer>
+      <LessonFooter
+        currentPage={currentPage}
+        totalPages={TOTAL_PAGES}
+        onPrev={() => setCurrentPage((p) => Math.max(1, p - 1))}
+        onNext={() => {
+          if (currentPage < TOTAL_PAGES) {
+            setCurrentPage((p) => p + 1);
+          } else {
+            setCompleted(true);
+            setTimeout(() => navigate("/"), 600);
+          }
+        }}
+        onPageChange={setCurrentPage}
+      />
     </div>
-  )
+  );
 }
