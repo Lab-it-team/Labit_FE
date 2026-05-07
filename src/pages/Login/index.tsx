@@ -1,8 +1,8 @@
 import { useNavigate } from "react-router";
-import mascot from "@/assets/icon/mascot.png";
-import logoSvg from "@/assets/icon/logo.svg";
-import backIconSvg from "@/assets/icon/icon-back.svg";
-import kakaoIconSvg from "@/assets/icon/kakao-icon.svg";
+import mascot from "@/assets/Icon/mascot.png";
+import logoSvg from "@/assets/Icon/logo.svg";
+import backIconSvg from "@/assets/Icon/icon-back.svg";
+import kakaoIconSvg from "@/assets/Icon/kakao-icon.svg";
 
 export default function Login() {
   const navigate = useNavigate();
@@ -34,7 +34,7 @@ export default function Login() {
         }}
       />
 
-      <header className="absolute left-0 right-0 top-0 z-20 flex h-15 items-center justify-between px-8">
+      <header className="absolute left-0 right-0 top-0 z-20 flex h-[60px] items-center justify-between px-8">
         <button
           type="button"
           onClick={() => navigate(-1)}
@@ -75,11 +75,11 @@ export default function Login() {
             </div>
 
             <div className="flex flex-col items-center">
-              <p className="text-body-xs font-medium">
+              <p className="text-body-sm font-medium">
                 <span className="text-blue-500">3초 만에 로그인</span>
                 <span className="text-text-normal">하고,</span>
               </p>
-              <p className="text-body-xs font-medium text-text-normal">
+              <p className="text-body-sm font-medium text-text-normal">
                 모든 기능을 제한 없이 즐겨보세요!
               </p>
             </div>
@@ -89,7 +89,7 @@ export default function Login() {
             <button
               type="button"
               onClick={handleKakaoLogin}
-              className="flex h-[46px] w-full cursor-pointer items-center justify-center gap-2 rounded-xl border-0 bg-[#FEE500] text-label-xl font-semibold text-[#181600]"
+              className="flex h-[46px] w-full cursor-pointer items-center justify-center gap-2 rounded-xl border-0 bg-[#FEE500] text-body-md font-semibold text-[#181600]"
             >
               <img src={kakaoIconSvg} alt="" width={20} height={20} />
               카카오로 시작하기
