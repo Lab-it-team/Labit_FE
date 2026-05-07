@@ -7,34 +7,133 @@
   --font-sans: "Pretendard", -apple-system, BlinkMacSystemFont, system-ui,
     sans-serif;
 
-  /* Base */
-  --color-black: #000000;
-  --color-white: #ffffff;
+  /* ── Primitive ─────────────────────────────── */
 
-  /* Static */
-  --color-static-white: #ffffff;
+  /* Common */
+  --color-common-0: #ffffff;
+  --color-common-100: #000000;
 
   /* Neutral */
   --color-neutral-5: #fcfcfc;
   --color-neutral-10: #f4f5f8;
+  --color-neutral-15: #f0f1f4;
   --color-neutral-20: #eaebee;
+  --color-neutral-25: #e0e1e4;
   --color-neutral-30: #d4d5d8;
   --color-neutral-40: #b4b5b8;
   --color-neutral-50: #8a8b8e;
   --color-neutral-70: #4e4f52;
+  --color-neutral-80: #353638;
   --color-neutral-90: #1c1d20;
 
-  /* Blue */
+  /* Primary Blue */
+  --color-blue-10: #eaf0ff;
   --color-blue-500: #275af0;
   --color-blue-600: #214dcc;
+  --color-blue-700: #1b40a8;
 
-  /* Semantic */
-  --color-bg-normal: #f4f5f8;
-  --color-bg-elevate: #f0f1f4;
-  --color-text-normal: #4e4f52;
-  --color-text-strong: #1c1d20;
-  --color-border-normal: #eaebee;
-  --color-border-light: #f0f1f4;
+  /* Red */
+  --color-red-50: #fef0ee;
+  --color-red-500: #e04444;
+
+  /* Orange */
+  --color-orange-50: #fff3e8;
+  --color-orange-400: #f39559;
+  --color-orange-500: #f07b2f;
+
+  /* Yellow */
+  --color-yellow-50: #fef8e0;
+  --color-yellow-500: #f5c025;
+
+  /* Mint */
+  --color-mint-50: #e0f9f4;
+  --color-mint-500: #65d2c0;
+
+  /* Light Blue */
+  --color-light-blue-500: #1aa0fb;
+
+  /* Violet */
+  --color-violet-50: #f0eaff;
+  --color-violet-500: #7c4fe0;
+
+  /* Pink */
+  --color-pink-50: #fde8f0;
+  --color-pink-500: #ed66c2;
+
+  /* ── Semantic ──────────────────────────────── */
+
+  /* Background */
+  --color-bg-color: var(--color-blue-10);
+  --color-bg-normal: var(--color-neutral-5);
+  --color-bg-elevate: var(--color-neutral-10);
+  --color-bg-dark: var(--color-neutral-80);
+  --color-bg-opacity-light40: rgba(253, 253, 253, 0.4);
+  --color-bg-opacity-light95: rgba(253, 253, 253, 0.95);
+
+  /* Primary */
+  --color-primary-light: var(--color-blue-10);
+  --color-primary-normal: var(--color-blue-500);
+  --color-primary-strong: var(--color-blue-600);
+  --color-primary-heavy: var(--color-blue-700);
+
+  /* Static */
+  --color-static-white: var(--color-common-0);
+  --color-static-black: var(--color-common-100);
+
+  /* Text */
+  --color-text-normal: var(--color-neutral-70);
+  --color-text-primary: var(--color-blue-500);
+  --color-text-sub: var(--color-neutral-50);
+  --color-text-light: var(--color-common-0);
+  --color-text-strong: var(--color-neutral-90);
+  --color-text-disabled: var(--color-neutral-25);
+
+  /* Fill */
+  --color-fill-dark70: var(--color-neutral-70);
+  --color-fill-light0: var(--color-common-0);
+  --color-fill-light10: var(--color-neutral-10);
+  --color-fill-primary: var(--color-blue-500);
+  --color-fill-grey: var(--color-neutral-40);
+  --color-fill-dark80: var(--color-neutral-80);
+  --color-fill-normal25: var(--color-neutral-25);
+
+  /* Line */
+  --color-line-normal: var(--color-neutral-70);
+  --color-line-light: var(--color-common-0);
+  --color-line-sub: var(--color-neutral-40);
+  --color-line-strong: var(--color-neutral-80);
+  --color-line-disabled: var(--color-neutral-25);
+
+  /* Border */
+  --color-border-light: var(--color-neutral-10);
+  --color-border-normal: var(--color-neutral-15);
+  --color-border-strong: var(--color-neutral-20);
+
+  /* Element / Normal */
+  --color-element-normal-red: var(--color-red-500);
+  --color-element-normal-orange: var(--color-orange-500);
+  --color-element-normal-yellow: var(--color-yellow-500);
+  --color-element-normal-mint: var(--color-mint-500);
+  --color-element-normal-blue: var(--color-light-blue-500);
+  --color-element-normal-violet: var(--color-violet-500);
+  --color-element-normal-pink: var(--color-pink-500);
+
+  /* Element / Light */
+  --color-element-light-red: var(--color-red-50);
+  --color-element-light-orange: var(--color-orange-50);
+  --color-element-light-yellow: var(--color-yellow-50);
+  --color-element-light-mint: var(--color-mint-50);
+  --color-element-light-blue: var(--color-blue-10);
+  --color-element-light-violet: var(--color-violet-50);
+  --color-element-light-pink: var(--color-pink-50);
+
+  /* Material */
+  --color-material-dimmer: rgba(0, 0, 0, 0.25);
+
+  /* Status */
+  --color-status-positive: var(--color-mint-500);
+  --color-status-negative: var(--color-red-500);
+  --color-status-cautionary: var(--color-orange-400);
 }
 
 @layer base {
@@ -47,6 +146,6 @@
   body {
     font-family: var(--font-sans);
     color: var(--color-text-normal);
-    background: var(--color-white);
+    background: var(--color-common-0);
   }
 }

@@ -4,7 +4,6 @@ import rightSvg from '@/assets/Icon/right.svg'
 import LessonHeader from '@/components/lesson/LessonHeader'
 
 const TOTAL_PAGES = 4
-const PROGRESS_PERCENT = 0
 
 const studyContent = {
   title: '이온 결합이란?',
@@ -69,7 +68,7 @@ function StudyCard() {
         </div>
       </div>
 
-      <div className="bg-blue-10 rounded-xl px-4 py-3 flex flex-col gap-1.5">
+      <div className="bg-bg-color rounded-xl px-4 py-3 flex flex-col gap-1.5">
         <p className="text-caption-lg text-neutral-50">{studyContent.tip.label}</p>
         <p className="text-label-xl font-semibold text-blue-500">{studyContent.tip.text}</p>
       </div>
@@ -77,20 +76,30 @@ function StudyCard() {
   )
 }
 
-function PageIndicator({ current, total }: { current: number; total: number }) {
+function PageIndicator({
+  current,
+  total,
+  onPageChange,
+}: {
+  current: number
+  total: number
+  onPageChange: (page: number) => void
+}) {
   return (
     <div className="flex items-center gap-3">
       {Array.from({ length: total }).map((_, i) => (
-        <div
+        <button
           key={i}
-          className={`w-6 h-6 rounded-md flex items-center justify-center text-caption-sm font-medium ${
+          type="button"
+          onClick={() => onPageChange(i + 1)}
+          className={`w-6 h-6 rounded-md flex items-center justify-center text-label-sm font-medium transition-colors ${
             i + 1 === current
-              ? 'bg-neutral-80 text-white'
+              ? 'bg-neutral-90 text-white'
               : 'bg-neutral-10 text-neutral-50'
           }`}
         >
           {i + 1}
-        </div>
+        </button>
       ))}
     </div>
   )
@@ -101,8 +110,10 @@ export default function IonicConcept() {
   const [activeTab, setActiveTab] = useState<'learn' | 'practice'>('learn')
   const [currentPage, setCurrentPage] = useState(1)
   const [showProgressBadge, setShowProgressBadge] = useState(true)
+  const [completed, setCompleted] = useState(false)
 
-  const progressWidth = `${((currentPage - 1) / (TOTAL_PAGES - 1)) * 100}%`
+  const progressPercent = completed ? 100 : Math.round(((currentPage - 1) / TOTAL_PAGES) * 100)
+  const progressWidth = `${progressPercent}%`
 
   return (
     <div className="min-h-screen flex flex-col bg-neutral-5">
@@ -111,7 +122,7 @@ export default function IonicConcept() {
         lessonLabel="2-1."
         lessonTitle="이온 결합 학습"
         progressWidth={progressWidth}
-        progressPercent={PROGRESS_PERCENT}
+        progressPercent={progressPercent}
         showProgressBadge={showProgressBadge}
         onCloseProgressBadge={() => setShowProgressBadge(false)}
         nextLesson={{ label: '공유 결합 학습', path: '/covalent-concept' }}
@@ -138,12 +149,16 @@ export default function IonicConcept() {
             type="button"
             onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
             disabled={currentPage === 1}
-            className="flex-1 flex items-center justify-center py-2 rounded-lg text-label-xl font-semibold text-neutral-50 disabled:opacity-30 hover:text-text-normal transition-colors"
+            className={`flex-1 flex items-center justify-center py-2 rounded-lg text-label-xl font-semibold transition-colors ${
+              currentPage === 1
+                ? 'text-neutral-50'
+                : 'text-text-normal hover:text-blue-500'
+            }`}
           >
             이전
           </button>
 
-          <PageIndicator current={currentPage} total={TOTAL_PAGES} />
+          <PageIndicator current={currentPage} total={TOTAL_PAGES} onPageChange={setCurrentPage} />
 
           <button
             type="button"
@@ -151,7 +166,8 @@ export default function IonicConcept() {
               if (currentPage < TOTAL_PAGES) {
                 setCurrentPage(p => p + 1)
               } else {
-                navigate('/')
+                setCompleted(true)
+                setTimeout(() => navigate('/'), 600)
               }
             }}
             className="flex-1 flex items-center justify-center gap-1 py-2 rounded-lg text-label-xl font-semibold text-text-normal hover:text-blue-500 transition-colors"
