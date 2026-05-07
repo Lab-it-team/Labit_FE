@@ -1,6 +1,6 @@
 import { Outlet } from 'react-router'
 import Sidebar from './Sidebar'
-import logoFullSvg from '@/assets/icon/logo-full.svg'
+import logoFullSvg from '@/assets/Icon/logo-full.svg'
 
 export default function Layout() {
   return (

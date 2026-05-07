@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useNavigate } from "react-router";
 import arrowRightSvg from "@/assets/Icon/right.svg";
 import arrowDownSvg from "@/assets/Icon/Arrow/down.svg";
 import arrowUpSvg from "@/assets/Icon/Arrow/up.svg";
@@ -63,6 +64,7 @@ const chapters: Chapter[] = [
 ];
 
 export default function Home() {
+  const navigate = useNavigate();
   const [expanded, setExpanded] = useState<number[]>([2]);
 
   const toggleChapter = (id: number, lessonCount: number) => {
@@ -122,6 +124,7 @@ export default function Home() {
             {/* 이어하기 버튼 */}
             <button
               type="button"
+              onClick={() => navigate('/ionic-concept')}
               className="flex h-[38px] shrink-0 items-center gap-1 rounded-lg bg-blue-500 px-2.5 py-2 text-label-xl font-semibold text-white transition-colors hover:bg-blue-600"
             >
               이어하기
