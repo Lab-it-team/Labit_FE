@@ -3,6 +3,7 @@ import { useNavigate } from "react-router";
 import LessonHeader from "@/components/lesson/LessonHeader";
 import LessonFooter from "@/components/lesson/LessonFooter";
 import ContentTab from "@/components/lesson/ContentTab";
+import CourseModal from "@/components/lesson/CourseModal";
 
 const TOTAL_PAGES = 4;
 
@@ -57,6 +58,7 @@ export default function IonicConcept() {
   const [currentPage, setCurrentPage] = useState(1);
   const [showProgressBadge, setShowProgressBadge] = useState(true);
   const [completed, setCompleted] = useState(false);
+  const [showCourseModal, setShowCourseModal] = useState(false);
 
   const progressPercent = completed
     ? 100
@@ -73,7 +75,9 @@ export default function IonicConcept() {
         showProgressBadge={showProgressBadge}
         onCloseProgressBadge={() => setShowProgressBadge(false)}
         nextLesson={{ label: "공유 결합 학습", path: "/covalent-concept" }}
+        onListClick={() => setShowCourseModal(true)}
       />
+      {showCourseModal && <CourseModal onClose={() => setShowCourseModal(false)} />}
 
       {/* ── Main Content ── */}
       <main className="flex-1 flex flex-col items-center pt-[80px] pb-[80px] px-4 sm:px-10 md:px-20 lg:px-[270px]">

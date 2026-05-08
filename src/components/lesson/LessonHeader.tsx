@@ -13,6 +13,7 @@ interface LessonHeaderProps {
   showProgressBadge: boolean
   onCloseProgressBadge: () => void
   nextLesson?: { label: string; path: string }
+  onListClick?: () => void
 }
 
 export default function LessonHeader({
@@ -23,6 +24,7 @@ export default function LessonHeader({
   showProgressBadge,
   onCloseProgressBadge,
   nextLesson,
+  onListClick,
 }: LessonHeaderProps) {
   const navigate = useNavigate()
 
@@ -42,7 +44,7 @@ export default function LessonHeader({
           </button>
           <button
             type="button"
-            onClick={() => navigate('/')}
+            onClick={onListClick}
             className="flex items-center gap-1 px-2.5 py-2 rounded-lg hover:bg-neutral-10 transition-colors"
           >
             <img src={listSvg} alt="" width={24} height={24} />
