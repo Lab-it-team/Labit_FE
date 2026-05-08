@@ -97,7 +97,9 @@ export default function LessonHeader({
         {showProgressBadge && (
           <div
             className="absolute top-2 flex items-center gap-1.5 bg-neutral-10 rounded-full px-2 py-1 transition-all duration-300"
-            style={{ left: progressWidth }}
+            style={{
+              left: `min(${progressWidth}, calc(100% - 110px))`,
+            }}
           >
             <div className="flex items-center gap-0.5">
               <span className="text-label-sm font-medium text-text-normal">진행률</span>
