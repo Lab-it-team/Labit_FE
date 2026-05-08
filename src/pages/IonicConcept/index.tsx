@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router";
 import LessonHeader from "@/components/lesson/LessonHeader";
 import LessonFooter from "@/components/lesson/LessonFooter";
@@ -60,6 +60,12 @@ export default function IonicConcept() {
   const [completed, setCompleted] = useState(false);
   const [showCourseModal, setShowCourseModal] = useState(false);
 
+  useEffect(() => {
+    if (!completed) return;
+    const timer = setTimeout(() => navigate("/"), 600);
+    return () => clearTimeout(timer);
+  }, [completed, navigate]);
+
   const progressPercent = completed
     ? 100
     : Math.round(((currentPage - 1) / TOTAL_PAGES) * 100);
@@ -102,7 +108,6 @@ export default function IonicConcept() {
             setCurrentPage((p) => p + 1);
           } else {
             setCompleted(true);
-            setTimeout(() => navigate("/"), 600);
           }
         }}
         onPageChange={setCurrentPage}
