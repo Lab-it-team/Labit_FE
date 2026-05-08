@@ -1,68 +1,15 @@
 import { useState } from "react";
+import { useNavigate } from "react-router";
 import arrowRightSvg from "@/assets/Icon/right.svg";
 import arrowDownSvg from "@/assets/Icon/Arrow/down.svg";
 import arrowUpSvg from "@/assets/Icon/Arrow/up.svg";
 import checkCircleSvg from "@/assets/Icon/check-c.svg";
 import dotActiveSvg from "@/assets/Icon/dot-active.svg";
-import dotInactiveSvg from "@/assets/Icon/dot-inactive.svg";  
-
-type ChapterStatus = "done" | "in-progress" | "upcoming";
-
-interface Lesson {
-  title: string;
-  inProgress: boolean;
-}
-
-interface Chapter {
-  id: number;
-  title: string;
-  status: ChapterStatus;
-  lessonCount: number;
-  lessons: Lesson[];
-}
-
-const chapters: Chapter[] = [
-  {
-    id: 1,
-    title: "원자와 이온의 기초",
-    status: "done",
-    lessonCount: 0,
-    lessons: [],
-  },
-  {
-    id: 2,
-    title: "이온 결합",
-    status: "in-progress",
-    lessonCount: 2,
-    lessons: [
-      { title: "이온 결합 개념 학습", inProgress: true },
-      { title: "이온 결합 실습", inProgress: false },
-    ],
-  },
-  {
-    id: 3,
-    title: "공유 결합",
-    status: "upcoming",
-    lessonCount: 2,
-    lessons: [],
-  },
-  {
-    id: 4,
-    title: "이온 결합 vs 공유 결합",
-    status: "upcoming",
-    lessonCount: 2,
-    lessons: [],
-  },
-  {
-    id: 5,
-    title: "단원 퀴즈",
-    status: "upcoming",
-    lessonCount: 1,
-    lessons: [],
-  },
-];
+import dotInactiveSvg from "@/assets/Icon/dot-inactive.svg";
+import { chapters } from "@/data/chapters";
 
 export default function Home() {
+  const navigate = useNavigate();
   const [expanded, setExpanded] = useState<number[]>([2]);
 
   const toggleChapter = (id: number, lessonCount: number) => {
@@ -122,6 +69,7 @@ export default function Home() {
             {/* 이어하기 버튼 */}
             <button
               type="button"
+              onClick={() => navigate('/ionic-concept')}
               className="flex h-[38px] shrink-0 items-center gap-1 rounded-lg bg-blue-500 px-2.5 py-2 text-label-xl font-semibold text-white transition-colors hover:bg-blue-600"
             >
               이어하기
@@ -151,7 +99,7 @@ export default function Home() {
                       toggleChapter(chapter.id, chapter.lessonCount)
                     }
                     className={`flex w-full items-center justify-between rounded-xl p-3 text-left transition-colors ${
-                      isInProgress ? "bg-bg-normal" : "bg-transparent"
+                      isInProgress ? "bg-bg-elevate" : "bg-transparent"
                     }`}
                   >
                     <div className="flex flex-1 items-center gap-3">
@@ -196,17 +144,17 @@ export default function Home() {
                     <div className="flex shrink-0 items-center gap-1 text-label-md font-normal text-neutral-50">
                       <span>{chapter.lessonCount}</span>
                       <img
-                        src={isExpanded ? arrowUpSvg : arrowDownSvg}
+                        src={isExpanded ? arrowDownSvg : arrowUpSvg}
                         alt=""
-                        width={16}
-                        height={16}
+                        width={20}
+                        height={20}
                       />
                     </div>
                   </button>
 
                   {/* 서브 레슨 목록 (펼쳐진 경우) */}
                   {isExpanded && chapter.lessons.length > 0 && (
-                    <div className="relative flex flex-col gap-6 px-4 py-3">
+                    <div className="relative flex flex-col gap-3 px-4 py-3">
                       <div className="absolute bottom-[30px] left-[34px] top-0 w-px bg-neutral-20" />
                       {chapter.lessons.map((lesson, i) => (
                         <div
