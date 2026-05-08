@@ -17,6 +17,8 @@ apiClient.interceptors.request.use((config) => {
   return config
 })
 
+let refreshPromise: Promise<string> | null = null
+
 apiClient.interceptors.response.use(
   (response) => response,
   async (error) => {
@@ -33,13 +35,24 @@ apiClient.interceptors.response.use(
       }
 
       try {
-        const { data } = await axios.post(
-          `${import.meta.env.VITE_API_BASE_URL}/auth/refresh`,
-          { refresh_token: refreshToken },
-          { headers: { 'Content-Type': 'application/json' } },
-        )
-        setTokens(data.access_token, data.refresh_token)
-        originalRequest.headers.Authorization = `Bearer ${data.access_token}`
+        if (!refreshPromise) {
+          refreshPromise = axios
+            .post(
+              `${import.meta.env.VITE_API_BASE_URL}/auth/refresh`,
+              { refresh_token: refreshToken },
+              { headers: { 'Content-Type': 'application/json' } },
+            )
+            .then(({ data }) => {
+              setTokens(data.access_token, data.refresh_token)
+              return data.access_token
+            })
+            .finally(() => {
+              refreshPromise = null
+            })
+        }
+
+        const accessToken = await refreshPromise
+        originalRequest.headers.Authorization = `Bearer ${accessToken}`
         return apiClient(originalRequest)
       } catch {
         clearAuth()
