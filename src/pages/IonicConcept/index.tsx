@@ -4,6 +4,8 @@ import LessonHeader from "@/components/lesson/LessonHeader";
 import LessonFooter from "@/components/lesson/LessonFooter";
 import ContentTab from "@/components/lesson/ContentTab";
 import CourseModal from "@/components/lesson/CourseModal";
+import AiChat from "@/components/lesson/AiChat";
+import { useTextSelection } from "@/hooks/useTextSelection";
 
 const TOTAL_PAGES = 4;
 
@@ -59,6 +61,7 @@ export default function IonicConcept() {
   const [showProgressBadge, setShowProgressBadge] = useState(true);
   const [completed, setCompleted] = useState(false);
   const [showCourseModal, setShowCourseModal] = useState(false);
+  const { selection, popupRef, clear } = useTextSelection();
 
   useEffect(() => {
     if (!completed) return;
@@ -84,6 +87,22 @@ export default function IonicConcept() {
         onListClick={() => setShowCourseModal(true)}
       />
       {showCourseModal && <CourseModal onClose={() => setShowCourseModal(false)} />}
+
+      {selection && (
+        <AiChat
+          ref={popupRef}
+          className="fixed z-40"
+          style={{
+            left: selection.x,
+            top: selection.bottom + 8,
+            transform: 'translateX(-50%)',
+          }}
+          onSend={(q) => {
+            console.log('질문:', q, '| 선택 텍스트:', selection.text)
+            clear()
+          }}
+        />
+      )}
 
       {/* ── Main Content ── */}
       <main className="flex-1 flex flex-col items-center pt-[80px] pb-[80px] px-4 sm:px-10 md:px-20 lg:px-[270px]">
