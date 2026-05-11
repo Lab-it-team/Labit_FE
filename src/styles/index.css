@@ -148,4 +148,9 @@
     color: var(--color-text-normal);
     background: var(--color-common-0);
   }
+
+  ::selection {
+    background: #e9effe;
+    color: inherit;
+  }
 }
