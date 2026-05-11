@@ -106,7 +106,7 @@ function ChatInput({
         type="text"
         value={value}
         onChange={(e) => onChange(e.target.value)}
-        onKeyDown={(e) => e.key === "Enter" && onSend()}
+        onKeyDown={(e) => e.key === "Enter" && !e.nativeEvent.isComposing && onSend()}
         placeholder={hasAiResponse ? "질문하세요" : "계속 물어볼 수 있어요"}
         className="flex-1 min-w-px bg-transparent text-[13px] font-medium leading-[18px] tracking-[-0.065px] text-text-normal placeholder-neutral-50 outline-none caret-blue-500"
       />
