@@ -209,7 +209,7 @@ const applyHighlight = (range: Range) => {
   }
 }
 
-const removeHighlight = () => {
+export const removeHighlight = () => {
   document.querySelectorAll('mark[data-ai-highlight]').forEach((mark) => {
     const parent = mark.parentNode
     if (parent) {
@@ -280,7 +280,6 @@ const AiChat = forwardRef<HTMLDivElement, AiChatProps>(function AiChat(
 
   const handleSend = () => {
     if (!inputValue.trim()) return
-    removeHighlight()
     onSend?.(inputValue.trim())
     setInputValue('')
     setState('default')

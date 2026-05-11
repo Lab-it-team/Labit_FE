@@ -4,7 +4,8 @@ import LessonHeader from "@/components/lesson/LessonHeader";
 import LessonFooter from "@/components/lesson/LessonFooter";
 import ContentTab from "@/components/lesson/ContentTab";
 import CourseModal from "@/components/lesson/CourseModal";
-import AiChat from "@/components/lesson/AiChat";
+import AiChat, { removeHighlight } from "@/components/lesson/AiChat";
+import AiAssistPanel from "@/components/lesson/AiAssistPanel";
 import { useTextSelection } from "@/hooks/useTextSelection";
 
 const TOTAL_PAGES = 4;
@@ -61,6 +62,12 @@ export default function IonicConcept() {
   const [showProgressBadge, setShowProgressBadge] = useState(true);
   const [completed, setCompleted] = useState(false);
   const [showCourseModal, setShowCourseModal] = useState(false);
+  const [assistPanel, setAssistPanel] = useState<{
+    question: string;
+    selectedText: string;
+    x: number;
+    y: number;
+  } | null>(null);
   const { selection, popupRef, clear } = useTextSelection();
 
   useEffect(() => {
@@ -88,6 +95,20 @@ export default function IonicConcept() {
       />
       {showCourseModal && <CourseModal onClose={() => setShowCourseModal(false)} />}
 
+      {assistPanel && (
+        <AiAssistPanel
+          selectedText={assistPanel.selectedText}
+          initialQuestion={assistPanel.question}
+          onClose={() => { setAssistPanel(null); removeHighlight(); }}
+          className="fixed z-50"
+          style={{
+            left: assistPanel.x,
+            top: assistPanel.y,
+            transform: 'translateX(-50%)',
+          }}
+        />
+      )}
+
       {selection && (
         <AiChat
           ref={popupRef}
@@ -98,8 +119,18 @@ export default function IonicConcept() {
             transform: 'translateX(-50%)',
           }}
           onSend={(q) => {
-            console.log('질문:', q, '| 선택 텍스트:', selection.text)
-            clear()
+            const PANEL_H = 371;
+            const PANEL_W = 334;
+            const spaceBelow = window.innerHeight - (selection.bottom + 8);
+            const y = spaceBelow >= PANEL_H
+              ? selection.bottom + 8
+              : Math.max(selection.top - PANEL_H - 8, 8);
+            const x = Math.min(
+              Math.max(selection.x, PANEL_W / 2 + 8),
+              window.innerWidth - PANEL_W / 2 - 8,
+            );
+            setAssistPanel({ question: q, selectedText: selection.text, x, y });
+            clear();
           }}
         />
       )}

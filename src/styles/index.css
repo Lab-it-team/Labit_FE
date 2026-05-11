@@ -154,3 +154,15 @@
     color: inherit;
   }
 }
+
+@layer utilities {
+  .chat-scroll::-webkit-scrollbar { width: 4px; }
+  .chat-scroll::-webkit-scrollbar-track { background: transparent; }
+  .chat-scroll::-webkit-scrollbar-thumb {
+    background: transparent;
+    border-radius: 9999px;
+  }
+  .chat-scroll.is-scrolling::-webkit-scrollbar-thumb {
+    background: var(--color-neutral-30);
+  }
+}
