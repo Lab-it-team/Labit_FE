@@ -22,8 +22,6 @@ const SUGGEST_CHIPS = [
 ];
 
 const ICON_FILTER_GRAY = "brightness(0) invert(1) brightness(0.83)";
-const ICON_FILTER_PRIMARY =
-  "invert(30%) sepia(99%) saturate(2000%) hue-rotate(210deg)";
 
 function Chip({ text, onClick }: { text: string; onClick: () => void }) {
   return (
@@ -95,8 +93,7 @@ function ChatInput({
   }, [hasAiResponse]);
 
   const isActive = value.trim().length > 0;
-  const iconFilter =
-    hasAiResponse && isActive ? ICON_FILTER_PRIMARY : ICON_FILTER_GRAY;
+  const iconFilter = isActive ? "none" : ICON_FILTER_GRAY;
 
   return (
     <div
