@@ -61,9 +61,17 @@ export default function AiFab({
   };
 
   return (
-    <div className={`inline-flex flex-col items-end gap-4 ${className}`}>
+    <div className={`inline-flex flex-col items-end gap-6 ${className}`}>
       {chatVisible && (
-        <AiChatPopup onClose={() => setChatVisible(false)} />
+        <>
+          <div
+            className="fixed inset-0 z-20"
+            onClick={() => setChatVisible(false)}
+          />
+          <div className="relative z-30">
+            <AiChatPopup onClose={() => setChatVisible(false)} />
+          </div>
+        </>
       )}
       {tooltipVisible && !chatVisible && (
         <AiFabTooltip onDismiss={() => setTooltipVisible(false)} />
