@@ -61,20 +61,22 @@ export default function AiFab({
   };
 
   return (
-    <div className={`inline-flex flex-col items-end gap-6 ${className}`}>
+    <div className={`inline-flex flex-col items-end ${className}`}>
       {chatVisible && (
         <>
           <div
             className="fixed inset-0 z-20"
             onClick={() => setChatVisible(false)}
           />
-          <div className="relative z-30">
+          <div className="relative z-30 mb-6">
             <AiChatPopup onClose={() => setChatVisible(false)} />
           </div>
         </>
       )}
       {tooltipVisible && !chatVisible && (
-        <AiFabTooltip onDismiss={() => setTooltipVisible(false)} />
+        <div className="mb-2">
+          <AiFabTooltip onDismiss={() => setTooltipVisible(false)} />
+        </div>
       )}
 
       <button
@@ -87,7 +89,13 @@ export default function AiFab({
         className={`flex items-center gap-1 px-3 py-2.5 rounded-full w-[109px] h-11 overflow-hidden transition-colors shrink-0 shadow-[0_0_15px_rgba(0,0,0,0.08)] ${fabBgClass}`}
       >
         <div className="size-[24px] flex items-center justify-center shrink-0">
-          <img src={tipsSvg} alt="" width={24} height={24} className="size-full brightness-0 invert" />
+          <img
+            src={tipsSvg}
+            alt=""
+            width={24}
+            height={24}
+            className="size-full brightness-0 invert"
+          />
         </div>
         <span className="text-[15px] font-semibold leading-[22px] tracking-[-0.075px] text-white whitespace-nowrap">
           AI 도우미
