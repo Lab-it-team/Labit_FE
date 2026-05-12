@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from "react";
-import failSvg from "@/assets/Icon/fail.svg";
+import closeSvg from "@/assets/Icon/close.svg";
 import rightSvg from "@/assets/Icon/send.svg";
 
 interface Message {
@@ -222,7 +222,7 @@ export default function AiAssistPanel({
           className="shrink-0 size-[24px]"
         >
           <img
-            src={failSvg}
+            src={closeSvg}
             alt="닫기"
             width={24}
             height={24}

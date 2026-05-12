@@ -1,6 +1,7 @@
 import { useState } from "react";
 import tipsSvg from "@/assets/Icon/mingcute_ai-fill.svg";
 import bgSvg from "@/assets/Icon/bg.svg";
+import AiChatPopup from "./AiChatPopup";
 
 function AiFabTooltip({ onDismiss }: { onDismiss: () => void }) {
   return (
@@ -44,6 +45,7 @@ export default function AiFab({
 }: AiFabProps) {
   const [interaction, setInteraction] = useState<FabInteraction>("default");
   const [tooltipVisible, setTooltipVisible] = useState(showTooltip);
+  const [chatVisible, setChatVisible] = useState(false);
 
   const fabBgClass =
     interaction === "pressed"
@@ -54,12 +56,16 @@ export default function AiFab({
 
   const handleClick = () => {
     setTooltipVisible(false);
+    setChatVisible((v) => !v);
     onClick?.();
   };
 
   return (
-    <div className={`inline-flex flex-col items-end gap-[8px] ${className}`}>
-      {tooltipVisible && (
+    <div className={`inline-flex flex-col items-end gap-4 ${className}`}>
+      {chatVisible && (
+        <AiChatPopup onClose={() => setChatVisible(false)} />
+      )}
+      {tooltipVisible && !chatVisible && (
         <AiFabTooltip onDismiss={() => setTooltipVisible(false)} />
       )}
 
