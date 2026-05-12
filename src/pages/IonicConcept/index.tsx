@@ -6,6 +6,7 @@ import ContentTab from "@/components/lesson/ContentTab";
 import CourseModal from "@/components/lesson/CourseModal";
 import AiChat, { removeHighlight } from "@/components/lesson/AiChat";
 import AiAssistPanel from "@/components/lesson/AiAssistPanel";
+import AiFab from "@/components/lesson/AiFab";
 import { useTextSelection } from "@/hooks/useTextSelection";
 
 const TOTAL_PAGES = 4;
@@ -148,6 +149,12 @@ export default function IonicConcept() {
           )}
         </div>
       </main>
+
+      <AiFab
+        showTooltip={true}
+        onClick={() => {}}
+        className="fixed bottom-[90px] right-10 z-30"
+      />
 
       <LessonFooter
         currentPage={currentPage}
