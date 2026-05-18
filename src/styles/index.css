@@ -127,6 +127,22 @@
   --color-element-light-violet: var(--color-violet-50);
   --color-element-light-pink: var(--color-pink-50);
 
+  /* Element / Hover Fill */
+  --color-element-hover-fill-orange: #FEF2EA;
+  --color-element-hover-fill-yellow: #FEF9E9;
+  --color-element-hover-fill-mint: #F0FBF9;
+  --color-element-hover-fill-blue: #E8F6FF;
+  --color-element-hover-fill-violet: #F2EDFC;
+  --color-element-hover-fill-pink: #FDF0F9;
+
+  /* Element / Hover Stroke */
+  --color-element-hover-stroke-orange: #FAD6BF;
+  --color-element-hover-stroke-yellow: #FCEBBB;
+  --color-element-hover-stroke-mint: #F0FBF9;
+  --color-element-hover-stroke-blue: #C8E8FE;
+  --color-element-hover-stroke-violet: #D6C8F5;
+  --color-element-hover-stroke-pink: #FBDAF0;
+
   /* Material */
   --color-material-dimmer: rgba(0, 0, 0, 0.25);
 
@@ -153,6 +169,11 @@
     background: #e9effe;
     color: inherit;
   }
+}
+
+@keyframes dot-orbit {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
 }
 
 @layer utilities {
