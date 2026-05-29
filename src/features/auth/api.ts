@@ -6,6 +6,20 @@ export interface TokenResponse {
   token_type: string
 }
 
+export interface UserProfile {
+  id: string
+  email: string
+  nickname: string
+  profile_image: string | null
+  created_at: string
+  updated_at: string
+}
+
+export const getMe = async (): Promise<UserProfile> => {
+  const { data } = await apiClient.get<UserProfile>('/users/me')
+  return data
+}
+
 export const kakaoLogin = async (code: string): Promise<TokenResponse> => {
   const { data } = await apiClient.post<TokenResponse>('/auth/kakao', {
     code,
