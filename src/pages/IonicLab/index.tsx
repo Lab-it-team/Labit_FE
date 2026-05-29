@@ -1,4 +1,4 @@
-import { useState, useRef, useCallback } from "react";
+import { useState, useRef, useCallback, useEffect } from "react";
 import { useNavigate } from "react-router";
 import LessonHeader from "@/components/lesson/LessonHeader";
 import ContentTab from "@/components/lesson/ContentTab";
@@ -63,27 +63,53 @@ export default function IonicLab() {
   const [activeTab,          setActiveTab]          = useState<"learn" | "practice">("practice");
   const [showProgressBadge,  setShowProgressBadge]  = useState(true);
   const [currentProblem,     setCurrentProblem]     = useState(0);
-  const [placedPieces,       setPlacedPieces]       = useState<PlacedPiece[]>([]);
+  const [allPieces,          setAllPieces]          = useState<Record<number, PlacedPiece[]>>({});
   const [isWrong,            setIsWrong]            = useState(false);
   const [checkKey,           setCheckKey]           = useState(0);
   const [solvedProblems,     setSolvedProblems]      = useState<Set<number>>(new Set());
+  const [isWrongCompound,    setIsWrongCompound]    = useState(false);
   const [ghost,              setGhost]              = useState<{ ion: Ion; x: number; y: number } | null>(null);
   const [isDragOver,         setIsDragOver]         = useState(false);
   const [draggingPaletteId,  setDraggingPaletteId]  = useState<string | null>(null);
 
-  const canvasRef  = useRef<HTMLDivElement>(null);
-  const dragRef    = useRef<DragState>({ id: null, ion: null, fromPalette: false, offsetX: 0, offsetY: 0 });
-  const idCounter  = useRef(0);
-  const cleanupRef = useRef<() => void>(() => {});
+  const canvasRef          = useRef<HTMLDivElement>(null);
+  const dragRef            = useRef<DragState>({ id: null, ion: null, fromPalette: false, offsetX: 0, offsetY: 0 });
+  const idCounter          = useRef(0);
+  const cleanupRef         = useRef<() => void>(() => {});
+  const currentProblemRef  = useRef(currentProblem);
+  currentProblemRef.current = currentProblem;
+
+  // Stable setter that always writes to the currently active problem
+  const setPlacedPieces = useCallback(
+    (update: PlacedPiece[] | ((prev: PlacedPiece[]) => PlacedPiece[])) => {
+      setAllPieces((prev) => {
+        const idx = currentProblemRef.current;
+        const cur = prev[idx] ?? [];
+        const next = typeof update === "function" ? update(cur) : update;
+        return { ...prev, [idx]: next };
+      });
+    },
+    [],
+  );
+
+  const placedPieces = allPieces[currentProblem] ?? [];
 
   const mkId = () => `p${idCounter.current++}`;
 
   const problem = PROBLEMS[currentProblem];
 
-  const cationSum   = placedPieces.filter((p) => p.ion.type === "plus").reduce((s, p) => s + p.ion.charge, 0);
-  const anionSum    = placedPieces.filter((p) => p.ion.type === "minus").reduce((s, p) => s + p.ion.charge, 0);
-  const totalCharge = cationSum - anionSum;
-  const isCorrect   = totalCharge === 0 && placedPieces.length > 0;
+  const placedCations  = placedPieces.filter((p) => p.ion.type === "plus");
+  const placedAnions   = placedPieces.filter((p) => p.ion.type === "minus");
+  const cationSum      = placedCations.reduce((s, p) => s + p.ion.charge, 0);
+  const anionSum       = placedAnions.reduce((s, p) => s + p.ion.charge, 0);
+  const totalCharge    = cationSum - anionSum;
+  const isChargeZero   = totalCharge === 0 && placedPieces.length > 0;
+  const isRightCompound =
+    placedCations.length === problem.cationCount &&
+    placedAnions.length  === problem.anionCount  &&
+    placedCations.every((p) => p.ion.id === problem.cation.id) &&
+    placedAnions.every((p)  => p.ion.id === problem.anion.id);
+  const isCorrect = isChargeZero && isRightCompound;
 
   // ── pointer move: update ghost / dragging piece position ─────────────────
   const onMove = useCallback((e: PointerEvent) => {
@@ -265,6 +291,7 @@ export default function IonicLab() {
     );
 
     setIsWrong(false);
+    setIsWrongCompound(false);
     window.addEventListener("pointermove", onMove);
     window.addEventListener("pointerup",   onUp);
   }, [placedPieces, onMove, onUp]);
@@ -281,7 +308,32 @@ export default function IonicLab() {
         })),
     );
     setIsWrong(false);
+    setIsWrongCompound(false);
   }
+
+  const problemSolved  = solvedProblems.has(currentProblem);
+  const isLastProblem  = currentProblem === PROBLEMS.length - 1;
+
+  // 오답 시 5초 후 캔버스 리셋
+  useEffect(() => {
+    if (!isWrong) return;
+    const timer = setTimeout(() => {
+      setPlacedPieces([]);
+      setIsWrong(false);
+    }, 5000);
+    return () => clearTimeout(timer);
+  }, [isWrong, checkKey]);
+
+  // 정답 시 3초 후 다음 문제로 자동 이동
+  useEffect(() => {
+    if (!problemSolved || isLastProblem) return;
+    const timer = setTimeout(() => {
+      setCurrentProblem((p) => p + 1);
+      setIsWrong(false);
+      setIsWrongCompound(false);
+    }, 3000);
+    return () => clearTimeout(timer);
+  }, [problemSolved, currentProblem]);
 
   return (
     <div style={{ minHeight: "100vh", background: "var(--color-bg-normal)" }}>
@@ -336,8 +388,8 @@ export default function IonicLab() {
 
           <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 24, width: 900, alignSelf: "stretch" }}>
             <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 12, width: 900, alignSelf: "stretch" }}>
-              <h1 className="text-heading-xl text-text-strong m-0">목표 화합물 만들기</h1>
-              <p className="text-body-sm text-text-sub m-0">플러스(+)와 마이너스(-)의 합이 '0'이 되도록 퍼즐을 연결해 보세요!</p>
+              <h1 className="text-heading-md text-text-strong m-0">목표 화합물 만들기</h1>
+              <p className="text-body-md text-text-sub m-0">플러스(+)와 마이너스(-)의 합이 '0'이 되도록 퍼즐을 연결해 보세요!</p>
             </div>
 
             {/* Problem selector */}
@@ -346,13 +398,13 @@ export default function IonicLab() {
                 {PROBLEMS.map((p, i) => (
                   <button
                     key={p.id}
-                    onClick={() => { setCurrentProblem(i); setPlacedPieces([]); setIsWrong(false); }}
+                    onClick={() => { setCurrentProblem(i); setIsWrong(false); }}
                     style={{
                       display: "flex", flexDirection: "column", justifyContent: "center", alignItems: "center",
                       padding: 4, width: 24, height: 24,
                       background: i === currentProblem ? "var(--color-primary-normal)" : "var(--color-primary-light)",
                       borderRadius: 6, border: "none", cursor: "pointer",
-                      fontFamily: "Pretendard", fontWeight: 500, fontSize: 12, lineHeight: "16px",
+                      fontFamily: "var(--font-sans)", fontWeight: 500, fontSize: 12, lineHeight: "16px",
                       letterSpacing: "-0.005em",
                       color: i === currentProblem ? "var(--color-static-white)" : "var(--color-text-sub)",
                     }}
@@ -367,7 +419,7 @@ export default function IonicLab() {
                       position: "relative", display: "flex", flexDirection: "column",
                       justifyContent: "center", alignItems: "center", padding: 4, width: 24, height: 24,
                       background: "var(--color-bg-elevate)", borderRadius: 6,
-                      fontFamily: "Pretendard", fontWeight: 500, fontSize: 12, lineHeight: "16px",
+                      fontFamily: "var(--font-sans)", fontWeight: 500, fontSize: 12, lineHeight: "16px",
                       color: "var(--color-text-disabled)",
                     }}
                   >
@@ -455,14 +507,27 @@ export default function IonicLab() {
                   <ToolBtn onClick={() => {}} bordered>힌트 보기</ToolBtn>
                   <ToolBtn
                     onClick={() => {
+                      if (problemSolved) {
+                        if (!isLastProblem) setCurrentProblem(currentProblem + 1);
+                        return;
+                      }
                       setCheckKey((k) => k + 1);
-                      if (isCorrect) setSolvedProblems((prev) => new Set([...prev, currentProblem]));
-                      else setIsWrong(true);
+                      if (isCorrect) {
+                        setSolvedProblems((prev) => new Set([...prev, currentProblem]));
+                        setIsWrong(false);
+                        setIsWrongCompound(false);
+                      } else if (isChargeZero && !isRightCompound) {
+                        setIsWrongCompound(true);
+                        setIsWrong(false);
+                      } else {
+                        setIsWrong(true);
+                        setIsWrongCompound(false);
+                      }
                     }}
-                    disabled={placedPieces.length === 0}
+                    disabled={!problemSolved && placedPieces.length === 0}
                     primary
                   >
-                    정답 확인
+                    {problemSolved ? (isLastProblem ? "완료" : "다음 문제 →") : "정답 확인"}
                   </ToolBtn>
                 </div>
               </div>
@@ -475,6 +540,7 @@ export default function IonicLab() {
                 isDragOver={isDragOver}
                 isCorrect={isCorrect}
                 isWrong={isWrong}
+                isWrongCompound={isWrongCompound}
                 checkKey={checkKey}
               />
             </div>
