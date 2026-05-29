@@ -7,6 +7,7 @@ import CourseModal from "@/components/lesson/CourseModal";
 import AiChat, { removeHighlight } from "@/components/lesson/AiChat";
 import AiAssistPanel from "@/components/lesson/AiAssistPanel";
 import AiFab from "@/components/lesson/AiFab";
+import FormationContent from "@/components/lesson/FormationContent";
 import { useTextSelection } from "@/hooks/useTextSelection";
 
 const TOTAL_PAGES = 4;
@@ -29,14 +30,14 @@ function StudyCard() {
   return (
     <div className="bg-white border border-border-light rounded-3xl p-6 flex flex-col gap-6 w-full">
       <div className="flex flex-col gap-4">
-        <h2 className="text-heading-md font-bold text-text-strong">
+        <h2 className="text-heading-md text-text-strong">
           {studyContent.title}
         </h2>
         <div className="flex flex-col gap-0">
           {studyContent.body.map((line, i) => (
             <p
               key={i}
-              className="text-body-md font-medium text-text-normal leading-[25px]"
+              className="text-body-md text-text-normal"
             >
               {line}
             </p>
@@ -45,10 +46,10 @@ function StudyCard() {
       </div>
 
       <div className="bg-bg-color rounded-xl px-4 py-3 flex flex-col gap-1.5">
-        <p className="text-caption-lg text-neutral-50">
+        <p className="text-caption-lg text-text-sub">
           {studyContent.tip.label}
         </p>
-        <p className="text-label-xl font-semibold text-blue-500">
+        <p className="text-label-xl text-text-primary">
           {studyContent.tip.text}
         </p>
       </div>
@@ -136,15 +137,21 @@ export default function IonicConcept() {
         />
       )}
 
-      {/* ── Main Content ── */}
+      {/* Main Content */}
       <main className="flex-1 flex flex-col items-center pt-[80px] pb-[80px] px-4 sm:px-10 md:px-20 lg:px-[270px]">
         <div className="w-full max-w-[900px] flex flex-col gap-14 pt-10">
-          <ContentTab active={activeTab} onChange={setActiveTab} />
-          {activeTab === "learn" ? (
-            <StudyCard />
-          ) : (
+          <ContentTab
+            active={activeTab}
+            onChange={(v) => {
+              if (v === "practice") navigate("/ionic-lab");
+              else setActiveTab(v);
+            }}
+          />
+          {currentPage === 1 && <StudyCard />}
+          {currentPage === 2 && <FormationContent />}
+          {currentPage > 2 && (
             <div className="bg-white border border-border-light rounded-3xl p-6 text-text-normal text-body-md">
-              실습 화면 준비 중이에요.
+              준비 중이에요.
             </div>
           )}
         </div>
