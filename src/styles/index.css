@@ -138,10 +138,30 @@
   /* Element / Hover Stroke */
   --color-element-hover-stroke-orange: #FAD6BF;
   --color-element-hover-stroke-yellow: #FCEBBB;
-  --color-element-hover-stroke-mint: #F0FBF9;
+  --color-element-hover-stroke-mint: #BDECE4;
   --color-element-hover-stroke-blue: #C8E8FE;
   --color-element-hover-stroke-violet: #D6C8F5;
   --color-element-hover-stroke-pink: #FBDAF0;
+
+  /* Element / Drag */
+  --color-element-drag-fill-blue: #F1F7FF;
+  --color-element-drag-stroke-blue: #7797F6;
+
+  /* Element / Pressed Fill */
+  --color-element-pressed-fill-orange: #FAD6BF;
+  --color-element-pressed-fill-yellow: #FCEBBB;
+  --color-element-pressed-fill-mint: #DAF4F0;
+  --color-element-pressed-fill-blue: #C8E8FE;
+  --color-element-pressed-fill-violet: #D6C8F5;
+  --color-element-pressed-fill-pink: #FBDAF0;
+
+  /* Element / Pressed Stroke */
+  --color-element-pressed-stroke-orange: #F8C29F;
+  --color-element-pressed-stroke-yellow: #FAE29B;
+  --color-element-pressed-stroke-mint: #9EE3D7;
+  --color-element-pressed-stroke-blue: #9DD6FD;
+  --color-element-pressed-stroke-violet: #C3AEF1;
+  --color-element-pressed-stroke-pink: #F7BDE5;
 
   /* Material */
   --color-material-dimmer: rgba(0, 0, 0, 0.25);
@@ -186,4 +206,95 @@
   .chat-scroll.is-scrolling::-webkit-scrollbar-thumb {
     background: var(--color-neutral-30);
   }
+}
+
+/* ── Toast slide-out animation ───────────────────────────────────────────── */
+@keyframes toast-slide-out {
+  from {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+  }
+  to {
+    opacity: 0;
+    transform: translateX(-50%) translateY(-16px);
+  }
+}
+
+/* ── Deco floating animations (물 위 부유 느낌) ──────────────────────────── */
+@keyframes deco-float-a {
+  0%   { transform: translate(0px,   0px)   rotate(0deg);    }
+  9%   { transform: translate(3px,  -9px)   rotate(1.2deg);  }
+  22%  { transform: translate(7px,  -17px)  rotate(1.9deg);  }
+  37%  { transform: translate(2px,  -11px)  rotate(0.5deg);  }
+  51%  { transform: translate(-4px,  0px)   rotate(-1deg);   }
+  64%  { transform: translate(-8px,  9px)   rotate(-2.2deg); }
+  78%  { transform: translate(-3px,  16px)  rotate(-1.5deg); }
+  90%  { transform: translate(1px,   7px)   rotate(0.3deg);  }
+  100% { transform: translate(0px,   0px)   rotate(0deg);    }
+}
+@keyframes deco-float-b {
+  0%   { transform: translate(0px,   0px)   rotate(0deg);    }
+  11%  { transform: translate(-5px,  7px)   rotate(-1.6deg); }
+  26%  { transform: translate(-9px,  15px)  rotate(-2.4deg); }
+  40%  { transform: translate(-5px,  9px)   rotate(-1.1deg); }
+  54%  { transform: translate(0px,  -2px)   rotate(0.4deg);  }
+  68%  { transform: translate(7px,  -13px)  rotate(2deg);    }
+  82%  { transform: translate(4px,  -8px)   rotate(1.3deg);  }
+  93%  { transform: translate(-1px,  1px)   rotate(-0.2deg); }
+  100% { transform: translate(0px,   0px)   rotate(0deg);    }
+}
+@keyframes deco-float-c {
+  0%   { transform: translate(0px,   0px)   rotate(0deg);    }
+  8%   { transform: translate(4px,  -11px)  rotate(2.5deg);  }
+  23%  { transform: translate(-1px, -18px)  rotate(1.3deg);  }
+  39%  { transform: translate(-7px, -10px)  rotate(-0.8deg); }
+  53%  { transform: translate(-10px, 3px)   rotate(-2.6deg); }
+  66%  { transform: translate(-4px,  12px)  rotate(-1.9deg); }
+  80%  { transform: translate(3px,   17px)  rotate(0.6deg);  }
+  92%  { transform: translate(6px,   6px)   rotate(1.6deg);  }
+  100% { transform: translate(0px,   0px)   rotate(0deg);    }
+}
+@keyframes deco-float-d {
+  0%   { transform: translate(0px,   0px)   rotate(0deg);    }
+  13%  { transform: translate(-6px,  8px)   rotate(-2.1deg); }
+  29%  { transform: translate(-2px,  16px)  rotate(-1.2deg); }
+  44%  { transform: translate(5px,   12px)  rotate(0.9deg);  }
+  58%  { transform: translate(9px,   1px)   rotate(2.3deg);  }
+  71%  { transform: translate(5px,  -11px)  rotate(1.7deg);  }
+  85%  { transform: translate(-1px, -15px)  rotate(-0.4deg); }
+  95%  { transform: translate(-5px, -5px)   rotate(-1.4deg); }
+  100% { transform: translate(0px,   0px)   rotate(0deg);    }
+}
+
+/* ── "더 많은 문제 풀기" text button ────────────────────────────────────── */
+.more-problems-btn {
+  color: var(--color-primary-normal);
+}
+.more-problems-btn:hover {
+  background: rgba(241, 247, 255, 0.2) !important;
+}
+.more-problems-btn:active {
+  color: var(--color-primary-heavy);
+}
+
+/* ── Canvas piece: show remove button on hover only ─────────────────────── */
+.canvas-piece .piece-remove-btn {
+  opacity: 0;
+  transition: opacity 0.15s ease;
+}
+.canvas-piece:hover .piece-remove-btn {
+  opacity: 1;
+}
+
+/* ── Puzzle card hover / pressed (CSS-only, no JS re-render) ─────────────── */
+.puzzle-card svg path {
+  transition: fill 0.12s, stroke 0.12s;
+}
+.puzzle-card:hover svg path {
+  fill: var(--card-hover-fill);
+  stroke: var(--card-hover-stroke);
+}
+.puzzle-card:active svg path {
+  fill: var(--card-pressed-fill);
+  stroke: var(--card-pressed-stroke);
 }
