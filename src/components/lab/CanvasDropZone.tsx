@@ -1,4 +1,4 @@
-import type { RefObject } from "react";
+import { useState, useEffect, type RefObject } from "react";
 import PuzzlePiece from "@/components/lab/PuzzlePiece";
 import type { Ion } from "@/data/ions";
 import bellSvg from "@/assets/Icon/bell.svg";
@@ -21,10 +21,11 @@ interface CanvasDropZoneProps {
   isDragOver: boolean;
   isCorrect: boolean;
   isWrong?: boolean;
+  isWrongCompound?: boolean;
   checkKey?: number;
 }
 
-type CanvasStatus = "empty" | "active" | "positive" | "negative";
+type CanvasStatus = "empty" | "active" | "positive" | "negative" | "wrongCompound";
 
 function getStyle(status: CanvasStatus, isDragOver: boolean) {
   if (isDragOver)
@@ -41,6 +42,11 @@ function getStyle(status: CanvasStatus, isDragOver: boolean) {
     return {
       bg: "var(--color-element-light-red)",
       border: "1px solid var(--color-status-negative)",
+    };
+  if (status === "wrongCompound")
+    return {
+      bg: "var(--color-element-light-orange)",
+      border: "1px solid var(--color-element-normal-orange)",
     };
   if (status === "active")
     return {
@@ -123,6 +129,25 @@ function Toast({ status }: { status: CanvasStatus }) {
     );
   }
 
+  if (status === "wrongCompound") {
+    return (
+      <div
+        style={{ ...base, ...slideOut, alignItems: "center", border: "1px solid var(--color-element-normal-orange)" }}
+      >
+        <svg width={24} height={24} viewBox="0 0 24 24" fill="none">
+          <path d="M12 9V13M12 16.5V17" stroke="var(--color-element-normal-orange)" strokeWidth="2" strokeLinecap="round" />
+          <path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z" stroke="var(--color-element-normal-orange)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+        </svg>
+        <div style={{ display: "flex", flexDirection: "column", alignItems: "flex-start", gap: 2 }}>
+          <span style={label}>전하는 맞지만 목표 화합물이 아니에요!</span>
+          <span style={{ ...label, fontSize: 12, lineHeight: "17px", color: "var(--color-text-sub)" }}>
+            이온의 종류와 개수를 다시 확인해 보세요.
+          </span>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div style={base}>
       <img src={bellSvg} width={24} height={24} alt="" />
@@ -139,11 +164,19 @@ export default function CanvasDropZone({
   isDragOver,
   isCorrect,
   isWrong = false,
+  isWrongCompound = false,
   checkKey = 0,
 }: CanvasDropZoneProps) {
   const hasInput = placedPieces.length > 0;
+  const [hintDismissed, setHintDismissed] = useState(false);
 
-  const status: CanvasStatus = isWrong
+  useEffect(() => {
+    if (hasInput) setHintDismissed(true);
+  }, [hasInput]);
+
+  const status: CanvasStatus = isWrongCompound
+    ? "wrongCompound"
+    : isWrong
     ? "negative"
     : isCorrect
     ? "positive"
@@ -171,20 +204,20 @@ export default function CanvasDropZone({
     >
       {!isDragOver && <Toast key={checkKey} status={status} />}
 
-      {!hasInput && !isDragOver && (
+      {!hintDismissed && (!hasInput || isDragOver) && (
         <span
           style={{
             position: "absolute",
             left: "50%",
             top: "50%",
             transform: "translate(-50%, -50%)",
-            fontFamily: "Pretendard, sans-serif",
+            fontFamily: "var(--font-sans)",
             fontWeight: 500,
             fontSize: 14,
             lineHeight: "24px",
             textAlign: "center",
             letterSpacing: "-0.005em",
-            color: "var(--color-text-disabled)",
+            color: isDragOver ? "var(--color-text-primary)" : "var(--color-text-disabled)",
             whiteSpace: "nowrap",
             pointerEvents: "none",
           }}
