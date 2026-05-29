@@ -109,6 +109,9 @@
   --color-border-normal: var(--color-neutral-15);
   --color-border-strong: var(--color-neutral-20);
 
+  /* Shadow */
+  --color-shadow-popup: rgba(0, 0, 0, 0.05);
+
   /* Element / Normal */
   --color-element-normal-red: var(--color-red-500);
   --color-element-normal-orange: var(--color-orange-500);
