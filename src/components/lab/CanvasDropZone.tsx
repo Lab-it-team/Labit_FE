@@ -14,7 +14,7 @@ export interface PlacedPiece {
 }
 
 interface CanvasDropZoneProps {
-  canvasRef: RefObject<HTMLDivElement>;
+  canvasRef: RefObject<HTMLDivElement | null>;
   placedPieces: PlacedPiece[];
   onRemove: (id: string) => void;
   onPieceDragStart: (id: string, e: React.PointerEvent) => void;

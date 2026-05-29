@@ -7,7 +7,10 @@ export interface TokenResponse {
 }
 
 export const kakaoLogin = async (code: string): Promise<TokenResponse> => {
-  const { data } = await apiClient.post<TokenResponse>('/auth/kakao', { code })
+  const { data } = await apiClient.post<TokenResponse>('/auth/kakao', {
+    code,
+    redirect_uri: import.meta.env.VITE_KAKAO_REDIRECT_URI,
+  })
   return data
 }
 
