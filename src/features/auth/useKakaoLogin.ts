@@ -18,7 +18,9 @@ export const useKakaoLogin = () => {
       } catch {
         // 프로필 조회 실패해도 로그인은 유지
       }
-      navigate('/')
+      const redirect = sessionStorage.getItem('lab_redirect') ?? '/';
+      sessionStorage.removeItem('lab_redirect');
+      navigate(redirect)
     },
   })
 }
