@@ -8,9 +8,11 @@ import TargetCompoundPanel from "@/components/lab/TargetCompoundPanel";
 import PuzzleGhost from "@/components/lab/PuzzleGhost";
 import CanvasDropZone from "@/components/lab/CanvasDropZone";
 import ToolBtn from "@/components/lab/ToolBtn";
+import KakaoLoginModal from "@/components/lab/KakaoLoginModal";
 import type { PlacedPiece } from "@/components/lab/CanvasDropZone";
 import { CATIONS, ANIONS } from "@/data/ions";
 import type { Ion } from "@/data/ions";
+import { useAuthStore } from "@/stores/authStore";
 import lockSvg from "@/assets/Icon/lock.svg";
 
 // ── Puzzle geometry (matches puzzlePaths.ts) ──────────────────────────────
@@ -29,6 +31,8 @@ interface Problem {
   anionCount: number;
 }
 
+const FREE_LIMIT = 3; // 비로그인 사용자에게 제공되는 문제 수
+
 const PROBLEMS: Problem[] = [
   {
     id: 1, name: "염화나트륨", formula: "NaCl",
@@ -37,16 +41,28 @@ const PROBLEMS: Problem[] = [
     cationCount: 1, anionCount: 1,
   },
   {
-    id: 2, name: "염화마그네슘", formula: "MgCl₂",
+    id: 2, name: "산화마그네슘", formula: "MgO",
     cation: CATIONS.find((i) => i.id === "Mg")!,
-    anion:  ANIONS.find((i)  => i.id === "Cl")!,
-    cationCount: 1, anionCount: 2,
+    anion:  ANIONS.find((i)  => i.id === "O")!,
+    cationCount: 1, anionCount: 1,
   },
   {
-    id: 3, name: "염화알루미늄", formula: "AlCl₃",
+    id: 3, name: "브롬화칼륨", formula: "KBr",
+    cation: CATIONS.find((i) => i.id === "K")!,
+    anion:  ANIONS.find((i)  => i.id === "Br")!,
+    cationCount: 1, anionCount: 1,
+  },
+  {
+    id: 4, name: "황산칼슘", formula: "CaSO₄",
+    cation: CATIONS.find((i) => i.id === "Ca")!,
+    anion:  ANIONS.find((i)  => i.id === "SO4")!,
+    cationCount: 1, anionCount: 1,
+  },
+  {
+    id: 5, name: "산화알루미늄", formula: "Al₂O₃",
     cation: CATIONS.find((i) => i.id === "Al")!,
-    anion:  ANIONS.find((i)  => i.id === "Cl")!,
-    cationCount: 1, anionCount: 3,
+    anion:  ANIONS.find((i)  => i.id === "O")!,
+    cationCount: 2, anionCount: 3,
   },
 ];
 
@@ -59,15 +75,25 @@ interface DragState {
 }
 
 export default function IonicLab() {
-  const navigate = useNavigate();
+  const navigate    = useNavigate();
+  const isLoggedIn  = !!useAuthStore((s) => s.accessToken);
   const [activeTab,          setActiveTab]          = useState<"learn" | "practice">("practice");
   const [showProgressBadge,  setShowProgressBadge]  = useState(true);
-  const [currentProblem,     setCurrentProblem]     = useState(0);
+  const [currentProblem,     setCurrentProblem]     = useState(() => {
+    const saved = sessionStorage.getItem("lab_current_problem");
+    if (saved !== null) { sessionStorage.removeItem("lab_current_problem"); return parseInt(saved); }
+    return 0;
+  });
   const [allPieces,          setAllPieces]          = useState<Record<number, PlacedPiece[]>>({});
   const [isWrong,            setIsWrong]            = useState(false);
   const [checkKey,           setCheckKey]           = useState(0);
-  const [solvedProblems,     setSolvedProblems]      = useState<Set<number>>(new Set());
+  const [solvedProblems,     setSolvedProblems]      = useState<Set<number>>(() => {
+    const saved = localStorage.getItem("lab_solved_problems");
+    if (saved) return new Set<number>(JSON.parse(saved));
+    return new Set<number>();
+  });
   const [isWrongCompound,    setIsWrongCompound]    = useState(false);
+  const [showLoginModal,     setShowLoginModal]     = useState(false);
   const [ghost,              setGhost]              = useState<{ ion: Ion; x: number; y: number } | null>(null);
   const [isDragOver,         setIsDragOver]         = useState(false);
   const [draggingPaletteId,  setDraggingPaletteId]  = useState<string | null>(null);
@@ -311,18 +337,24 @@ export default function IonicLab() {
     setIsWrongCompound(false);
   }
 
-  const problemSolved  = solvedProblems.has(currentProblem);
-  const isLastProblem  = currentProblem === PROBLEMS.length - 1;
+  const problemSolved   = solvedProblems.has(currentProblem);
+  const lastAccessible  = isLoggedIn ? PROBLEMS.length - 1 : FREE_LIMIT - 1;
+  const isLastProblem   = currentProblem === lastAccessible;
 
-  // 오답 시 5초 후 캔버스 리셋
   useEffect(() => {
-    if (!isWrong) return;
+    localStorage.setItem("lab_solved_problems", JSON.stringify([...solvedProblems]));
+  }, [solvedProblems]);
+
+  // 오답 / 화합물 불일치 시 5초 후 캔버스 리셋
+  useEffect(() => {
+    if (!isWrong && !isWrongCompound) return;
     const timer = setTimeout(() => {
       setPlacedPieces([]);
       setIsWrong(false);
+      setIsWrongCompound(false);
     }, 5000);
     return () => clearTimeout(timer);
-  }, [isWrong, checkKey]);
+  }, [isWrong, isWrongCompound, checkKey]);
 
   // 정답 시 3초 후 다음 문제로 자동 이동
   useEffect(() => {
@@ -332,6 +364,13 @@ export default function IonicLab() {
       setIsWrong(false);
       setIsWrongCompound(false);
     }, 3000);
+    return () => clearTimeout(timer);
+  }, [problemSolved, currentProblem]);
+
+  // 비로그인 마지막 문제 정답 시 2초 후 로그인 모달 자동 오픈
+  useEffect(() => {
+    if (!problemSolved || !isLastProblem || isLoggedIn) return;
+    const timer = setTimeout(() => setShowLoginModal(true), 2000);
     return () => clearTimeout(timer);
   }, [problemSolved, currentProblem]);
 
@@ -395,50 +434,49 @@ export default function IonicLab() {
             {/* Problem selector */}
             <div style={{ display: "flex", flexDirection: "column", justifyContent: "center", alignItems: "center", gap: 8, width: 168 }}>
               <div style={{ display: "flex", flexDirection: "row", alignItems: "flex-start", gap: 12 }}>
-                {PROBLEMS.map((p, i) => (
-                  <button
-                    key={p.id}
-                    onClick={() => { setCurrentProblem(i); setIsWrong(false); }}
-                    style={{
-                      display: "flex", flexDirection: "column", justifyContent: "center", alignItems: "center",
-                      padding: 4, width: 24, height: 24,
-                      background: i === currentProblem ? "var(--color-primary-normal)" : "var(--color-primary-light)",
-                      borderRadius: 6, border: "none", cursor: "pointer",
-                      fontFamily: "var(--font-sans)", fontWeight: 500, fontSize: 12, lineHeight: "16px",
-                      letterSpacing: "-0.005em",
-                      color: i === currentProblem ? "var(--color-static-white)" : "var(--color-text-sub)",
-                    }}
-                  >
-                    {p.id}
-                  </button>
-                ))}
-                {[4, 5].map((n) => (
-                  <div
-                    key={n}
-                    style={{
-                      position: "relative", display: "flex", flexDirection: "column",
-                      justifyContent: "center", alignItems: "center", padding: 4, width: 24, height: 24,
-                      background: "var(--color-bg-elevate)", borderRadius: 6,
-                      fontFamily: "var(--font-sans)", fontWeight: 500, fontSize: 12, lineHeight: "16px",
-                      color: "var(--color-text-disabled)",
-                    }}
-                  >
-                    {n}
-                    <img src={lockSvg} alt="locked" width={20} height={20} style={{ position: "absolute", top: -10, right: -10 }} />
-                  </div>
-                ))}
+                {PROBLEMS.map((p, i) => {
+                  const accessible = isLoggedIn || i < FREE_LIMIT;
+                  const isActive   = i === currentProblem;
+                  return (
+                    <div key={p.id} style={{ position: "relative" }}>
+                      <button
+                        onClick={() => { if (accessible) { setCurrentProblem(i); setIsWrong(false); setIsWrongCompound(false); } }}
+                        style={{
+                          display: "flex", flexDirection: "column", justifyContent: "center", alignItems: "center",
+                          padding: 4, width: 24, height: 24,
+                          background: isActive ? "var(--color-primary-normal)"
+                            : accessible ? "var(--color-primary-light)"
+                            : "var(--color-bg-elevate)",
+                          borderRadius: 6, border: "none",
+                          cursor: accessible ? "pointer" : "default",
+                          fontFamily: "var(--font-sans)", fontWeight: 500, fontSize: 12, lineHeight: "16px",
+                          letterSpacing: "-0.005em",
+                          color: isActive ? "var(--color-static-white)"
+                            : accessible ? "var(--color-text-sub)"
+                            : "var(--color-text-disabled)",
+                        }}
+                      >
+                        {p.id}
+                      </button>
+                      {!accessible && (
+                        <img src={lockSvg} alt="locked" width={20} height={20} style={{ position: "absolute", top: -10, right: -10, pointerEvents: "none" }} />
+                      )}
+                    </div>
+                  );
+                })}
               </div>
 
-              {solvedProblems.has(2) && (
+              {!isLoggedIn && solvedProblems.has(FREE_LIMIT - 1) && (
                 <button
                   className="more-problems-btn"
+                  onClick={() => setShowLoginModal(true)}
                   style={{
                     display: "flex", flexDirection: "row", alignItems: "center",
                     padding: "6px 8px", gap: 4, height: 32, borderRadius: 8,
                     background: "none", border: "none", cursor: "pointer", whiteSpace: "nowrap",
                   }}
                 >
-                  <span style={{ fontFamily: "Pretendard, sans-serif", fontWeight: 500, fontSize: 13, lineHeight: "18px", letterSpacing: "-0.005em", color: "inherit" }}>
+                  <span style={{ fontFamily: "var(--font-sans)", fontWeight: 500, fontSize: 13, lineHeight: "18px", letterSpacing: "-0.005em", color: "inherit" }}>
                     더 많은 문제 풀기
                   </span>
                   <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
@@ -508,6 +546,7 @@ export default function IonicLab() {
                   <ToolBtn
                     onClick={() => {
                       if (problemSolved) {
+                        if (isLastProblem && !isLoggedIn) { setShowLoginModal(true); return; }
                         if (!isLastProblem) setCurrentProblem(currentProblem + 1);
                         return;
                       }
@@ -527,7 +566,11 @@ export default function IonicLab() {
                     disabled={!problemSolved && placedPieces.length === 0}
                     primary
                   >
-                    {problemSolved ? (isLastProblem ? "완료" : "다음 문제 →") : "정답 확인"}
+                    {problemSolved
+                      ? isLastProblem
+                        ? isLoggedIn ? "완료" : "다음 화합물 만들기 →"
+                        : "다음 문제 →"
+                      : "정답 확인"}
                   </ToolBtn>
                 </div>
               </div>
@@ -549,6 +592,13 @@ export default function IonicLab() {
       </div>
 
       <AiFab />
+
+      {showLoginModal && (
+        <KakaoLoginModal
+          onClose={() => setShowLoginModal(false)}
+          nextProblemIndex={FREE_LIMIT}
+        />
+      )}
     </div>
   );
 }
