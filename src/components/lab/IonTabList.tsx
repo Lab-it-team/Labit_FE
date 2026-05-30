@@ -1,11 +1,12 @@
 import { useState } from "react";
+import { useDraggable } from "@dnd-kit/core";
 import { CATIONS, ANIONS } from "@/data/ions";
 import type { Ion } from "@/data/ions";
 import { getPuzzlePath, cardHeight, ionColor } from "@/components/lab/puzzlePaths";
 import tipsSvg from "@/assets/Icon/tips.svg";
 
-function shapeFill(_ion: Ion): string { return "var(--color-bg-normal)"; }
-function shapeStroke(_ion: Ion): string { return "var(--color-border-strong)"; }
+function shapeFill(): string { return "var(--color-bg-normal)"; }
+function shapeStroke(): string { return "var(--color-border-strong)"; }
 
 function hoverFill(ion: Ion): string {
   const c = Math.abs(ion.charge);
@@ -57,11 +58,14 @@ function pressedStroke(ion: Ion): string {
 
 interface PuzzleCardProps {
   ion: Ion;
-  onDragStart: (ion: Ion, e: React.PointerEvent) => void;
   isDragging: boolean;
 }
 
-function PuzzleCard({ ion, onDragStart, isDragging }: PuzzleCardProps) {
+function PuzzleCard({ ion, isDragging }: PuzzleCardProps) {
+  const { attributes, listeners, setNodeRef } = useDraggable({
+    id: `palette:${ion.id}`,
+    data: { source: "palette", ion },
+  });
   const h     = cardHeight(ion);
   const color = ionColor(ion);
   const path  = getPuzzlePath(ion);
@@ -83,7 +87,9 @@ function PuzzleCard({ ion, onDragStart, isDragging }: PuzzleCardProps) {
 
   return (
     <div
-      onPointerDown={(e) => { e.preventDefault(); onDragStart(ion, e); }}
+      ref={setNodeRef}
+      {...listeners}
+      {...attributes}
       className="puzzle-card"
       style={{
         position: "relative",
@@ -107,7 +113,7 @@ function PuzzleCard({ ion, onDragStart, isDragging }: PuzzleCardProps) {
         fill="none"
         style={{ position: "absolute", inset: 0 }}
       >
-        <path d={path} fill={shapeFill(ion)} stroke={shapeStroke(ion)} />
+        <path d={path} fill={shapeFill()} stroke={shapeStroke()} />
       </svg>
       <div
         style={{
@@ -137,11 +143,10 @@ function PuzzleCard({ ion, onDragStart, isDragging }: PuzzleCardProps) {
 type TabType = "cation" | "anion";
 
 interface IonTabListProps {
-  onPaletteDragStart: (ion: Ion, e: React.PointerEvent) => void;
   draggingIonId: string | null;
 }
 
-export default function IonTabList({ onPaletteDragStart, draggingIonId }: IonTabListProps) {
+export default function IonTabList({ draggingIonId }: IonTabListProps) {
   const [activeTab, setActiveTab] = useState<TabType>("cation");
   const ions = activeTab === "cation" ? CATIONS : ANIONS;
   const rows: Ion[][] = [];
@@ -200,7 +205,7 @@ export default function IonTabList({ onPaletteDragStart, draggingIonId }: IonTab
           {rows.map((row, ri) => (
             <div key={ri} style={{ display: "flex", flexDirection: "row", alignItems: "flex-start", gap: 16 }}>
               {row.map((ion) => (
-                <PuzzleCard key={ion.id} ion={ion} onDragStart={onPaletteDragStart} isDragging={draggingIonId === ion.id} />
+                <PuzzleCard key={ion.id} ion={ion} isDragging={draggingIonId === ion.id} />
               ))}
             </div>
           ))}

@@ -1,4 +1,4 @@
-import { useState, useEffect, type RefObject } from "react";
+import { useDraggable, useDroppable } from "@dnd-kit/core";
 import PuzzlePiece from "@/components/lab/PuzzlePiece";
 import type { Ion } from "@/data/ions";
 import bellSvg from "@/assets/Icon/bell.svg";
@@ -14,15 +14,15 @@ export interface PlacedPiece {
 }
 
 interface CanvasDropZoneProps {
-  canvasRef: RefObject<HTMLDivElement | null>;
+  onCanvasReady: (node: HTMLDivElement | null) => void;
   placedPieces: PlacedPiece[];
   onRemove: (id: string) => void;
-  onPieceDragStart: (id: string, e: React.PointerEvent) => void;
   isDragOver: boolean;
   isCorrect: boolean;
   isWrong?: boolean;
   isWrongCompound?: boolean;
   checkKey?: number;
+  draggingPieceId?: string | null;
 }
 
 type CanvasStatus = "empty" | "active" | "positive" | "negative" | "wrongCompound";
@@ -157,22 +157,19 @@ function Toast({ status }: { status: CanvasStatus }) {
 }
 
 export default function CanvasDropZone({
-  canvasRef,
+  onCanvasReady,
   placedPieces,
   onRemove,
-  onPieceDragStart,
   isDragOver,
   isCorrect,
   isWrong = false,
   isWrongCompound = false,
   checkKey = 0,
+  draggingPieceId = null,
 }: CanvasDropZoneProps) {
+  const { setNodeRef } = useDroppable({ id: "ionic-canvas" });
   const hasInput = placedPieces.length > 0;
-  const [hintDismissed, setHintDismissed] = useState(false);
-
-  useEffect(() => {
-    if (hasInput) setHintDismissed(true);
-  }, [hasInput]);
+  const hintDismissed = hasInput;
 
   const status: CanvasStatus = isWrongCompound
     ? "wrongCompound"
@@ -185,10 +182,14 @@ export default function CanvasDropZone({
     : "empty";
 
   const { bg, border } = getStyle(status, isDragOver);
+  const setCanvasNode = (node: HTMLDivElement | null) => {
+    setNodeRef(node);
+    onCanvasReady(node);
+  };
 
   return (
     <div
-      ref={canvasRef}
+      ref={setCanvasNode}
       style={{
         boxSizing: "border-box",
         position: "relative",
@@ -229,31 +230,61 @@ export default function CanvasDropZone({
       {placedPieces.map((piece) => {
         const isSnapped = !!piece.bondedToCationId || piece.bondedAnionIds.length > 0;
         return (
-          <div
+          <DraggableCanvasPiece
             key={piece.id}
-            className="canvas-piece"
-            style={{
-              position: "absolute",
-              left: piece.x,
-              top: piece.y,
-              cursor: "grab",
-              zIndex: isSnapped ? 4 : 8,
-              transition: piece.bondedToCationId
-                ? "left 0.18s cubic-bezier(.34,1.5,.64,1), top 0.18s cubic-bezier(.34,1.5,.64,1)"
-                : "none",
-            }}
-            onPointerDown={(e) => onPieceDragStart(piece.id, e)}
-          >
-            <PuzzlePiece
-              ion={piece.ion}
-              size="default"
-              interaction="removable"
-              onRemove={() => onRemove(piece.id)}
-            />
-          </div>
+            piece={piece}
+            isSnapped={isSnapped}
+            isDragging={draggingPieceId === piece.id}
+            onRemove={onRemove}
+          />
         );
       })}
 
+    </div>
+  );
+}
+
+function DraggableCanvasPiece({
+  piece,
+  isSnapped,
+  isDragging,
+  onRemove,
+}: {
+  piece: PlacedPiece;
+  isSnapped: boolean;
+  isDragging: boolean;
+  onRemove: (id: string) => void;
+}) {
+  const { attributes, listeners, setNodeRef } = useDraggable({
+    id: `canvas:${piece.id}`,
+    data: { source: "canvas", pieceId: piece.id, ion: piece.ion },
+  });
+
+  return (
+    <div
+      ref={setNodeRef}
+      {...listeners}
+      {...attributes}
+      className="canvas-piece"
+      style={{
+        position: "absolute",
+        left: piece.x,
+        top: piece.y,
+        cursor: "grab",
+        zIndex: isSnapped ? 4 : 8,
+        opacity: isDragging ? 0.35 : 1,
+        transition: piece.bondedToCationId
+          ? "left 0.18s cubic-bezier(.34,1.5,.64,1), top 0.18s cubic-bezier(.34,1.5,.64,1)"
+          : "none",
+        touchAction: "none",
+      }}
+    >
+      <PuzzlePiece
+        ion={piece.ion}
+        size="default"
+        interaction="removable"
+        onRemove={() => onRemove(piece.id)}
+      />
     </div>
   );
 }

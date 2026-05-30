@@ -1,4 +1,14 @@
 import { useState, useRef, useCallback, useEffect } from "react";
+import {
+  DndContext,
+  DragOverlay,
+  PointerSensor,
+  useSensor,
+  useSensors,
+  type DragEndEvent,
+  type DragOverEvent,
+  type DragStartEvent,
+} from "@dnd-kit/core";
 import { useNavigate } from "react-router";
 import LessonHeader from "@/components/lesson/LessonHeader";
 import ContentTab from "@/components/lesson/ContentTab";
@@ -66,12 +76,87 @@ const PROBLEMS: Problem[] = [
   },
 ];
 
-interface DragState {
-  id: string | null;
-  ion: Ion | null;
-  fromPalette: boolean;
-  offsetX: number;
-  offsetY: number;
+type LabDragData =
+  | { source: "palette"; ion: Ion }
+  | { source: "canvas"; pieceId: string; ion: Ion };
+
+function parseStoredPieces(value: string | null): Record<number, PlacedPiece[]> {
+  if (!value) return {};
+  try {
+    return JSON.parse(value) as Record<number, PlacedPiece[]>;
+  } catch {
+    return {};
+  }
+}
+
+function getNextPieceId(piecesByProblem: Record<number, PlacedPiece[]>) {
+  return Object.values(piecesByProblem)
+    .flat()
+    .reduce((max, piece) => {
+      const match = /^p(\d+)$/.exec(piece.id);
+      return match ? Math.max(max, Number(match[1]) + 1) : max;
+    }, 0);
+}
+
+function removePieceLinks(pieces: PlacedPiece[], id: string) {
+  return pieces.map((p) => {
+    if (p.id === id) return { ...p, bondedAnionIds: [], bondedToCationId: null };
+    return {
+      ...p,
+      bondedAnionIds:   p.bondedAnionIds.filter((a) => a !== id),
+      bondedToCationId: p.bondedToCationId === id ? null : p.bondedToCationId,
+    };
+  });
+}
+
+function snapDroppedPiece(pieces: PlacedPiece[], dropId: string, dropX: number, dropY: number) {
+  const dropped = pieces.find((p) => p.id === dropId);
+  if (!dropped) return pieces;
+
+  let bestDist = SNAP_THR;
+  let bestSnap: { kind: "aniCat"; catId: string; tx: number; ty: number }
+              | { kind: "catAni"; aniId: string; tx: number; ty: number }
+              | null = null;
+
+  if (dropped.ion.type === "minus") {
+    for (const cat of pieces.filter((p) => p.id !== dropId && p.ion.type === "plus")) {
+      const usedCharge = cat.bondedAnionIds.reduce((sum, aid) => {
+        const a = pieces.find((p) => p.id === aid);
+        return sum + (a?.ion.charge ?? 0);
+      }, 0);
+      if (dropped.ion.charge > cat.ion.charge - usedCharge) continue;
+
+      const tx   = cat.x + PIECE_W - NOTCH_D;
+      const ty   = cat.y + usedCharge * UNIT_H;
+      const dist = Math.hypot(dropX - tx, dropY - ty);
+      if (dist < bestDist) { bestDist = dist; bestSnap = { kind: "aniCat", catId: cat.id, tx, ty }; }
+    }
+  } else {
+    for (const ani of pieces.filter((p) => p.id !== dropId && p.ion.type === "minus" && !p.bondedToCationId)) {
+      const tx   = ani.x - PIECE_W + NOTCH_D;
+      const ty   = ani.y;
+      const dist = Math.hypot(dropX - tx, dropY - ty);
+      if (dist < bestDist) { bestDist = dist; bestSnap = { kind: "catAni", aniId: ani.id, tx, ty }; }
+    }
+  }
+
+  if (!bestSnap) return pieces;
+
+  if (bestSnap.kind === "aniCat") {
+    const { catId, tx, ty } = bestSnap;
+    return pieces.map((p) => {
+      if (p.id === dropId) return { ...p, x: tx, y: ty, bondedToCationId: catId };
+      if (p.id === catId)  return { ...p, bondedAnionIds: [...p.bondedAnionIds, dropId] };
+      return p;
+    });
+  }
+
+  const { aniId, tx, ty } = bestSnap;
+  return pieces.map((p) => {
+    if (p.id === dropId) return { ...p, x: tx, y: ty, bondedAnionIds: [aniId] };
+    if (p.id === aniId)  return { ...p, bondedToCationId: dropId };
+    return p;
+  });
 }
 
 export default function IonicLab() {
@@ -84,26 +169,49 @@ export default function IonicLab() {
     if (saved !== null) { sessionStorage.removeItem("lab_current_problem"); return parseInt(saved); }
     return 0;
   });
-  const [allPieces,          setAllPieces]          = useState<Record<number, PlacedPiece[]>>({});
+  const [allPieces,          setAllPieces]          = useState<Record<number, PlacedPiece[]>>(() => {
+    const saved = parseStoredPieces(localStorage.getItem("lab_placed_pieces"));
+    const preLoginSaved = parseStoredPieces(sessionStorage.getItem("lab_pre_login_placed_pieces"));
+    sessionStorage.removeItem("lab_pre_login_placed_pieces");
+    return { ...saved, ...preLoginSaved };
+  });
   const [isWrong,            setIsWrong]            = useState(false);
   const [checkKey,           setCheckKey]           = useState(0);
   const [solvedProblems,     setSolvedProblems]      = useState<Set<number>>(() => {
     const saved = localStorage.getItem("lab_solved_problems");
-    if (saved) return new Set<number>(JSON.parse(saved));
+    const preLoginSaved = sessionStorage.getItem("lab_pre_login_solved_problems");
+    if (preLoginSaved) sessionStorage.removeItem("lab_pre_login_solved_problems");
+    const merged = [
+      ...(saved ? JSON.parse(saved) as number[] : []),
+      ...(preLoginSaved ? JSON.parse(preLoginSaved) as number[] : []),
+    ];
+    if (merged.length > 0) return new Set<number>(merged);
     return new Set<number>();
   });
   const [isWrongCompound,    setIsWrongCompound]    = useState(false);
   const [showLoginModal,     setShowLoginModal]     = useState(false);
-  const [ghost,              setGhost]              = useState<{ ion: Ion; x: number; y: number } | null>(null);
+  const [justSolved,         setJustSolved]         = useState(false);
+  const [activeDragIon,      setActiveDragIon]      = useState<Ion | null>(null);
   const [isDragOver,         setIsDragOver]         = useState(false);
   const [draggingPaletteId,  setDraggingPaletteId]  = useState<string | null>(null);
+  const [draggingPieceId,    setDraggingPieceId]    = useState<string | null>(null);
 
   const canvasRef          = useRef<HTMLDivElement>(null);
-  const dragRef            = useRef<DragState>({ id: null, ion: null, fromPalette: false, offsetX: 0, offsetY: 0 });
-  const idCounter          = useRef(0);
-  const cleanupRef         = useRef<() => void>(() => {});
+  const idCounter          = useRef(getNextPieceId(allPieces));
   const currentProblemRef  = useRef(currentProblem);
-  currentProblemRef.current = currentProblem;
+  const sensors = useSensors(
+    useSensor(PointerSensor, {
+      activationConstraint: { distance: 4 },
+    }),
+  );
+
+  useEffect(() => {
+    currentProblemRef.current = currentProblem;
+  }, [currentProblem]);
+
+  const handleCanvasReady = useCallback((node: HTMLDivElement | null) => {
+    canvasRef.current = node;
+  }, []);
 
   // Stable setter that always writes to the currently active problem
   const setPlacedPieces = useCallback(
@@ -137,190 +245,81 @@ export default function IonicLab() {
     placedAnions.every((p)  => p.ion.id === problem.anion.id);
   const isCorrect = isChargeZero && isRightCompound;
 
-  // ── pointer move: update ghost / dragging piece position ─────────────────
-  const onMove = useCallback((e: PointerEvent) => {
-    const d = dragRef.current;
-    if (!d.ion) return;
+  const resetDragState = () => {
+    setActiveDragIon(null);
+    setDraggingPaletteId(null);
+    setDraggingPieceId(null);
+    setIsDragOver(false);
+  };
 
-    const rect = canvasRef.current?.getBoundingClientRect();
-    if (rect) {
-      setIsDragOver(
-        e.clientX >= rect.left && e.clientX <= rect.right &&
-        e.clientY >= rect.top  && e.clientY <= rect.bottom,
-      );
-    }
+  const resetFeedbackState = () => {
+    setIsWrong(false);
+    setIsWrongCompound(false);
+    setJustSolved(false);
+  };
 
-    if (d.fromPalette) {
-      setGhost({ ion: d.ion, x: e.clientX - d.offsetX, y: e.clientY - d.offsetY });
-    } else if (d.id && rect) {
-      setPlacedPieces((prev) =>
-        prev.map((p) =>
-          p.id === d.id
-            ? { ...p, x: e.clientX - rect.left - d.offsetX, y: e.clientY - rect.top - d.offsetY }
-            : p,
-        ),
-      );
-    }
-  }, []);
+  const handleDragStart = ({ active }: DragStartEvent) => {
+    const data = active.data.current as LabDragData | undefined;
+    if (!data) return;
 
-  // ── pointer up: place piece + snap ───────────────────────────────────────
-  const onUp = useCallback((e: PointerEvent) => {
-    const d = dragRef.current;
-    if (!d.ion) return;
+    setActiveDragIon(data.ion);
+    resetFeedbackState();
 
-    setGhost(null);
-
-    const rect = canvasRef.current?.getBoundingClientRect();
-
-    // Dropped outside canvas → discard palette drag or remove canvas piece
-    if (
-      !rect ||
-      e.clientX < rect.left || e.clientX > rect.right ||
-      e.clientY < rect.top  || e.clientY > rect.bottom
-    ) {
-      if (!d.fromPalette && d.id) {
-        const rid = d.id;
-        setPlacedPieces((prev) =>
-          prev
-            .filter((p) => p.id !== rid)
-            .map((p) => ({
-              ...p,
-              bondedAnionIds:   p.bondedAnionIds.filter((a) => a !== rid),
-              bondedToCationId: p.bondedToCationId === rid ? null : p.bondedToCationId,
-            })),
-        );
-      }
-      cleanupRef.current();
+    if (data.source === "palette") {
+      setDraggingPaletteId(data.ion.id);
       return;
     }
 
-    const dropX = e.clientX - rect.left - d.offsetX;
-    const dropY = e.clientY - rect.top  - d.offsetY;
+    setDraggingPieceId(data.pieceId);
+    setPlacedPieces((prev) => removePieceLinks(prev, data.pieceId));
+  };
+
+  const handleDragOver = ({ over }: DragOverEvent) => {
+    setIsDragOver(over?.id === "ionic-canvas");
+  };
+
+  const handleDragCancel = () => {
+    resetDragState();
+  };
+
+  const handleDragEnd = ({ active, over }: DragEndEvent) => {
+    const data = active.data.current as LabDragData | undefined;
+    const rect = canvasRef.current?.getBoundingClientRect();
+    const translated = active.rect.current.translated ?? active.rect.current.initial;
+    const droppedOnCanvas = over?.id === "ionic-canvas";
+
+    if (!data || !rect || !translated || !droppedOnCanvas) {
+      if (data?.source === "canvas") {
+        const removeId = data.pieceId;
+        setPlacedPieces((prev) => removePieceLinks(prev.filter((p) => p.id !== removeId), removeId));
+      }
+      resetDragState();
+      return;
+    }
+
+    const dropX = translated.left - rect.left;
+    const dropY = translated.top - rect.top;
 
     setPlacedPieces((prev) => {
-      let next    = [...prev];
-      let dropId  = d.id;
+      let next = [...prev];
+      let dropId: string;
 
-      // Add new piece from palette
-      if (d.fromPalette) {
-        const newId = mkId();
-        next   = [...next, { id: newId, ion: d.ion!, x: dropX, y: dropY, bondedAnionIds: [], bondedToCationId: null }];
-        dropId = newId;
+      if (data.source === "palette") {
+        dropId = mkId();
+        next = [
+          ...next,
+          { id: dropId, ion: data.ion, x: dropX, y: dropY, bondedAnionIds: [], bondedToCationId: null },
+        ];
       } else {
+        dropId = data.pieceId;
         next = next.map((p) => (p.id === dropId ? { ...p, x: dropX, y: dropY } : p));
       }
 
-      const dropped = next.find((p) => p.id === dropId)!;
-
-      // ── Snap logic ────────────────────────────────────────────────────────
-      // anion.x = cation.x + PIECE_W - NOTCH_D  (= cation.x + 100)
-      // anion.y = cation.y + usedCharge * UNIT_H
-      // ─────────────────────────────────────────────────────────────────────
-
-      let bestDist = SNAP_THR;
-      let bestSnap: { kind: "aniCat"; catId: string; tx: number; ty: number }
-                  | { kind: "catAni"; aniId: string; tx: number; ty: number }
-                  | null = null;
-
-      if (dropped.ion.type === "minus") {
-        // Anion looking for a cation with free slots
-        for (const cat of next.filter((p) => p.id !== dropId && p.ion.type === "plus")) {
-          const usedCharge = cat.bondedAnionIds.reduce((sum, aid) => {
-            const a = next.find((p) => p.id === aid);
-            return sum + (a?.ion.charge ?? 0);
-          }, 0);
-          if (dropped.ion.charge > cat.ion.charge - usedCharge) continue;
-
-          const tx   = cat.x + PIECE_W - NOTCH_D;
-          const ty   = cat.y + usedCharge * UNIT_H;
-          const dist = Math.hypot(dropX - tx, dropY - ty);
-          if (dist < bestDist) { bestDist = dist; bestSnap = { kind: "aniCat", catId: cat.id, tx, ty }; }
-        }
-      } else {
-        // Cation looking for a free anion (slot 0 alignment)
-        for (const ani of next.filter((p) => p.id !== dropId && p.ion.type === "minus" && !p.bondedToCationId)) {
-          const tx   = ani.x - PIECE_W + NOTCH_D;
-          const ty   = ani.y;
-          const dist = Math.hypot(dropX - tx, dropY - ty);
-          if (dist < bestDist) { bestDist = dist; bestSnap = { kind: "catAni", aniId: ani.id, tx, ty }; }
-        }
-      }
-
-      if (!bestSnap) return next;
-
-      if (bestSnap.kind === "aniCat") {
-        const { catId, tx, ty } = bestSnap;
-        next = next.map((p) => {
-          if (p.id === dropId)  return { ...p, x: tx, y: ty, bondedToCationId: catId };
-          if (p.id === catId)   return { ...p, bondedAnionIds: [...p.bondedAnionIds, dropId!] };
-          return p;
-        });
-      } else {
-        const { aniId, tx, ty } = bestSnap;
-        next = next.map((p) => {
-          if (p.id === dropId) return { ...p, x: tx, y: ty, bondedAnionIds: [aniId] };
-          if (p.id === aniId)  return { ...p, bondedToCationId: dropId };
-          return p;
-        });
-      }
-
-      return next;
+      return snapDroppedPiece(next, dropId, dropX, dropY);
     });
 
-    cleanupRef.current();
-  }, []);
-
-  const cleanup = useCallback(() => {
-    window.removeEventListener("pointermove", onMove);
-    window.removeEventListener("pointerup",   onUp);
-    dragRef.current = { id: null, ion: null, fromPalette: false, offsetX: 0, offsetY: 0 };
-    setIsDragOver(false);
-    setDraggingPaletteId(null);
-  }, [onMove, onUp]);
-
-  cleanupRef.current = cleanup;
-
-  // ── Start drag from palette ───────────────────────────────────────────────
-  const handlePaletteDragStart = useCallback((ion: Ion, e: React.PointerEvent) => {
-    e.preventDefault();
-    const h = ion.charge * UNIT_H;
-    dragRef.current = { id: null, ion, fromPalette: true, offsetX: 60, offsetY: h / 2 };
-    setGhost({ ion, x: e.clientX - 60, y: e.clientY - h / 2 });
-    setDraggingPaletteId(ion.id);
-    window.addEventListener("pointermove", onMove);
-    window.addEventListener("pointerup",   onUp);
-  }, [onMove, onUp]);
-
-  // ── Start drag from canvas ────────────────────────────────────────────────
-  const handleCanvasDragStart = useCallback((id: string, e: React.PointerEvent) => {
-    e.preventDefault();
-    e.stopPropagation();
-    const piece = placedPieces.find((p) => p.id === id);
-    if (!piece) return;
-
-    const rect    = canvasRef.current!.getBoundingClientRect();
-    const offsetX = e.clientX - rect.left - piece.x;
-    const offsetY = e.clientY - rect.top  - piece.y;
-
-    dragRef.current = { id, ion: piece.ion, fromPalette: false, offsetX, offsetY };
-
-    // Unbond the dragged piece
-    setPlacedPieces((prev) =>
-      prev.map((p) => {
-        if (p.id === id) return { ...p, bondedAnionIds: [], bondedToCationId: null };
-        return {
-          ...p,
-          bondedAnionIds:   p.bondedAnionIds.filter((a) => a !== id),
-          bondedToCationId: p.bondedToCationId === id ? null : p.bondedToCationId,
-        };
-      }),
-    );
-
-    setIsWrong(false);
-    setIsWrongCompound(false);
-    window.addEventListener("pointermove", onMove);
-    window.addEventListener("pointerup",   onUp);
-  }, [placedPieces, onMove, onUp]);
+    resetDragState();
+  };
 
   // ── Remove piece ──────────────────────────────────────────────────────────
   function handleRemovePiece(id: string) {
@@ -335,15 +334,20 @@ export default function IonicLab() {
     );
     setIsWrong(false);
     setIsWrongCompound(false);
+    setJustSolved(false);
   }
 
-  const problemSolved   = solvedProblems.has(currentProblem);
   const lastAccessible  = isLoggedIn ? PROBLEMS.length - 1 : FREE_LIMIT - 1;
   const isLastProblem   = currentProblem === lastAccessible;
+  const freeProblemsSolved = Array.from({ length: FREE_LIMIT }, (_, i) => solvedProblems.has(i)).every(Boolean);
 
   useEffect(() => {
     localStorage.setItem("lab_solved_problems", JSON.stringify([...solvedProblems]));
   }, [solvedProblems]);
+
+  useEffect(() => {
+    localStorage.setItem("lab_placed_pieces", JSON.stringify(allPieces));
+  }, [allPieces]);
 
   // 오답 / 화합물 불일치 시 5초 후 캔버스 리셋
   useEffect(() => {
@@ -354,25 +358,57 @@ export default function IonicLab() {
       setIsWrongCompound(false);
     }, 5000);
     return () => clearTimeout(timer);
-  }, [isWrong, isWrongCompound, checkKey]);
+  }, [isWrong, isWrongCompound, checkKey, setPlacedPieces]);
 
-  // 정답 시 3초 후 다음 문제로 자동 이동
+  const moveToNextProblem = useCallback(() => {
+    setCurrentProblem((p) => Math.min(p + 1, lastAccessible));
+    setJustSolved(false);
+    setIsWrong(false);
+    setIsWrongCompound(false);
+  }, [lastAccessible]);
+
   useEffect(() => {
-    if (!problemSolved || isLastProblem) return;
-    const timer = setTimeout(() => {
-      setCurrentProblem((p) => p + 1);
+    if (!justSolved || isLastProblem) return;
+    const timer = setTimeout(moveToNextProblem, 3000);
+    return () => clearTimeout(timer);
+  }, [justSolved, isLastProblem, moveToNextProblem]);
+
+  useEffect(() => {
+    if (!justSolved || !isLastProblem || isLoggedIn) return;
+    const timer = setTimeout(() => setShowLoginModal(true), 3000);
+    return () => clearTimeout(timer);
+  }, [justSolved, isLastProblem, isLoggedIn]);
+
+  const handleAnswerButtonClick = () => {
+    if (justSolved) {
+      if (isLastProblem) {
+        if (!isLoggedIn) setShowLoginModal(true);
+        return;
+      }
+      moveToNextProblem();
+      return;
+    }
+
+    setCheckKey((k) => k + 1);
+    if (isCorrect) {
+      setSolvedProblems((prev) => new Set([...prev, currentProblem]));
+      setJustSolved(true);
       setIsWrong(false);
       setIsWrongCompound(false);
-    }, 3000);
-    return () => clearTimeout(timer);
-  }, [problemSolved, currentProblem]);
+    } else if (isChargeZero && !isRightCompound) {
+      setIsWrongCompound(true);
+      setIsWrong(false);
+    } else {
+      setIsWrong(true);
+      setIsWrongCompound(false);
+    }
+  };
 
-  // 비로그인 마지막 문제 정답 시 2초 후 로그인 모달 자동 오픈
-  useEffect(() => {
-    if (!problemSolved || !isLastProblem || isLoggedIn) return;
-    const timer = setTimeout(() => setShowLoginModal(true), 2000);
-    return () => clearTimeout(timer);
-  }, [problemSolved, currentProblem]);
+  const answerButtonLabel = justSolved
+    ? isLastProblem
+      ? isLoggedIn ? "완료" : "더 많은 문제 풀기 →"
+      : "다음 문제 →"
+    : "정답 확인";
 
   return (
     <div style={{ minHeight: "100vh", background: "var(--color-bg-normal)" }}>
@@ -387,34 +423,27 @@ export default function IonicLab() {
         onListClick={() => {}}
       />
 
-      {/* Ghost follows cursor globally */}
-      {ghost && (
+      <DndContext
+        sensors={sensors}
+        onDragStart={handleDragStart}
+        onDragOver={handleDragOver}
+        onDragCancel={handleDragCancel}
+        onDragEnd={handleDragEnd}
+      >
+        <DragOverlay>{activeDragIon ? <PuzzleGhost ion={activeDragIon} /> : null}</DragOverlay>
+
         <div
           style={{
-            position: "fixed",
-            left: ghost.x,
-            top: ghost.y,
-            pointerEvents: "none",
-            zIndex: 9999,
-            opacity: 0.9,
+            width: "100%",
+            display: "flex",
+            flexDirection: "column",
+            alignItems: "center",
+            paddingTop: 60,
+            paddingBottom: 24,
+            gap: 48,
+            marginTop: 60,
           }}
         >
-          <PuzzleGhost ion={ghost.ion} />
-        </div>
-      )}
-
-      <div
-        style={{
-          width: "100%",
-          display: "flex",
-          flexDirection: "column",
-          alignItems: "center",
-          paddingTop: 60,
-          paddingBottom: 24,
-          gap: 48,
-          marginTop: 60,
-        }}
-      >
         {/* Tab + Title + Step indicators */}
         <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 42, width: 900 }}>
           <ContentTab
@@ -440,7 +469,10 @@ export default function IonicLab() {
                   return (
                     <div key={p.id} style={{ position: "relative" }}>
                       <button
-                        onClick={() => { if (accessible) { setCurrentProblem(i); setIsWrong(false); setIsWrongCompound(false); } }}
+                        onClick={() => {
+                          if (accessible) { setCurrentProblem(i); setIsWrong(false); setIsWrongCompound(false); setJustSolved(false); }
+                          else if (!isLoggedIn) { setShowLoginModal(true); }
+                        }}
                         style={{
                           display: "flex", flexDirection: "column", justifyContent: "center", alignItems: "center",
                           padding: 4, width: 24, height: 24,
@@ -466,7 +498,7 @@ export default function IonicLab() {
                 })}
               </div>
 
-              {!isLoggedIn && solvedProblems.has(FREE_LIMIT - 1) && (
+              {!isLoggedIn && currentProblem >= FREE_LIMIT - 1 && freeProblemsSolved && (
                 <button
                   className="more-problems-btn"
                   onClick={() => setShowLoginModal(true)}
@@ -503,7 +535,7 @@ export default function IonicLab() {
 
           {/* Ion list + canvas */}
           <div style={{ display: "flex", flexDirection: "row", alignItems: "flex-start", gap: 16, width: 900 }}>
-            <IonTabList onPaletteDragStart={handlePaletteDragStart} draggingIonId={draggingPaletteId} />
+            <IonTabList draggingIonId={draggingPaletteId} />
 
             {/* Canvas panel */}
             <div
@@ -529,13 +561,20 @@ export default function IonicLab() {
                         }));
                       });
                       setIsWrong(false);
+                      setIsWrongCompound(false);
+                      setJustSolved(false);
                     }}
                     disabled={placedPieces.length === 0}
                   >
                     되돌리기
                   </ToolBtn>
                   <ToolBtn
-                    onClick={() => { setPlacedPieces([]); setIsWrong(false); }}
+                    onClick={() => {
+                      setPlacedPieces([]);
+                      setIsWrong(false);
+                      setIsWrongCompound(false);
+                      setJustSolved(false);
+                    }}
                     disabled={placedPieces.length === 0}
                   >
                     초기화
@@ -544,52 +583,31 @@ export default function IonicLab() {
                 <div style={{ display: "flex", flexDirection: "row", alignItems: "center", gap: 6, height: 34 }}>
                   <ToolBtn onClick={() => {}} bordered>힌트 보기</ToolBtn>
                   <ToolBtn
-                    onClick={() => {
-                      if (problemSolved) {
-                        if (isLastProblem && !isLoggedIn) { setShowLoginModal(true); return; }
-                        if (!isLastProblem) setCurrentProblem(currentProblem + 1);
-                        return;
-                      }
-                      setCheckKey((k) => k + 1);
-                      if (isCorrect) {
-                        setSolvedProblems((prev) => new Set([...prev, currentProblem]));
-                        setIsWrong(false);
-                        setIsWrongCompound(false);
-                      } else if (isChargeZero && !isRightCompound) {
-                        setIsWrongCompound(true);
-                        setIsWrong(false);
-                      } else {
-                        setIsWrong(true);
-                        setIsWrongCompound(false);
-                      }
-                    }}
-                    disabled={!problemSolved && placedPieces.length === 0}
+                    onClick={handleAnswerButtonClick}
+                    disabled={placedPieces.length === 0}
                     primary
                   >
-                    {problemSolved
-                      ? isLastProblem
-                        ? isLoggedIn ? "완료" : "다음 화합물 만들기 →"
-                        : "다음 문제 →"
-                      : "정답 확인"}
+                    {answerButtonLabel}
                   </ToolBtn>
                 </div>
               </div>
 
               <CanvasDropZone
-                canvasRef={canvasRef}
+                onCanvasReady={handleCanvasReady}
                 placedPieces={placedPieces}
                 onRemove={handleRemovePiece}
-                onPieceDragStart={handleCanvasDragStart}
                 isDragOver={isDragOver}
-                isCorrect={isCorrect}
+                isCorrect={justSolved && isCorrect}
                 isWrong={isWrong}
                 isWrongCompound={isWrongCompound}
                 checkKey={checkKey}
+                draggingPieceId={draggingPieceId}
               />
             </div>
           </div>
         </div>
-      </div>
+        </div>
+      </DndContext>
 
       <AiFab />
 
