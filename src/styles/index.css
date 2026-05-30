@@ -111,6 +111,10 @@
 
   /* Shadow */
   --color-shadow-popup: rgba(0, 0, 0, 0.05);
+  --color-shadow-modal: rgba(78, 79, 82, 0.18);
+
+  /* Overlay */
+  --color-bg-overlay: rgba(0, 0, 0, 0.4);
 
   /* Element / Normal */
   --color-element-normal-red: var(--color-red-500);
