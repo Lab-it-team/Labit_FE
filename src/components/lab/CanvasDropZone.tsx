@@ -141,7 +141,7 @@ function Toast({ status }: { status: CanvasStatus }) {
         <div style={{ display: "flex", flexDirection: "column", alignItems: "flex-start", gap: 2 }}>
           <span style={label}>전하는 맞지만 목표 화합물이 아니에요!</span>
           <span style={{ ...label, fontSize: 12, lineHeight: "17px", color: "var(--color-text-sub)" }}>
-            이온의 종류와 개수를 다시 확인해 보세요.
+            5초 후 자동으로 리셋됩니다.
           </span>
         </div>
       </div>
