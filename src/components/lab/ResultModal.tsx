@@ -1,3 +1,5 @@
+import { useEffect, useId, useRef } from 'react';
+
 interface ResultModalProps {
   type: 'correct' | 'wrong' | 'wrongCompound';
   formula: string;
@@ -9,6 +11,22 @@ interface ResultModalProps {
 
 export default function ResultModal({ type, formula, name, isLastProblem, onNext, onClose }: ResultModalProps) {
   const isCorrect = type === 'correct';
+  const titleId   = useId();
+  const dialogRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const prev = document.activeElement as HTMLElement | null;
+    dialogRef.current?.focus();
+    return () => { prev?.focus(); };
+  }, []);
+
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') onClose();
+    };
+    document.addEventListener('keydown', handleKeyDown);
+    return () => document.removeEventListener('keydown', handleKeyDown);
+  }, [onClose]);
 
   return (
     <div
@@ -20,6 +38,11 @@ export default function ResultModal({ type, formula, name, isLastProblem, onNext
       onClick={onClose}
     >
       <div
+        ref={dialogRef}
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby={titleId}
+        tabIndex={-1}
         style={{
           background: 'var(--color-static-white)',
           borderRadius: 20,
@@ -27,6 +50,7 @@ export default function ResultModal({ type, formula, name, isLastProblem, onNext
           display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 24,
           width: 400,
           boxShadow: '0 8px 32px var(--color-shadow-popup)',
+          outline: 'none',
         }}
         onClick={(e) => e.stopPropagation()}
       >
@@ -58,6 +82,7 @@ export default function ResultModal({ type, formula, name, isLastProblem, onNext
         {/* Text */}
         <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 8, textAlign: 'center' }}>
           <span
+            id={titleId}
             style={{
               fontFamily: 'var(--font-sans)', fontWeight: 700, fontSize: 22,
               lineHeight: '30px', color: 'var(--color-text-strong)',
