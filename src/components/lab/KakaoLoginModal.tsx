@@ -10,11 +10,11 @@ export default function KakaoLoginModal({ onClose, nextProblemIndex }: KakaoLogi
   const handleKakaoLogin = () => {
     sessionStorage.setItem("lab_current_problem", String(nextProblemIndex));
     sessionStorage.setItem("lab_redirect", "/ionic-lab");
-    const solvedProblems = localStorage.getItem("lab_solved_problems");
+    const solvedProblems = sessionStorage.getItem("lab_solved_problems");
     if (solvedProblems) {
       sessionStorage.setItem("lab_pre_login_solved_problems", solvedProblems);
     }
-    const placedPieces = localStorage.getItem("lab_placed_pieces");
+    const placedPieces = sessionStorage.getItem("lab_placed_pieces");
     if (placedPieces) {
       sessionStorage.setItem("lab_pre_login_placed_pieces", placedPieces);
     }

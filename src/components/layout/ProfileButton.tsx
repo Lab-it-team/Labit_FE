@@ -23,6 +23,8 @@ export default function ProfileButton() {
   const handleLogout = async () => {
     try { await logout() } catch { /* 토큰 만료 등 무시 */ }
     clearAuth()
+    sessionStorage.removeItem('lab_placed_pieces')
+    sessionStorage.removeItem('lab_solved_problems')
     navigate('/login')
   }
 

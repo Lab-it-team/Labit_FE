@@ -210,7 +210,7 @@ export default function IonicLab() {
     return 0;
   });
   const [allPieces,          setAllPieces]          = useState<Record<number, PlacedPiece[]>>(() => {
-    const saved = parseStoredPieces(localStorage.getItem("lab_placed_pieces"));
+    const saved = parseStoredPieces(sessionStorage.getItem("lab_placed_pieces"));
     const preLoginSaved = parseStoredPieces(sessionStorage.getItem("lab_pre_login_placed_pieces"));
     sessionStorage.removeItem("lab_pre_login_placed_pieces");
     return { ...saved, ...preLoginSaved };
@@ -218,7 +218,7 @@ export default function IonicLab() {
   const [isWrong,            setIsWrong]            = useState(false);
   const [checkKey,           setCheckKey]           = useState(0);
   const [solvedProblems,     setSolvedProblems]      = useState<Set<number>>(() => {
-    const saved = localStorage.getItem("lab_solved_problems");
+    const saved = sessionStorage.getItem("lab_solved_problems");
     const preLoginSaved = sessionStorage.getItem("lab_pre_login_solved_problems");
     if (preLoginSaved) sessionStorage.removeItem("lab_pre_login_solved_problems");
     const merged = [
@@ -229,6 +229,7 @@ export default function IonicLab() {
     return new Set<number>();
   });
   const [isWrongCompound,    setIsWrongCompound]    = useState(false);
+  const [showHint,           setShowHint]           = useState(false);
   const [showLoginModal,     setShowLoginModal]     = useState(false);
   const [justSolved,         setJustSolved]         = useState(false);
   const [activeDragIon,      setActiveDragIon]      = useState<Ion | null>(null);
@@ -240,6 +241,7 @@ export default function IonicLab() {
   const idCounter          = useRef(getNextPieceId(allPieces));
   const currentProblemRef  = useRef(currentProblem);
   const pendingSnapRef     = useRef<{ dropId: string; dropX: number; dropY: number } | null>(null);
+  const pointerRef         = useRef({ x: 0, y: 0 });
   const sensors = useSensors(
     useSensor(PointerSensor, {
       activationConstraint: { distance: 4 },
@@ -249,6 +251,17 @@ export default function IonicLab() {
   useEffect(() => {
     currentProblemRef.current = currentProblem;
   }, [currentProblem]);
+
+  useEffect(() => {
+    // capture phase로 dnd-kit보다 먼저 실행되어 handleDragEnd 시점에 최신 좌표 보장
+    const track = (e: PointerEvent) => { pointerRef.current = { x: e.clientX, y: e.clientY }; };
+    window.addEventListener("pointermove", track, { passive: true, capture: true });
+    window.addEventListener("pointerup",   track, { passive: true, capture: true });
+    return () => {
+      window.removeEventListener("pointermove", track, { capture: true });
+      window.removeEventListener("pointerup",   track, { capture: true });
+    };
+  }, []);
 
   useEffect(() => {
     const snap = pendingSnapRef.current;
@@ -290,6 +303,13 @@ export default function IonicLab() {
       problem.anionCount  * problem.anion.charge,
     ) * UNIT_H + 80,
   );
+
+  const hintText = (() => {
+    const ratio = `${problem.cationCount}:${problem.anionCount}`;
+    const lastDigit = parseInt(ratio.at(-1) ?? "1");
+    const particle = [3, 6].includes(lastDigit) ? "으로" : "로";
+    return `${problem.cation.symbol}는 +${problem.cation.charge}, ${problem.anion.symbol}은 -${problem.anion.charge}입니다. ${ratio}${particle} 만나면 전하 합이 0이 됩니다.`;
+  })();
 
   const placedCations  = placedPieces.filter((p) => p.ion.type === "plus");
   const placedAnions   = placedPieces.filter((p) => p.ion.type === "minus");
@@ -347,7 +367,7 @@ export default function IonicLab() {
     const initialRect = active.rect.current.initial;
     const droppedOnCanvas = over?.id === "ionic-canvas";
 
-    if (!data || !rect || !initialRect || !droppedOnCanvas) {
+    if (!data || !rect || !droppedOnCanvas) {
       if (data?.source === "canvas") {
         const removeId = data.pieceId;
         setPlacedPieces((prev) => removePieceLinks(prev.filter((p) => p.id !== removeId), removeId));
@@ -356,9 +376,20 @@ export default function IonicLab() {
       return;
     }
 
-    const rawX = initialRect.left + delta.x - rect.left;
-    const rawY = initialRect.top  + delta.y - rect.top;
     const ionH = data.ion.charge * UNIT_H;
+    let rawX: number;
+    let rawY: number;
+
+    if (data.source === "canvas" && initialRect) {
+      // 캔버스 피스: 그랩 오프셋 유지 (드래그 전 위치 + delta)
+      rawX = initialRect.left + delta.x - rect.left;
+      rawY = initialRect.top  + delta.y - rect.top;
+    } else {
+      // 팔레트 피스: 실제 포인터 위치에 피스 중앙을 배치
+      // (DragOverlay 크기 ≠ 팔레트 카드 크기이므로 initialRect 기반 계산은 오차 발생)
+      rawX = pointerRef.current.x - rect.left - PIECE_W / 2;
+      rawY = pointerRef.current.y - rect.top  - ionH / 2;
+    }
     const dropX = Math.max(0, Math.min(rawX, CANVAS_W - PIECE_W));
     const dropY = Math.max(0, Math.min(rawY, canvasHeight - ionH));
     const dropId = data.source === "palette" ? mkId() : data.pieceId;
@@ -400,11 +431,11 @@ export default function IonicLab() {
   const freeProblemsSolved = Array.from({ length: FREE_LIMIT }, (_, i) => solvedProblems.has(i)).every(Boolean);
 
   useEffect(() => {
-    localStorage.setItem("lab_solved_problems", JSON.stringify([...solvedProblems]));
+    sessionStorage.setItem("lab_solved_problems", JSON.stringify([...solvedProblems]));
   }, [solvedProblems]);
 
   useEffect(() => {
-    localStorage.setItem("lab_placed_pieces", JSON.stringify(allPieces));
+    sessionStorage.setItem("lab_placed_pieces", JSON.stringify(allPieces));
   }, [allPieces]);
 
   // 오답 / 화합물 불일치 시 5초 후 캔버스 리셋
@@ -423,6 +454,7 @@ export default function IonicLab() {
     setJustSolved(false);
     setIsWrong(false);
     setIsWrongCompound(false);
+    setShowHint(false);
   }, [lastAccessible]);
 
   useEffect(() => {
@@ -528,7 +560,7 @@ export default function IonicLab() {
                     <div key={p.id} style={{ position: "relative" }}>
                       <button
                         onClick={() => {
-                          if (accessible) { setCurrentProblem(i); setIsWrong(false); setIsWrongCompound(false); setJustSolved(false); }
+                          if (accessible) { setCurrentProblem(i); setIsWrong(false); setIsWrongCompound(false); setJustSolved(false); setShowHint(false); }
                           else if (!isLoggedIn) { setShowLoginModal(true); }
                         }}
                         style={{
@@ -639,7 +671,7 @@ export default function IonicLab() {
                   </ToolBtn>
                 </div>
                 <div style={{ display: "flex", flexDirection: "row", alignItems: "center", gap: 6, height: 34 }}>
-                  <ToolBtn onClick={() => {}} bordered>힌트 보기</ToolBtn>
+                  <ToolBtn onClick={() => setShowHint((v) => !v)} bordered>힌트 보기</ToolBtn>
                   <ToolBtn
                     onClick={handleAnswerButtonClick}
                     disabled={placedPieces.length === 0}
@@ -661,6 +693,8 @@ export default function IonicLab() {
                 checkKey={checkKey}
                 draggingPieceId={draggingPieceId}
                 height={canvasHeight}
+                hintVisible={showHint}
+                hintText={hintText}
               />
             </div>
           </div>
@@ -668,9 +702,7 @@ export default function IonicLab() {
         </div>
       </DndContext>
 
-      <div className="fixed bottom-15 right-6 z-30 flex flex-col items-end">
-        <AiFab showTooltip={false} />
-      </div>
+      <AiFab showTooltip={false} className="fixed bottom-[90px] right-10 z-30" />
 
       {showLoginModal && (
         <KakaoLoginModal
