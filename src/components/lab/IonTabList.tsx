@@ -8,53 +8,22 @@ import tipsSvg from "@/assets/Icon/tips.svg";
 function shapeFill(): string { return "var(--color-bg-normal)"; }
 function shapeStroke(): string { return "var(--color-border-strong)"; }
 
-function hoverFill(ion: Ion): string {
+function ionColorKey(ion: Ion): string {
   const c = Math.abs(ion.charge);
   if (ion.type === "minus") {
-    if (c >= 3) return "var(--color-element-hover-fill-violet)";
-    if (c >= 2) return "var(--color-element-hover-fill-blue)";
-    return "var(--color-element-hover-fill-mint)";
+    if (c >= 3) return "violet";
+    if (c >= 2) return "blue";
+    return "mint";
   }
-  if (c >= 3) return "var(--color-element-hover-fill-orange)";
-  if (c >= 2) return "var(--color-element-hover-fill-yellow)";
-  return "var(--color-element-hover-fill-pink)";
+  if (c >= 3) return "orange";
+  if (c >= 2) return "yellow";
+  return "pink";
 }
 
-function hoverStroke(ion: Ion): string {
-  const c = Math.abs(ion.charge);
-  if (ion.type === "minus") {
-    if (c >= 3) return "var(--color-element-hover-stroke-violet)";
-    if (c >= 2) return "var(--color-element-hover-stroke-blue)";
-    return "var(--color-element-hover-stroke-mint)";
-  }
-  if (c >= 3) return "var(--color-element-hover-stroke-orange)";
-  if (c >= 2) return "var(--color-element-hover-stroke-yellow)";
-  return "var(--color-element-hover-stroke-pink)";
-}
-
-function pressedFill(ion: Ion): string {
-  const c = Math.abs(ion.charge);
-  if (ion.type === "minus") {
-    if (c >= 3) return "var(--color-element-pressed-fill-violet)";
-    if (c >= 2) return "var(--color-element-pressed-fill-blue)";
-    return "var(--color-element-pressed-fill-mint)";
-  }
-  if (c >= 3) return "var(--color-element-pressed-fill-orange)";
-  if (c >= 2) return "var(--color-element-pressed-fill-yellow)";
-  return "var(--color-element-pressed-fill-pink)";
-}
-
-function pressedStroke(ion: Ion): string {
-  const c = Math.abs(ion.charge);
-  if (ion.type === "minus") {
-    if (c >= 3) return "var(--color-element-pressed-stroke-violet)";
-    if (c >= 2) return "var(--color-element-pressed-stroke-blue)";
-    return "var(--color-element-pressed-stroke-mint)";
-  }
-  if (c >= 3) return "var(--color-element-pressed-stroke-orange)";
-  if (c >= 2) return "var(--color-element-pressed-stroke-yellow)";
-  return "var(--color-element-pressed-stroke-pink)";
-}
+function hoverFill(ion: Ion):     string { return `var(--color-element-hover-fill-${ionColorKey(ion)})`; }
+function hoverStroke(ion: Ion):   string { return `var(--color-element-hover-stroke-${ionColorKey(ion)})`; }
+function pressedFill(ion: Ion):   string { return `var(--color-element-pressed-fill-${ionColorKey(ion)})`; }
+function pressedStroke(ion: Ion): string { return `var(--color-element-pressed-stroke-${ionColorKey(ion)})`; }
 
 interface PuzzleCardProps {
   ion: Ion;
