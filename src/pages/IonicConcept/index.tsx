@@ -1,9 +1,14 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router";
 import LessonHeader from "@/components/lesson/LessonHeader";
 import LessonFooter from "@/components/lesson/LessonFooter";
 import ContentTab from "@/components/lesson/ContentTab";
 import CourseModal from "@/components/lesson/CourseModal";
+import AiChat, { removeHighlight } from "@/components/lesson/AiChat";
+import AiAssistPanel from "@/components/lesson/AiAssistPanel";
+import AiFab from "@/components/lesson/AiFab";
+import FormationContent from "@/components/lesson/FormationContent";
+import { useTextSelection } from "@/hooks/useTextSelection";
 
 const TOTAL_PAGES = 4;
 
@@ -25,14 +30,14 @@ function StudyCard() {
   return (
     <div className="bg-white border border-border-light rounded-3xl p-6 flex flex-col gap-6 w-full">
       <div className="flex flex-col gap-4">
-        <h2 className="text-heading-md font-bold text-text-strong">
+        <h2 className="text-heading-md text-text-strong">
           {studyContent.title}
         </h2>
         <div className="flex flex-col gap-0">
           {studyContent.body.map((line, i) => (
             <p
               key={i}
-              className="text-body-md font-medium text-text-normal leading-[25px]"
+              className="text-body-md text-text-normal"
             >
               {line}
             </p>
@@ -41,10 +46,10 @@ function StudyCard() {
       </div>
 
       <div className="bg-bg-color rounded-xl px-4 py-3 flex flex-col gap-1.5">
-        <p className="text-caption-lg text-neutral-50">
+        <p className="text-caption-lg text-text-sub">
           {studyContent.tip.label}
         </p>
-        <p className="text-label-xl font-semibold text-blue-500">
+        <p className="text-label-xl text-text-primary">
           {studyContent.tip.text}
         </p>
       </div>
@@ -59,6 +64,15 @@ export default function IonicConcept() {
   const [showProgressBadge, setShowProgressBadge] = useState(true);
   const [completed, setCompleted] = useState(false);
   const [showCourseModal, setShowCourseModal] = useState(false);
+  const [assistPanel, setAssistPanel] = useState<{
+    key: number;
+    question: string;
+    selectedText: string;
+    x: number;
+    y: number;
+  } | null>(null);
+  const assistPanelKeyRef = useRef(0);
+  const { selection, popupRef, clear } = useTextSelection();
 
   useEffect(() => {
     if (!completed) return;
@@ -85,19 +99,72 @@ export default function IonicConcept() {
       />
       {showCourseModal && <CourseModal onClose={() => setShowCourseModal(false)} />}
 
-      {/* ── Main Content ── */}
+      {assistPanel && (
+        <AiAssistPanel
+          key={assistPanel.key}
+          selectedText={assistPanel.selectedText}
+          initialQuestion={assistPanel.question}
+          onClose={() => { setAssistPanel(null); removeHighlight(); }}
+          className="fixed z-50"
+          style={{
+            left: assistPanel.x,
+            top: assistPanel.y,
+            transform: 'translateX(-50%)',
+          }}
+        />
+      )}
+
+      {selection && (
+        <AiChat
+          ref={popupRef}
+          className="fixed z-40"
+          style={{
+            left: selection.x,
+            top: selection.bottom + 8,
+            transform: 'translateX(-50%)',
+          }}
+          onSend={(q) => {
+            const PANEL_H = 371;
+            const PANEL_W = 334;
+            const spaceBelow = window.innerHeight - (selection.bottom + 8);
+            const y = spaceBelow >= PANEL_H
+              ? selection.bottom + 8
+              : Math.max(selection.top - PANEL_H - 8, 8);
+            const x = Math.min(
+              Math.max(selection.x, PANEL_W / 2 + 8),
+              window.innerWidth - PANEL_W / 2 - 8,
+            );
+            setAssistPanel({ key: ++assistPanelKeyRef.current, question: q, selectedText: selection.text, x, y });
+            clear();
+          }}
+        />
+      )}
+
+      {/* Main Content */}
       <main className="flex-1 flex flex-col items-center pt-[80px] pb-[80px] px-4 sm:px-10 md:px-20 lg:px-[270px]">
         <div className="w-full max-w-[900px] flex flex-col gap-14 pt-10">
-          <ContentTab active={activeTab} onChange={setActiveTab} />
-          {activeTab === "learn" ? (
-            <StudyCard />
-          ) : (
+          <ContentTab
+            active={activeTab}
+            onChange={(v) => {
+              if (v === "practice") navigate("/ionic-lab");
+              else setActiveTab(v);
+            }}
+          />
+          {currentPage === 1 && <StudyCard />}
+          {currentPage === 2 && <FormationContent />}
+          {currentPage > 2 && (
             <div className="bg-white border border-border-light rounded-3xl p-6 text-text-normal text-body-md">
-              실습 화면 준비 중이에요.
+              준비 중이에요.
             </div>
           )}
         </div>
       </main>
+
+      <AiFab
+        showTooltip={true}
+        onClick={() => {}}
+        className="fixed bottom-[90px] right-10 z-30"
+      />
 
       <LessonFooter
         currentPage={currentPage}

@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import failSvg from "@/assets/Icon/fail.svg";
 import checkCircleSvg from "@/assets/Icon/check-c.svg";
 import arrowUpSvg from "@/assets/Icon/Arrow/up.svg";
 import arrowDownSvg from "@/assets/Icon/Arrow/down.svg";
@@ -50,10 +51,8 @@ export default function CourseModal({ onClose }: CourseModalProps) {
               <span>6</span>
             </div>
           </div>
-          <button type="button" onClick={onClose} aria-label="닫기">
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <path d="M17.6569 6.3424C17.4693 6.15486 17.215 6.04951 16.9497 6.04951C16.6845 6.04951 16.4302 6.15486 16.2426 6.3424L12 10.585L7.75736 6.3424C7.56982 6.15486 7.31547 6.04951 7.05025 6.04951C6.78504 6.04951 6.53068 6.15486 6.34315 6.3424C6.15561 6.52994 6.05025 6.78429 6.05025 7.04951C6.05025 7.31472 6.15561 7.56908 6.34315 7.75661L10.5858 11.9993L6.34315 16.2419C6.15561 16.4294 6.05025 16.6838 6.05025 16.949C6.05025 17.2142 6.15561 17.4686 6.34315 17.6561C6.53068 17.8436 6.78504 17.949 7.05025 17.949C7.31547 17.949 7.56982 17.8436 7.75736 17.6561L12 13.4135L16.2426 17.6561C16.4302 17.8436 16.6845 17.949 16.9497 17.949C17.215 17.949 17.4693 17.8436 17.6569 17.6561C17.8444 17.4686 17.9497 17.2142 17.9497 16.949C17.9497 16.6838 17.8444 16.4294 17.6569 16.2419L13.4142 11.9993L17.6569 7.75661C17.8444 7.56908 17.9497 7.31472 17.9497 7.04951C17.9497 6.78429 17.8444 6.52994 17.6569 6.3424Z" fill="#4E4F52"/>
-            </svg>
+          <button type="button" onClick={onClose} className="shrink-0 size-[24px]" aria-label="닫기">
+            <img src={failSvg} alt="" width={24} height={24} className="size-full" />
           </button>
         </div>
 
