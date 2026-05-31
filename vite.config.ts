@@ -40,11 +40,22 @@ export default defineConfig({
         globPatterns: ['**/*.{js,css,html,ico,png,svg,woff2}'],
         runtimeCaching: [
           {
-            urlPattern: /^https:\/\/fonts\.(googleapis|gstatic)\.com/,
+            // 스타일시트: 최신 URL로 자주 갱신되므로 StaleWhileRevalidate
+            urlPattern: /^https:\/\/fonts\.googleapis\.com/,
+            handler: 'StaleWhileRevalidate',
+            options: {
+              cacheName: 'google-fonts-stylesheets',
+              cacheableResponse: { statuses: [0, 200] },
+            },
+          },
+          {
+            // 폰트 파일: 불변 리소스이므로 CacheFirst + 1년 만료
+            urlPattern: /^https:\/\/fonts\.gstatic\.com/,
             handler: 'CacheFirst',
             options: {
-              cacheName: 'google-fonts',
-              expiration: { maxEntries: 10, maxAgeSeconds: 60 * 60 * 24 * 365 },
+              cacheName: 'google-fonts-webfonts',
+              expiration: { maxEntries: 20, maxAgeSeconds: 60 * 60 * 24 * 365 },
+              cacheableResponse: { statuses: [0, 200] },
             },
           },
         ],
