@@ -268,16 +268,6 @@ export default function IonicLab() {
     };
   }, []);
 
-  useEffect(() => {
-    const snap = pendingSnapRef.current;
-    if (!snap) return;
-    pendingSnapRef.current = null;
-    const id = requestAnimationFrame(() => {
-      setPlacedPieces((prev) => snapDroppedPiece(prev, snap.dropId, snap.dropX, snap.dropY));
-    });
-    return () => cancelAnimationFrame(id);
-  });
-
   const handleCanvasReady = useCallback((node: HTMLDivElement | null) => {
     canvasRef.current = node;
   }, []);
@@ -294,6 +284,16 @@ export default function IonicLab() {
     },
     [],
   );
+
+  useEffect(() => {
+    const snap = pendingSnapRef.current;
+    if (!snap) return;
+    pendingSnapRef.current = null;
+    const id = requestAnimationFrame(() => {
+      setPlacedPieces((prev) => snapDroppedPiece(prev, snap.dropId, snap.dropX, snap.dropY));
+    });
+    return () => cancelAnimationFrame(id);
+  });
 
   const placedPieces = allPieces[currentProblem] ?? [];
 
