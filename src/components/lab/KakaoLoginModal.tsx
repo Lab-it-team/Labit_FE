@@ -1,6 +1,10 @@
 import kakaoIconSvg from "@/assets/Icon/kakao-icon.svg";
 import mascotPng from "@/assets/Icon/mascot.png";
 
+const KAKAO_CLIENT_ID  = import.meta.env.VITE_KAKAO_REST_API_KEY  as string | undefined;
+const KAKAO_REDIRECT   = import.meta.env.VITE_KAKAO_REDIRECT_URI  as string | undefined;
+const kakaoConfigReady = Boolean(KAKAO_CLIENT_ID && KAKAO_REDIRECT);
+
 interface KakaoLoginModalProps {
   onClose: () => void;
   nextProblemIndex: number;
@@ -21,9 +25,10 @@ export default function KakaoLoginModal({ onClose, nextProblemIndex }: KakaoLogi
 
     const state = crypto.randomUUID();
     sessionStorage.setItem("kakao_oauth_state", state);
+    if (!kakaoConfigReady) return;
     const params = new URLSearchParams({
-      client_id: import.meta.env.VITE_KAKAO_REST_API_KEY ?? "",
-      redirect_uri: import.meta.env.VITE_KAKAO_REDIRECT_URI ?? "",
+      client_id: KAKAO_CLIENT_ID!,
+      redirect_uri: KAKAO_REDIRECT!,
       response_type: "code",
       state,
     });
@@ -90,10 +95,13 @@ export default function KakaoLoginModal({ onClose, nextProblemIndex }: KakaoLogi
           <button
             type="button"
             onClick={handleKakaoLogin}
+            disabled={!kakaoConfigReady}
             style={{
               display: "flex", flexDirection: "row", justifyContent: "center", alignItems: "center",
               padding: "12px 20px", gap: 6, width: "100%", height: 46,
-              background: "#FEE500", borderRadius: 12, border: "none", cursor: "pointer",
+              background: "#FEE500", borderRadius: 12, border: "none",
+              cursor: kakaoConfigReady ? "pointer" : "not-allowed",
+              opacity: kakaoConfigReady ? 1 : 0.4,
             }}
           >
             <img src={kakaoIconSvg} alt="" width={20} height={20} />
