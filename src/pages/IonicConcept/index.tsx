@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router";
 import LessonHeader from "@/components/lesson/LessonHeader";
 import LessonFooter from "@/components/lesson/LessonFooter";
@@ -65,11 +65,13 @@ export default function IonicConcept() {
   const [completed, setCompleted] = useState(false);
   const [showCourseModal, setShowCourseModal] = useState(false);
   const [assistPanel, setAssistPanel] = useState<{
+    key: number;
     question: string;
     selectedText: string;
     x: number;
     y: number;
   } | null>(null);
+  const assistPanelKeyRef = useRef(0);
   const { selection, popupRef, clear } = useTextSelection();
 
   useEffect(() => {
@@ -99,6 +101,7 @@ export default function IonicConcept() {
 
       {assistPanel && (
         <AiAssistPanel
+          key={assistPanel.key}
           selectedText={assistPanel.selectedText}
           initialQuestion={assistPanel.question}
           onClose={() => { setAssistPanel(null); removeHighlight(); }}
@@ -131,7 +134,7 @@ export default function IonicConcept() {
               Math.max(selection.x, PANEL_W / 2 + 8),
               window.innerWidth - PANEL_W / 2 - 8,
             );
-            setAssistPanel({ question: q, selectedText: selection.text, x, y });
+            setAssistPanel({ key: ++assistPanelKeyRef.current, question: q, selectedText: selection.text, x, y });
             clear();
           }}
         />
