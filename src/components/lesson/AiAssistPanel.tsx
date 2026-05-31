@@ -40,8 +40,8 @@ function Chip({ text, onClick }: { text: string; onClick: () => void }) {
 function UserBubble({ text }: { text: string }) {
   return (
     <div className="flex justify-end w-full">
-      <div className="bg-blue-500 px-[12px] py-[10px] rounded-tl-[12px] rounded-tr-[2px] rounded-br-[12px] rounded-bl-[12px]">
-        <p className="text-[13px] font-medium leading-[18px] tracking-[-0.065px] text-white whitespace-nowrap">
+      <div className="bg-blue-500 px-[12px] py-[10px] rounded-tl-[12px] rounded-tr-[2px] rounded-br-[12px] rounded-bl-[12px] max-w-[286px]">
+        <p className="text-[13px] font-medium leading-[18px] tracking-[-0.065px] text-white break-keep">
           {text}
         </p>
       </div>
