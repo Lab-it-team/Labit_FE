@@ -21,7 +21,10 @@ export const useKakaoLogin = () => {
       const redirect = sessionStorage.getItem('lab_redirect') ?? '/';
       sessionStorage.removeItem('lab_redirect');
       // 실습 화면에서 로그인한 경우가 아니면 이전 실습 데이터를 초기화
-      if (!sessionStorage.getItem('lab_pre_login_placed_pieces')) {
+      const hasPreLoginState =
+        sessionStorage.getItem('lab_pre_login_placed_pieces') !== null ||
+        sessionStorage.getItem('lab_pre_login_solved_problems') !== null
+      if (!hasPreLoginState) {
         sessionStorage.removeItem('lab_placed_pieces')
         sessionStorage.removeItem('lab_solved_problems')
       }
