@@ -119,7 +119,7 @@ export default function ResultModal({ type, formula, name, isLastProblem, onNext
                 color: 'var(--color-text-sub)', lineHeight: '20px',
               }}
             >
-              목표는 <strong style={{ color: 'var(--color-primary-normal)' }}>{formula}({name})</strong>이에요.{'\n'}
+              목표는 <strong style={{ color: 'var(--color-primary-normal)' }}>{formula}({name})</strong>이에요.<br />
               올바른 이온의 종류와 개수를 다시 확인해보세요!
             </span>
           ) : (
@@ -129,7 +129,7 @@ export default function ResultModal({ type, formula, name, isLastProblem, onNext
                 color: 'var(--color-text-sub)', lineHeight: '20px',
               }}
             >
-              양이온과 음이온의 전하 합이 0이 되도록{'\n'}다시 맞춰보세요!
+              양이온과 음이온의 전하 합이 0이 되도록<br />다시 맞춰보세요!
             </span>
           )}
         </div>
