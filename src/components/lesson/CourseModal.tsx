@@ -52,7 +52,7 @@ export default function CourseModal({ onClose }: CourseModalProps) {
             </div>
           </div>
           <button type="button" onClick={onClose} className="shrink-0 size-[24px]" aria-label="닫기">
-            <img src={failSvg} alt="닫기" width={24} height={24} className="size-full" />
+            <img src={failSvg} alt="" width={24} height={24} className="size-full" />
           </button>
         </div>
 
