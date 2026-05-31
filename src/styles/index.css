@@ -284,12 +284,13 @@
   color: var(--color-primary-heavy);
 }
 
-/* ── Canvas piece: show remove button on hover only ─────────────────────── */
+/* ── Canvas piece: show remove button on hover or keyboard focus ─────────── */
 .canvas-piece .piece-remove-btn {
   opacity: 0;
   transition: opacity 0.15s ease;
 }
-.canvas-piece:hover .piece-remove-btn {
+.canvas-piece:hover .piece-remove-btn,
+.canvas-piece:focus-within .piece-remove-btn {
   opacity: 1;
 }
 
