@@ -81,6 +81,11 @@ type LabDragData =
   | { source: "palette"; ion: Ion }
   | { source: "canvas"; pieceId: string; ion: Ion };
 
+function parseStoredNumbers(value: string | null): number[] {
+  if (!value) return [];
+  try { return JSON.parse(value) as number[]; } catch { return []; }
+}
+
 function parseStoredPieces(value: string | null): Record<number, PlacedPiece[]> {
   if (!value) return {};
   try {
@@ -222,8 +227,8 @@ export default function IonicLab() {
     const preLoginSaved = sessionStorage.getItem("lab_pre_login_solved_problems");
     if (preLoginSaved) sessionStorage.removeItem("lab_pre_login_solved_problems");
     const merged = [
-      ...(saved ? JSON.parse(saved) as number[] : []),
-      ...(preLoginSaved ? JSON.parse(preLoginSaved) as number[] : []),
+      ...parseStoredNumbers(saved),
+      ...parseStoredNumbers(preLoginSaved),
     ];
     if (merged.length > 0) return new Set<number>(merged);
     return new Set<number>();
