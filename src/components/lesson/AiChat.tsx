@@ -179,7 +179,7 @@ const applyHighlight = (range: Range) => {
   try {
     range.surroundContents(createMark())
     return
-  } catch {}
+  } catch { /* 여러 요소에 걸친 선택은 아래 fallback으로 처리 */ }
 
   // 여러 요소에 걸친 선택: 각 텍스트 노드를 개별로 감쌈
   const walker = document.createTreeWalker(range.commonAncestorContainer, NodeFilter.SHOW_TEXT)
@@ -205,7 +205,7 @@ const applyHighlight = (range: Range) => {
       r.selectNodeContents(textNode)
     }
     if (r.collapsed) continue
-    try { r.surroundContents(createMark()) } catch {}
+    try { r.surroundContents(createMark()) } catch { /* 노드 경계 불일치 시 해당 텍스트 노드 건너뜀 */ }
   }
 }
 
