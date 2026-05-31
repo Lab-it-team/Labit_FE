@@ -23,8 +23,16 @@ export default function ProfileButton() {
   const handleLogout = async () => {
     try { await logout() } catch { /* 토큰 만료 등 무시 */ }
     clearAuth()
-    sessionStorage.removeItem('lab_placed_pieces')
-    sessionStorage.removeItem('lab_solved_problems')
+    const LAB_SESSION_KEYS = [
+      'lab_placed_pieces',
+      'lab_solved_problems',
+      'lab_current_problem',
+      'lab_redirect',
+      'lab_pre_login_placed_pieces',
+      'lab_pre_login_solved_problems',
+      'kakao_oauth_state',
+    ]
+    LAB_SESSION_KEYS.forEach((key) => sessionStorage.removeItem(key))
     navigate('/login')
   }
 
