@@ -188,6 +188,8 @@ export default function PuzzlePiece({
 
       {interaction === 'removable' && (
         <button
+          type="button"
+          aria-label={`${ion.name} 제거`}
           onPointerDown={(e) => e.stopPropagation()}
           onClick={(e) => { e.stopPropagation(); onRemove?.(); }}
           className="piece-remove-btn"
