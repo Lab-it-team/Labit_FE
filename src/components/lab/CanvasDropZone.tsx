@@ -11,6 +11,8 @@ export interface PlacedPiece {
   y: number;
   bondedAnionIds: string[];
   bondedToCationId: string | null;
+  bondedBelowId: string | null;       // (양이온) 아래 양이온 ID
+  bondedAboveCationId: string | null; // (양이온) 위 양이온 ID
 }
 
 interface CanvasDropZoneProps {
@@ -23,6 +25,7 @@ interface CanvasDropZoneProps {
   isWrongCompound?: boolean;
   checkKey?: number;
   draggingPieceId?: string | null;
+  height: number;
 }
 
 type CanvasStatus = "empty" | "active" | "positive" | "negative" | "wrongCompound";
@@ -166,6 +169,7 @@ export default function CanvasDropZone({
   isWrongCompound = false,
   checkKey = 0,
   draggingPieceId = null,
+  height,
 }: CanvasDropZoneProps) {
   const { setNodeRef } = useDroppable({ id: "ionic-canvas" });
   const hasInput = placedPieces.length > 0;
@@ -194,7 +198,7 @@ export default function CanvasDropZone({
         boxSizing: "border-box",
         position: "relative",
         width: 548,
-        height: 470,
+        height,
         background: bg,
         border,
         borderRadius: 12,
@@ -228,7 +232,11 @@ export default function CanvasDropZone({
       )}
 
       {placedPieces.map((piece) => {
-        const isSnapped = !!piece.bondedToCationId || piece.bondedAnionIds.length > 0;
+        const isSnapped =
+          !!piece.bondedToCationId ||
+          piece.bondedAnionIds.length > 0 ||
+          !!piece.bondedAboveCationId ||
+          !!piece.bondedBelowId;
         return (
           <DraggableCanvasPiece
             key={piece.id}
@@ -273,7 +281,7 @@ function DraggableCanvasPiece({
         cursor: "grab",
         zIndex: isSnapped ? 4 : 8,
         opacity: isDragging ? 0.35 : 1,
-        transition: piece.bondedToCationId
+        transition: (piece.bondedToCationId || piece.bondedAboveCationId)
           ? "left 0.18s cubic-bezier(.34,1.5,.64,1), top 0.18s cubic-bezier(.34,1.5,.64,1)"
           : "none",
         touchAction: "none",

@@ -26,10 +26,11 @@ import { useAuthStore } from "@/stores/authStore";
 import lockSvg from "@/assets/Icon/lock.svg";
 
 // ── Puzzle geometry (matches puzzlePaths.ts) ──────────────────────────────
-const PIECE_W  = 120;   // cation & anion both 120px wide
-const NOTCH_D  = 20;    // notch depth / protrusion width
-const UNIT_H   = 100;   // height per charge unit
-const SNAP_THR = 80;    // snap threshold in px
+const PIECE_W   = 120;   // cation & anion both 120px wide
+const NOTCH_D   = 20;    // notch depth / protrusion width
+const UNIT_H    = 100;   // height per charge unit
+const SNAP_THR  = 80;    // snap threshold in px
+const CANVAS_W  = 548;   // inner canvas width
 
 interface Problem {
   id: number;
@@ -83,7 +84,17 @@ type LabDragData =
 function parseStoredPieces(value: string | null): Record<number, PlacedPiece[]> {
   if (!value) return {};
   try {
-    return JSON.parse(value) as Record<number, PlacedPiece[]>;
+    const data = JSON.parse(value) as Record<number, PlacedPiece[]>;
+    return Object.fromEntries(
+      Object.entries(data).map(([k, pieces]) => [
+        k,
+        pieces.map((p) => ({
+          bondedBelowId: null,
+          bondedAboveCationId: null,
+          ...p,
+        })),
+      ]),
+    );
   } catch {
     return {};
   }
@@ -100,11 +111,13 @@ function getNextPieceId(piecesByProblem: Record<number, PlacedPiece[]>) {
 
 function removePieceLinks(pieces: PlacedPiece[], id: string) {
   return pieces.map((p) => {
-    if (p.id === id) return { ...p, bondedAnionIds: [], bondedToCationId: null };
+    if (p.id === id) return { ...p, bondedAnionIds: [], bondedToCationId: null, bondedBelowId: null, bondedAboveCationId: null };
     return {
       ...p,
-      bondedAnionIds:   p.bondedAnionIds.filter((a) => a !== id),
-      bondedToCationId: p.bondedToCationId === id ? null : p.bondedToCationId,
+      bondedAnionIds:      p.bondedAnionIds.filter((a) => a !== id),
+      bondedToCationId:    p.bondedToCationId === id ? null : p.bondedToCationId,
+      bondedBelowId:       p.bondedBelowId === id ? null : p.bondedBelowId,
+      bondedAboveCationId: p.bondedAboveCationId === id ? null : p.bondedAboveCationId,
     };
   });
 }
@@ -114,17 +127,20 @@ function snapDroppedPiece(pieces: PlacedPiece[], dropId: string, dropX: number, 
   if (!dropped) return pieces;
 
   let bestDist = SNAP_THR;
-  let bestSnap: { kind: "aniCat"; catId: string; tx: number; ty: number }
-              | { kind: "catAni"; aniId: string; tx: number; ty: number }
-              | null = null;
+  let bestSnap:
+    | { kind: "aniCat"; catId: string; tx: number; ty: number }
+    | { kind: "catAni"; aniId: string; tx: number; ty: number }
+    | { kind: "catCat"; topId: string; tx: number; ty: number }
+    | null = null;
 
   if (dropped.ion.type === "minus") {
+    // 음이온 → 양이온 오른쪽에 스냅
     for (const cat of pieces.filter((p) => p.id !== dropId && p.ion.type === "plus")) {
       const usedCharge = cat.bondedAnionIds.reduce((sum, aid) => {
         const a = pieces.find((p) => p.id === aid);
         return sum + (a?.ion.charge ?? 0);
       }, 0);
-      if (dropped.ion.charge > cat.ion.charge - usedCharge) continue;
+      if (usedCharge >= cat.ion.charge) continue;
 
       const tx   = cat.x + PIECE_W - NOTCH_D;
       const ty   = cat.y + usedCharge * UNIT_H;
@@ -132,11 +148,25 @@ function snapDroppedPiece(pieces: PlacedPiece[], dropId: string, dropX: number, 
       if (dist < bestDist) { bestDist = dist; bestSnap = { kind: "aniCat", catId: cat.id, tx, ty }; }
     }
   } else {
+    // 양이온 → 자유 음이온 왼쪽에 스냅
     for (const ani of pieces.filter((p) => p.id !== dropId && p.ion.type === "minus" && !p.bondedToCationId)) {
       const tx   = ani.x - PIECE_W + NOTCH_D;
       const ty   = ani.y;
       const dist = Math.hypot(dropX - tx, dropY - ty);
       if (dist < bestDist) { bestDist = dist; bestSnap = { kind: "catAni", aniId: ani.id, tx, ty }; }
+    }
+
+    // 양이온 → 같은 종류 양이온 바로 아래에 수직 스냅
+    for (const topCat of pieces.filter((p) =>
+      p.id !== dropId &&
+      p.ion.type === "plus" &&
+      p.ion.id === dropped.ion.id &&
+      !p.bondedBelowId
+    )) {
+      const tx   = topCat.x;
+      const ty   = topCat.y + topCat.ion.charge * UNIT_H;
+      const dist = Math.hypot(dropX - tx, dropY - ty);
+      if (dist < bestDist) { bestDist = dist; bestSnap = { kind: "catCat", topId: topCat.id, tx, ty }; }
     }
   }
 
@@ -151,10 +181,20 @@ function snapDroppedPiece(pieces: PlacedPiece[], dropId: string, dropX: number, 
     });
   }
 
-  const { aniId, tx, ty } = bestSnap;
+  if (bestSnap.kind === "catAni") {
+    const { aniId, tx, ty } = bestSnap;
+    return pieces.map((p) => {
+      if (p.id === dropId) return { ...p, x: tx, y: ty, bondedAnionIds: [aniId] };
+      if (p.id === aniId)  return { ...p, bondedToCationId: dropId };
+      return p;
+    });
+  }
+
+  // catCat: 드롭된 양이온을 topCat 바로 아래에 수직 결합
+  const { topId, tx, ty } = bestSnap;
   return pieces.map((p) => {
-    if (p.id === dropId) return { ...p, x: tx, y: ty, bondedAnionIds: [aniId] };
-    if (p.id === aniId)  return { ...p, bondedToCationId: dropId };
+    if (p.id === dropId) return { ...p, x: tx, y: ty, bondedAboveCationId: topId };
+    if (p.id === topId)  return { ...p, bondedBelowId: dropId };
     return p;
   });
 }
@@ -199,6 +239,7 @@ export default function IonicLab() {
   const canvasRef          = useRef<HTMLDivElement>(null);
   const idCounter          = useRef(getNextPieceId(allPieces));
   const currentProblemRef  = useRef(currentProblem);
+  const pendingSnapRef     = useRef<{ dropId: string; dropX: number; dropY: number } | null>(null);
   const sensors = useSensors(
     useSensor(PointerSensor, {
       activationConstraint: { distance: 4 },
@@ -208,6 +249,16 @@ export default function IonicLab() {
   useEffect(() => {
     currentProblemRef.current = currentProblem;
   }, [currentProblem]);
+
+  useEffect(() => {
+    const snap = pendingSnapRef.current;
+    if (!snap) return;
+    pendingSnapRef.current = null;
+    const id = requestAnimationFrame(() => {
+      setPlacedPieces((prev) => snapDroppedPiece(prev, snap.dropId, snap.dropX, snap.dropY));
+    });
+    return () => cancelAnimationFrame(id);
+  });
 
   const handleCanvasReady = useCallback((node: HTMLDivElement | null) => {
     canvasRef.current = node;
@@ -231,6 +282,14 @@ export default function IonicLab() {
   const mkId = () => `p${idCounter.current++}`;
 
   const problem = PROBLEMS[currentProblem];
+
+  const canvasHeight = Math.max(
+    470,
+    Math.max(
+      problem.cationCount * problem.cation.charge,
+      problem.anionCount  * problem.anion.charge,
+    ) * UNIT_H + 80,
+  );
 
   const placedCations  = placedPieces.filter((p) => p.ion.type === "plus");
   const placedAnions   = placedPieces.filter((p) => p.ion.type === "minus");
@@ -282,13 +341,13 @@ export default function IonicLab() {
     resetDragState();
   };
 
-  const handleDragEnd = ({ active, over }: DragEndEvent) => {
+  const handleDragEnd = ({ active, over, delta }: DragEndEvent) => {
     const data = active.data.current as LabDragData | undefined;
     const rect = canvasRef.current?.getBoundingClientRect();
-    const translated = active.rect.current.translated ?? active.rect.current.initial;
+    const initialRect = active.rect.current.initial;
     const droppedOnCanvas = over?.id === "ionic-canvas";
 
-    if (!data || !rect || !translated || !droppedOnCanvas) {
+    if (!data || !rect || !initialRect || !droppedOnCanvas) {
       if (data?.source === "canvas") {
         const removeId = data.pieceId;
         setPlacedPieces((prev) => removePieceLinks(prev.filter((p) => p.id !== removeId), removeId));
@@ -297,27 +356,26 @@ export default function IonicLab() {
       return;
     }
 
-    const dropX = translated.left - rect.left;
-    const dropY = translated.top - rect.top;
+    const rawX = initialRect.left + delta.x - rect.left;
+    const rawY = initialRect.top  + delta.y - rect.top;
+    const ionH = data.ion.charge * UNIT_H;
+    const dropX = Math.max(0, Math.min(rawX, CANVAS_W - PIECE_W));
+    const dropY = Math.max(0, Math.min(rawY, canvasHeight - ionH));
+    const dropId = data.source === "palette" ? mkId() : data.pieceId;
 
+    // Step 1: 드롭 위치로만 이동 (transition 없음)
     setPlacedPieces((prev) => {
-      let next = [...prev];
-      let dropId: string;
-
       if (data.source === "palette") {
-        dropId = mkId();
-        next = [
-          ...next,
-          { id: dropId, ion: data.ion, x: dropX, y: dropY, bondedAnionIds: [], bondedToCationId: null },
+        return [
+          ...prev,
+          { id: dropId, ion: data.ion, x: dropX, y: dropY, bondedAnionIds: [], bondedToCationId: null, bondedBelowId: null, bondedAboveCationId: null },
         ];
-      } else {
-        dropId = data.pieceId;
-        next = next.map((p) => (p.id === dropId ? { ...p, x: dropX, y: dropY } : p));
       }
-
-      return snapDroppedPiece(next, dropId, dropX, dropY);
+      return prev.map((p) => (p.id === dropId ? { ...p, x: dropX, y: dropY } : p));
     });
 
+    // Step 2: 다음 프레임에 스냅 적용 (드롭 위치 → 스냅 위치로 spring 애니메이션)
+    pendingSnapRef.current = { dropId, dropX, dropY };
     resetDragState();
   };
 
@@ -430,7 +488,7 @@ export default function IonicLab() {
         onDragCancel={handleDragCancel}
         onDragEnd={handleDragEnd}
       >
-        <DragOverlay>{activeDragIon ? <PuzzleGhost ion={activeDragIon} /> : null}</DragOverlay>
+        <DragOverlay dropAnimation={null}>{activeDragIon ? <PuzzleGhost ion={activeDragIon} /> : null}</DragOverlay>
 
         <div
           style={{
@@ -602,6 +660,7 @@ export default function IonicLab() {
                 isWrongCompound={isWrongCompound}
                 checkKey={checkKey}
                 draggingPieceId={draggingPieceId}
+                height={canvasHeight}
               />
             </div>
           </div>
@@ -609,7 +668,9 @@ export default function IonicLab() {
         </div>
       </DndContext>
 
-      <AiFab />
+      <div className="fixed bottom-15 right-6 z-30 flex flex-col items-end">
+        <AiFab showTooltip={false} />
+      </div>
 
       {showLoginModal && (
         <KakaoLoginModal
