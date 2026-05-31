@@ -235,7 +235,6 @@ const AiChat = forwardRef<HTMLDivElement, AiChatProps>(function AiChat(
   const [inputValue, setInputValue] = useState('')
   const [fixedWidth, setFixedWidth] = useState<number | null>(null)
   const containerRef = useRef<HTMLDivElement>(null)
-  const savedRangeRef = useRef<Range | null>(null)
 
   useEffect(() => {
     if (fixedWidth === null && containerRef.current) {
@@ -251,14 +250,8 @@ const AiChat = forwardRef<HTMLDivElement, AiChatProps>(function AiChat(
 
     if (selectedText && selection && selection.rangeCount > 0) {
       try {
-        const range = selection.getRangeAt(0)
-        applyHighlight(range)
-        savedRangeRef.current = range
-      } catch {
-        savedRangeRef.current = null
-      }
-    } else {
-      savedRangeRef.current = null
+        applyHighlight(selection.getRangeAt(0))
+      } catch { /* 하이라이트 적용 실패 시 무시 */ }
     }
 
     window.getSelection()?.removeAllRanges()
@@ -273,7 +266,6 @@ const AiChat = forwardRef<HTMLDivElement, AiChatProps>(function AiChat(
 
   const handleCancel = () => {
     removeHighlight()
-    savedRangeRef.current = null
     setInputValue('')
     setState('default')
   }
@@ -283,7 +275,6 @@ const AiChat = forwardRef<HTMLDivElement, AiChatProps>(function AiChat(
     onSend?.(inputValue.trim())
     setInputValue('')
     setState('default')
-    savedRangeRef.current = null
   }
 
   useEffect(() => {
