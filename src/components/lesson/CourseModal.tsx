@@ -1,18 +1,63 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import failSvg from "@/assets/Icon/fail.svg";
 import checkCircleSvg from "@/assets/Icon/check-c.svg";
 import arrowUpSvg from "@/assets/Icon/Arrow/up.svg";
 import arrowDownSvg from "@/assets/Icon/Arrow/down.svg";
 import dotActiveSvg from "@/assets/Icon/dot-active.svg";
 import dotInactiveSvg from "@/assets/Icon/dot-inactive.svg";
-import { chapters } from "@/data/chapters";
+import { useUnits } from "@/queries/learning";
+import { chapters as staticChapters } from "@/data/chapters";
+import type { UnitWithLessons } from "@/types";
 
 interface CourseModalProps {
   onClose: () => void;
 }
 
+function getUnitStatus(unit: UnitWithLessons): "done" | "in-progress" | "upcoming" {
+  const { lessons } = unit;
+  if (lessons.length === 0) return "upcoming";
+  if (lessons.every((l) => l.status === "completed")) return "done";
+  if (lessons.some((l) => l.status !== "not_started")) return "in-progress";
+  return "upcoming";
+}
+
 export default function CourseModal({ onClose }: CourseModalProps) {
-  const [expanded, setExpanded] = useState<number[]>([2]);
+  const { data: homeData } = useUnits();
+
+  const units = homeData?.units ?? [];
+  const hasApiData = units.length > 0;
+
+  const chapters = useMemo(() => {
+    if (!hasApiData) return staticChapters;
+    return units.map((unit) => ({
+      id: unit.id,
+      title: unit.title,
+      status: getUnitStatus(unit),
+      lessonCount: unit.lessons.length,
+      lessons: unit.lessons.map((l) => ({
+        id: l.id,
+        title: l.title,
+        inProgress: l.status === "in_progress",
+      })),
+    }));
+  }, [units, hasApiData]);
+
+  const allLessons = hasApiData ? units.flatMap((u) => u.lessons) : [];
+  const completedCount = hasApiData
+    ? allLessons.filter((l) => l.status === "completed").length
+    : staticChapters.filter((c) => c.status === "done").length;
+  const totalCount = hasApiData
+    ? allLessons.length
+    : staticChapters.reduce((sum, c) => sum + c.lessonCount, 0);
+
+  const inProgressId = chapters.find((c) => c.status === "in-progress")?.id;
+  const [expanded, setExpanded] = useState<number[]>([]);
+
+  useEffect(() => {
+    if (inProgressId !== undefined) {
+      setExpanded([inProgressId]);
+    }
+  }, [inProgressId]);
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
@@ -25,7 +70,7 @@ export default function CourseModal({ onClose }: CourseModalProps) {
   const toggle = (id: number, lessonCount: number) => {
     if (lessonCount === 0) return;
     setExpanded((prev) =>
-      prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id]
+      prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id],
     );
   };
 
@@ -46,12 +91,17 @@ export default function CourseModal({ onClose }: CourseModalProps) {
             </h2>
             <div className="flex items-center gap-1 text-caption-lg font-normal text-neutral-50">
               <span>학습 완료</span>
-              <span>2</span>
+              <span>{completedCount}</span>
               <span>/</span>
-              <span>6</span>
+              <span>{totalCount}</span>
             </div>
           </div>
-          <button type="button" onClick={onClose} className="shrink-0 size-[24px]" aria-label="닫기">
+          <button
+            type="button"
+            onClick={onClose}
+            className="shrink-0 size-[24px]"
+            aria-label="닫기"
+          >
             <img src={failSvg} alt="" width={24} height={24} className="size-full" />
           </button>
         </div>
@@ -121,7 +171,7 @@ export default function CourseModal({ onClose }: CourseModalProps) {
                   <div className="relative flex flex-col gap-3 px-4 py-3">
                     <div className="absolute left-[34px] top-0 bottom-[30px] w-px bg-neutral-20" />
                     {chapter.lessons.map((lesson, i) => (
-                      <div key={i} className="relative flex items-center gap-3">
+                      <div key={lesson.id} className="relative flex items-center gap-3">
                         <img
                           src={lesson.inProgress ? dotActiveSvg : dotInactiveSvg}
                           alt=""

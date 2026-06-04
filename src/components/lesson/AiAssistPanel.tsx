@@ -1,6 +1,7 @@
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef, useEffect, forwardRef } from "react";
 import closeSvg from "@/assets/Icon/close.svg";
 import rightSvg from "@/assets/Icon/send.svg";
+import { createSession, sendMessage } from "@/features/chat/api";
 
 interface Message {
   role: "user" | "ai";
@@ -106,7 +107,9 @@ function ChatInput({
         type="text"
         value={value}
         onChange={(e) => onChange(e.target.value)}
-        onKeyDown={(e) => e.key === "Enter" && !e.nativeEvent.isComposing && onSend()}
+        onKeyDown={(e) =>
+          e.key === "Enter" && !e.nativeEvent.isComposing && onSend()
+        }
         placeholder={hasAiResponse ? "질문하세요" : "계속 물어볼 수 있어요"}
         className="flex-1 min-w-px bg-transparent text-[13px] font-medium leading-[18px] tracking-[-0.065px] text-text-normal placeholder-neutral-50 outline-none caret-blue-500"
       />
@@ -129,135 +132,154 @@ function ChatInput({
   );
 }
 
-const AI_DUMMY_RESPONSE =
-  "음, 어쩌고저쩌고.음, 어쩌고저쩌고.음, 어쩌고저쩌고.음, 어쩌고저쩌고.음, 어쩌고저쩌고.음, 어쩌고저쩌고.음, 어쩌고저쩌고.";
+const AiAssistPanel = forwardRef<HTMLDivElement, AiAssistPanelProps>(
+  function AiAssistPanel(
+    { selectedText = "비금속 원자는 전자", initialQuestion, onClose, className = "", style },
+    ref,
+  ) {
+    const [messages, setMessages] = useState<Message[]>(
+      initialQuestion ? [{ role: "user", text: initialQuestion }] : [],
+    );
+    const [inputValue, setInputValue] = useState("");
+    const [isWaiting, setIsWaiting] = useState(!!initialQuestion);
+    const [hasAiResponse, setHasAiResponse] = useState(false);
+    const sessionIdRef = useRef<number | null>(null);
+    const chatContainerRef = useRef<HTMLDivElement>(null);
+    const scrollTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+    const isProgrammaticScroll = useRef(false);
 
-export default function AiAssistPanel({
-  selectedText = "비금속 원자는 전자",
-  initialQuestion,
-  onClose,
-  className = "",
-  style,
-}: AiAssistPanelProps) {
-  const [messages, setMessages] = useState<Message[]>(
-    initialQuestion ? [{ role: "user", text: initialQuestion }] : []
-  );
-  const [inputValue, setInputValue] = useState("");
-  const [isWaiting, setIsWaiting] = useState(!!initialQuestion);
-  const [hasAiResponse, setHasAiResponse] = useState(false);
-  const chatContainerRef = useRef<HTMLDivElement>(null);
-  const scrollTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
-  const isProgrammaticScroll = useRef(false);
+    useEffect(() => {
+      const el = chatContainerRef.current;
+      if (!el) return;
+      isProgrammaticScroll.current = true;
+      el.scrollTop = el.scrollHeight;
+    }, [messages, isWaiting]);
 
-  useEffect(() => {
-    const el = chatContainerRef.current;
-    if (!el) return;
-    isProgrammaticScroll.current = true;
-    el.scrollTop = el.scrollHeight;
-  }, [messages, isWaiting]);
+    useEffect(() => {
+      return () => {
+        if (scrollTimerRef.current) clearTimeout(scrollTimerRef.current);
+      };
+    }, []);
 
-  useEffect(() => {
-    return () => {
+    const handleChatScroll = () => {
+      if (isProgrammaticScroll.current) {
+        isProgrammaticScroll.current = false;
+        return;
+      }
+      const el = chatContainerRef.current;
+      if (!el) return;
+      el.classList.add("is-scrolling");
       if (scrollTimerRef.current) clearTimeout(scrollTimerRef.current);
+      scrollTimerRef.current = setTimeout(() => {
+        el.classList.remove("is-scrolling");
+      }, 800);
     };
-  }, []);
 
-  const handleChatScroll = () => {
-    if (isProgrammaticScroll.current) {
-      isProgrammaticScroll.current = false;
-      return;
-    }
-    const el = chatContainerRef.current;
-    if (!el) return;
-    el.classList.add("is-scrolling");
-    if (scrollTimerRef.current) clearTimeout(scrollTimerRef.current);
-    scrollTimerRef.current = setTimeout(() => {
-      el.classList.remove("is-scrolling");
-    }, 800);
-  };
+    const ensureSession = async (): Promise<number> => {
+      if (sessionIdRef.current !== null) return sessionIdRef.current;
+      const session = await createSession();
+      sessionIdRef.current = session.id;
+      return session.id;
+    };
 
-  useEffect(() => {
-    if (!initialQuestion) return;
-    const timer = setTimeout(() => {
-      setMessages((prev) => [...prev, { role: "ai", text: AI_DUMMY_RESPONSE }]);
-      setIsWaiting(false);
-      setHasAiResponse(true);
-    }, 600);
-    return () => clearTimeout(timer);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+    const sendToApi = async (question: string) => {
+      setIsWaiting(true);
+      try {
+        const sid = await ensureSession();
+        const response = await sendMessage(sid, question, selectedText);
+        setMessages((prev) => [
+          ...prev,
+          { role: "ai", text: response.ai_message.content },
+        ]);
+        setHasAiResponse(true);
+      } catch {
+        setMessages((prev) => [
+          ...prev,
+          { role: "ai", text: "응답을 가져오는 데 실패했어요. 다시 시도해 주세요." },
+        ]);
+      } finally {
+        setIsWaiting(false);
+      }
+    };
 
-  const handleSend = (text?: string) => {
-    const question = (text ?? inputValue).trim();
-    if (!question) return;
+    useEffect(() => {
+      if (!initialQuestion) return;
+      sendToApi(initialQuestion);
+      // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, []);
 
-    setMessages((prev) => [...prev, { role: "user", text: question }]);
-    setInputValue("");
-    setIsWaiting(true);
+    const handleSend = (text?: string) => {
+      const question = (text ?? inputValue).trim();
+      if (!question) return;
+      setMessages((prev) => [...prev, { role: "user", text: question }]);
+      setInputValue("");
+      sendToApi(question);
+    };
 
-    setTimeout(() => {
-      setMessages((prev) => [...prev, { role: "ai", text: AI_DUMMY_RESPONSE }]);
-      setIsWaiting(false);
-      setHasAiResponse(true);
-    }, 600);
-  };
-
-  return (
-    <div
-      className={`bg-white border border-border-strong drop-shadow-[0px_0px_7.5px_rgba(0,0,0,0.08)] flex flex-col gap-[24px] p-[24px] rounded-[24px] w-[334px] h-[371px] overflow-hidden ${className}`}
-      style={style}
-    >
-      <div className="flex items-start justify-between pb-[12px] border-b border-border-strong w-full shrink-0">
-        <div className="flex flex-col gap-[2px] flex-1 min-w-px">
-          <p className="text-[13px] font-normal leading-[18px] tracking-[-0.065px] text-text-normal">
-            AI 도우미
-          </p>
-          <p className="text-[16px] font-medium leading-[25px] tracking-[-0.08px] text-text-strong truncate">
-            "{selectedText}"
-          </p>
+    return (
+      <div
+        ref={ref}
+        className={`bg-white border border-border-strong drop-shadow-[0px_0px_7.5px_rgba(0,0,0,0.08)] flex flex-col gap-[24px] p-[24px] rounded-[24px] w-[334px] h-[371px] overflow-hidden ${className}`}
+        style={style}
+      >
+        <div className="flex items-start justify-between pb-[12px] border-b border-border-strong w-full shrink-0">
+          <div className="flex flex-col gap-[2px] flex-1 min-w-px">
+            <p className="text-[13px] font-normal leading-[18px] tracking-[-0.065px] text-text-normal">
+              AI 도우미
+            </p>
+            <p className="text-[16px] font-medium leading-[25px] tracking-[-0.08px] text-text-strong truncate">
+              "{selectedText}"
+            </p>
+          </div>
+          <button
+            type="button"
+            onClick={onClose}
+            className="shrink-0 size-[24px]"
+          >
+            <img
+              src={closeSvg}
+              alt="닫기"
+              width={24}
+              height={24}
+              className="size-full"
+            />
+          </button>
         </div>
-        <button
-          type="button"
-          onClick={onClose}
-          className="shrink-0 size-[24px]"
+
+        <div
+          ref={chatContainerRef}
+          onScroll={handleChatScroll}
+          className="flex flex-col flex-1 min-h-0 overflow-y-auto chat-scroll"
         >
-          <img
-            src={closeSvg}
-            alt="닫기"
-            width={24}
-            height={24}
-            className="size-full"
+          <div className="flex-1" />
+          <div className="flex flex-col gap-[16px] items-start w-full">
+            {messages.map((msg, i) =>
+              msg.role === "user" ? (
+                <UserBubble key={i} text={msg.text} />
+              ) : (
+                <AiBubble key={i} text={msg.text} />
+              ),
+            )}
+            {isWaiting && <LoadingBubble />}
+          </div>
+        </div>
+
+        <div className="flex flex-col gap-[12px] items-start w-full shrink-0">
+          <div className="flex gap-1 items-center w-full overflow-x-auto scrollbar-none">
+            {SUGGEST_CHIPS.map((chip) => (
+              <Chip key={chip} text={chip} onClick={() => handleSend(chip)} />
+            ))}
+          </div>
+          <ChatInput
+            value={inputValue}
+            onChange={setInputValue}
+            onSend={() => handleSend()}
+            hasAiResponse={hasAiResponse}
           />
-        </button>
-      </div>
-
-      <div ref={chatContainerRef} onScroll={handleChatScroll} className="flex flex-col flex-1 min-h-0 overflow-y-auto chat-scroll">
-        <div className="flex-1" />
-        <div className="flex flex-col gap-[16px] items-start w-full">
-          {messages.map((msg, i) =>
-            msg.role === "user" ? (
-              <UserBubble key={i} text={msg.text} />
-            ) : (
-              <AiBubble key={i} text={msg.text} />
-            )
-          )}
-          {isWaiting && <LoadingBubble />}
         </div>
       </div>
+    );
+  },
+);
 
-      <div className="flex flex-col gap-[12px] items-start w-full shrink-0">
-        <div className="flex gap-1 items-center w-full overflow-x-auto scrollbar-none">
-          {SUGGEST_CHIPS.map((chip) => (
-            <Chip key={chip} text={chip} onClick={() => handleSend(chip)} />
-          ))}
-        </div>
-        <ChatInput
-          value={inputValue}
-          onChange={setInputValue}
-          onSend={() => handleSend()}
-          hasAiResponse={hasAiResponse}
-        />
-      </div>
-    </div>
-  );
-}
+export default AiAssistPanel;
