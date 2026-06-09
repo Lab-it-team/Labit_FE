@@ -174,11 +174,15 @@ export default function AiChatPopup({ onClose, className = "" }: AiChatPopupProp
     }
   }, [sessionMessages, view]);
 
-  const handleMainSend = () => {
+  const handleMainSend = async () => {
     if (!input.trim()) return;
     const question = input.trim();
     setInput("");
-    startChat(question);
+    try {
+      await startChat(question);
+    } catch {
+      setInput(question);
+    }
   };
 
   const handleChatSend = async (text?: string) => {
