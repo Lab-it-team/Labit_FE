@@ -169,13 +169,16 @@ export default {
         "content-xl": ["28px", { lineHeight: "28px", fontWeight: "700" }],
 
         /* Body */
+        "body-xl": ["20px", { lineHeight: "32px", fontWeight: "400" }],
         "body-lg": ["18px", { lineHeight: "26px", fontWeight: "400" }],
         "body-md": ["16px", { lineHeight: "25px", fontWeight: "400" }],
         "body-sm": ["15px", { lineHeight: "24px", fontWeight: "400" }],
+        "body-xs": ["14px", { lineHeight: "24px", fontWeight: "400" }],
         "body-xxs": ["14px", { lineHeight: "20px", fontWeight: "400" }],
 
         /* Caption */
         "caption-lg": ["13px", { lineHeight: "18px", fontWeight: "400" }],
+        "caption-sm": ["12px", { lineHeight: "17px", fontWeight: "400" }],
 
         /* Label */
         "label-xl": ["15px", { lineHeight: "22px", fontWeight: "500" }],
