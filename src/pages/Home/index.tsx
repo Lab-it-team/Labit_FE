@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { useNavigate } from "react-router";
 import arrowRightSvg from "@/assets/Icon/right.svg";
 import arrowDownSvg from "@/assets/Icon/Arrow/down.svg";
@@ -6,16 +6,64 @@ import arrowUpSvg from "@/assets/Icon/Arrow/up.svg";
 import checkCircleSvg from "@/assets/Icon/check-c.svg";
 import dotActiveSvg from "@/assets/Icon/dot-active.svg";
 import dotInactiveSvg from "@/assets/Icon/dot-inactive.svg";
-import { chapters } from "@/data/chapters";
+import { useUnits } from "@/queries/learning";
+import { useMe } from "@/queries/user";
+import { chapters as staticChapters } from "@/data/chapters";
+import type { UnitWithLessons } from "@/types";
+
+function getUnitStatus(unit: UnitWithLessons): "done" | "in-progress" | "upcoming" {
+  const { lessons } = unit;
+  if (lessons.length === 0) return "upcoming";
+  if (lessons.every((l) => l.status === "completed")) return "done";
+  if (lessons.some((l) => l.status !== "not_started")) return "in-progress";
+  return "upcoming";
+}
 
 export default function Home() {
   const navigate = useNavigate();
-  const [expanded, setExpanded] = useState<number[]>([2]);
+  const { data: homeData } = useUnits();
+  const { data: me } = useMe();
+
+  const units = homeData?.units ?? [];
+  const hasApiData = units.length > 0;
+  const progressRate = Math.round(homeData?.progress_rate ?? 0);
+
+  const chapters = useMemo(() => {
+    if (!hasApiData) return staticChapters;
+    return units.map((unit) => ({
+      id: unit.id,
+      title: unit.title,
+      status: getUnitStatus(unit),
+      lessonCount: unit.lessons.length,
+      lessons: unit.lessons.map((l) => ({
+        id: l.id,
+        title: l.title,
+        inProgress: l.status === "in_progress",
+      })),
+    }));
+  }, [units, hasApiData]);
+
+  const inProgressId = chapters.find((c) => c.status === "in-progress")?.id;
+  const [expanded, setExpanded] = useState<number[]>([]);
+
+  useEffect(() => {
+    if (inProgressId !== undefined) {
+      setExpanded([inProgressId]);
+    }
+  }, [inProgressId]);
+
+  const allLessons = hasApiData ? units.flatMap((u) => u.lessons) : [];
+  const completedCount = hasApiData
+    ? allLessons.filter((l) => l.status === "completed").length
+    : staticChapters.filter((c) => c.status === "done").length;
+  const totalCount = hasApiData
+    ? allLessons.length
+    : staticChapters.reduce((sum, c) => sum + c.lessonCount, 0);
 
   const toggleChapter = (id: number, lessonCount: number) => {
     if (lessonCount === 0) return;
     setExpanded((prev) =>
-      prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id]
+      prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id],
     );
   };
 
@@ -24,7 +72,7 @@ export default function Home() {
       {/* 인사말 */}
       <div className="flex flex-col gap-3">
         <h1 className="text-heading-lg font-bold text-text-strong">
-          안녕하세요, 김과학 님!
+          안녕하세요, {me?.nickname ?? ""}님!
         </h1>
         <p className="text-body-xl font-medium text-text-normal">
           오늘도 쉽게 과학을 배워볼까요?
@@ -47,7 +95,7 @@ export default function Home() {
                   진행률
                 </span>
                 <span className="text-[14px]/[20px] font-semibold text-blue-500">
-                  30
+                  {progressRate}
                 </span>
                 <span className="text-label-sm font-medium text-text-normal">
                   %
@@ -61,7 +109,9 @@ export default function Home() {
                 </h2>
                 <p className="flex items-center gap-1 text-label-md font-normal text-neutral-50">
                   <span>학습 완료</span>
-                  <span>2 / 6</span>
+                  <span>
+                    {completedCount} / {totalCount}
+                  </span>
                 </p>
               </div>
             </div>
@@ -69,7 +119,7 @@ export default function Home() {
             {/* 이어하기 버튼 */}
             <button
               type="button"
-              onClick={() => navigate('/ionic-concept')}
+              onClick={() => navigate("/ionic-concept")}
               className="flex h-[38px] shrink-0 items-center gap-1 rounded-lg bg-blue-500 px-2.5 py-2 text-label-xl font-semibold text-white transition-colors hover:bg-blue-600"
             >
               이어하기
@@ -106,9 +156,7 @@ export default function Home() {
                       {/* 번호 배지 */}
                       <div
                         className={`flex h-6 w-6 shrink-0 items-center justify-center text-[14px]/[20px] font-semibold text-white ${
-                          isDone ? "bg-neutral-40" : ""
-                        } ${isInProgress ? "bg-blue-500" : ""} ${
-                          !isDone && !isInProgress ? "bg-neutral-40" : ""
+                          isInProgress ? "bg-blue-500" : "bg-neutral-40"
                         } rounded-full`}
                       >
                         {chapter.id}
@@ -158,11 +206,11 @@ export default function Home() {
                       <div className="absolute bottom-[30px] left-[34px] top-0 w-px bg-neutral-20" />
                       {chapter.lessons.map((lesson, i) => (
                         <div
-                          key={i}
+                          key={lesson.id}
                           className="relative flex items-center gap-3"
                         >
                           <img
-                            src={i === 0 ? dotActiveSvg : dotInactiveSvg}
+                            src={lesson.inProgress ? dotActiveSvg : dotInactiveSvg}
                             alt=""
                             width={36}
                             height={36}

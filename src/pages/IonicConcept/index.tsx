@@ -7,8 +7,10 @@ import CourseModal from "@/components/lesson/CourseModal";
 import AiChat, { removeHighlight } from "@/components/lesson/AiChat";
 import AiAssistPanel from "@/components/lesson/AiAssistPanel";
 import AiFab from "@/components/lesson/AiFab";
+import LoginRequiredModal from "@/components/common/LoginRequiredModal";
 import FormationContent from "@/components/lesson/FormationContent";
 import { useTextSelection } from "@/hooks/useTextSelection";
+import { useAuthStore } from "@/stores/authStore";
 
 const TOTAL_PAGES = 4;
 
@@ -59,11 +61,13 @@ function StudyCard() {
 
 export default function IonicConcept() {
   const navigate = useNavigate();
+  const isLoggedIn = !!useAuthStore((s) => s.accessToken);
   const [activeTab, setActiveTab] = useState<"learn" | "practice">("learn");
   const [currentPage, setCurrentPage] = useState(1);
   const [showProgressBadge, setShowProgressBadge] = useState(true);
   const [completed, setCompleted] = useState(false);
   const [showCourseModal, setShowCourseModal] = useState(false);
+  const [showLoginModal, setShowLoginModal] = useState(false);
   const [assistPanel, setAssistPanel] = useState<{
     key: number;
     question: string;
@@ -98,6 +102,7 @@ export default function IonicConcept() {
         onListClick={() => setShowCourseModal(true)}
       />
       {showCourseModal && <CourseModal onClose={() => setShowCourseModal(false)} />}
+      {showLoginModal && <LoginRequiredModal onClose={() => setShowLoginModal(false)} />}
 
       {assistPanel && (
         <AiAssistPanel
@@ -124,6 +129,12 @@ export default function IonicConcept() {
             transform: 'translateX(-50%)',
           }}
           onSend={(q) => {
+            if (!isLoggedIn) {
+              clear();
+              removeHighlight();
+              setShowLoginModal(true);
+              return;
+            }
             const PANEL_H = 371;
             const PANEL_W = 334;
             const spaceBelow = window.innerHeight - (selection.bottom + 8);
