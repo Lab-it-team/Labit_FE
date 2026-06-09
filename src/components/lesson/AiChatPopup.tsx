@@ -91,6 +91,7 @@ export default function AiChatPopup({ onClose, className = "" }: AiChatPopupProp
   const chatInputRef = useRef<HTMLInputElement>(null);
   const scrollTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const isProgrammaticScroll = useRef(false);
+  const isNewSession = useRef(false);
 
   const { data: sessions = [], refetch: refetchSessions } = useSessions();
   const { mutateAsync: createSession } = useCreateSession();
@@ -133,6 +134,7 @@ export default function AiChatPopup({ onClose, className = "" }: AiChatPopupProp
 
   const startChat = async (question: string) => {
     const session = await createSession();
+    isNewSession.current = true;
     setCurrentSessionId(session.id);
     setMessages([{ role: "user", text: question }]);
     setIsWaiting(true);
@@ -156,6 +158,7 @@ export default function AiChatPopup({ onClose, className = "" }: AiChatPopupProp
   };
 
   const openHistorySession = async (sessionId: number) => {
+    isNewSession.current = false;
     setCurrentSessionId(sessionId);
     setMessages([]);
     setHasAiResponse(false);
@@ -163,7 +166,7 @@ export default function AiChatPopup({ onClose, className = "" }: AiChatPopupProp
   };
 
   useEffect(() => {
-    if (view === "chat" && sessionMessages) {
+    if (view === "chat" && sessionMessages && !isNewSession.current) {
       setMessages(
         sessionMessages.map((m) => ({
           role: m.role === "assistant" ? "ai" : "user",
@@ -187,7 +190,7 @@ export default function AiChatPopup({ onClose, className = "" }: AiChatPopupProp
 
   const handleChatSend = async (text?: string) => {
     const question = (text ?? chatInput).trim();
-    if (!question || currentSessionId === null) return;
+    if (!question || currentSessionId === null || isWaiting) return;
     setMessages((prev) => [...prev, { role: "user", text: question }]);
     setChatInput("");
     setIsWaiting(true);
@@ -286,7 +289,7 @@ export default function AiChatPopup({ onClose, className = "" }: AiChatPopupProp
             type="button"
             onClick={() => handleChatSend()}
             className="shrink-0 size-[20px]"
-            disabled={!isChatActive}
+            disabled={!isChatActive || isWaiting}
           >
             <img
               src={sendSvg}
