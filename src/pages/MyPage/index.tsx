@@ -70,7 +70,9 @@ export default function MyPage() {
     <div className="flex min-h-screen flex-col bg-static-white">
       {/* 메인 헤더 */}
       <header className="fixed left-0 right-0 top-0 z-10 flex h-[60px] items-center justify-between border-b border-border-normal bg-static-white px-10">
-        <img src={logoFullSvg} alt="Labit" />
+        <button type="button" onClick={() => navigate('/')} className="flex items-center">
+          <img src={logoFullSvg} alt="Labit" />
+        </button>
         <ProfileButton />
       </header>
 
@@ -113,6 +115,7 @@ export default function MyPage() {
                 <span className="text-caption-sm font-normal text-text-sub">가입일</span>
                 <span className="text-caption-lg font-normal text-text-normal">
                   {formatDate(me?.created_at)}
+                  
                 </span>
               </div>
 

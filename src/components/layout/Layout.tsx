@@ -1,13 +1,16 @@
-import { Outlet } from 'react-router'
+import { Outlet, useNavigate } from 'react-router'
 import Sidebar from './Sidebar'
 import ProfileButton from './ProfileButton'
 import logoFullSvg from '@/assets/Icon/logo-full.svg'
 
 export default function Layout() {
+  const navigate = useNavigate()
   return (
     <div className="flex min-h-screen flex-col">
       <header className="fixed left-0 right-0 top-0 z-10 flex h-[60px] items-center justify-between border-b border-border-light bg-static-white px-10">
-        <img src={logoFullSvg} alt="Labit" />
+        <button type="button" onClick={() => navigate('/')} className="flex items-center">
+          <img src={logoFullSvg} alt="Labit" />
+        </button>
         <ProfileButton />
       </header>
 
