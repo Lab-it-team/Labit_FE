@@ -82,24 +82,19 @@ export default function DeleteAccountModal({ onClose }: Props) {
   const clearAuth = useAuthStore((s) => s.clearAuth)
 
   const [step, setStep] = useState(1)
-  const [selected, setSelected] = useState<Set<number>>(new Set())
+  const [selected, setSelected] = useState<number | null>(null)
   const [detail, setDetail] = useState('')
   const [confirmText, setConfirmText] = useState('')
   const [deleting, setDeleting] = useState(false)
 
   const toggle = (i: number) =>
-    setSelected((prev) => {
-      const next = new Set(prev)
-      next.has(i) ? next.delete(i) : next.add(i)
-      return next
-    })
+    setSelected((prev) => (prev === i ? null : i))
 
   const handleDelete = async () => {
     if (confirmText !== '회원 탈퇴') return
     setDeleting(true)
     try {
-      const firstSelected = Array.from(selected)[0]
-      const reasonType = firstSelected !== undefined ? REASON_TYPES[firstSelected] : 'OTHER'
+      const reasonType = selected !== null ? REASON_TYPES[selected] : 'OTHER'
       await deleteAccount({ reason_type: reasonType, reason_detail: detail || undefined, confirm_text: confirmText })
       clearAuth()
       setStep(4)
@@ -124,7 +119,7 @@ export default function DeleteAccountModal({ onClose }: Props) {
             <h2 className="text-heading-md font-bold text-text-strong">정말 떠나시나요?</h2>
             <div className="flex items-center gap-1">
               <span className="text-body-xxs font-normal text-text-normal">떠나시는 이유를 알려주세요.</span>
-              <span className="text-caption-sm font-normal text-text-sub">(복수 선택 가능)</span>
+              <span className="text-caption-sm font-normal text-text-sub">(하나 선택)</span>
             </div>
           </div>
         </div>
@@ -132,7 +127,7 @@ export default function DeleteAccountModal({ onClose }: Props) {
         {/* Frame 484: 체크박스 목록 (gap: 4px) */}
         <div className="flex flex-col gap-1">
           {REASONS.map((reason, i) => {
-            const checked = selected.has(i)
+            const checked = selected === i
             return (
               <button
                 key={i}
@@ -264,7 +259,7 @@ export default function DeleteAccountModal({ onClose }: Props) {
           onClick={() => navigate('/login')}
           className="flex h-[42px] w-full items-center justify-center rounded-xl bg-neutral-15 text-label-xl font-semibold text-text-normal transition-colors hover:bg-neutral-20"
         >
-          홈으로 가기
+          로그인으로 이동
         </button>
       </div>
     </Card>
