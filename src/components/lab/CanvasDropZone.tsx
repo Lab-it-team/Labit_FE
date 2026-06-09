@@ -1,4 +1,7 @@
 import { useDraggable, useDroppable } from "@dnd-kit/core";
+
+let canvasHintSeen = false;
+let checkToastSeen = false;
 import PuzzlePiece from "@/components/lab/PuzzlePiece";
 import type { Ion } from "@/data/ions";
 import bellSvg from "@/assets/Icon/bell.svg";
@@ -170,9 +173,10 @@ function HintPopup({ text }: { text: string }) {
         boxSizing: "border-box",
         position: "absolute",
         top: 24,
-        left: "calc(50% - 180px)",
-        width: 360,
-        height: 40,
+        left: "50%",
+        transform: "translateX(-50%)",
+        maxWidth: 480,
+        width: "max-content",
         display: "flex",
         flexDirection: "row",
         justifyContent: "center",
@@ -188,7 +192,6 @@ function HintPopup({ text }: { text: string }) {
       <img src={bellSvg} width={24} height={24} alt="" style={{ flexShrink: 0 }} />
       <span
         style={{
-          width: 306,
           fontFamily: "Pretendard, sans-serif",
           fontStyle: "normal",
           fontWeight: 400,
@@ -197,9 +200,6 @@ function HintPopup({ text }: { text: string }) {
           textAlign: "center",
           letterSpacing: "-0.005em",
           color: "var(--color-text-normal)",
-          overflow: "hidden",
-          textOverflow: "ellipsis",
-          whiteSpace: "nowrap",
         }}
       >
         {text}
@@ -224,7 +224,8 @@ export default function CanvasDropZone({
 }: CanvasDropZoneProps) {
   const { setNodeRef } = useDroppable({ id: "ionic-canvas" });
   const hasInput = placedPieces.length > 0;
-  const hintDismissed = hasInput;
+  if (hasInput) { canvasHintSeen = true; checkToastSeen = true; }
+  const hintDismissed = canvasHintSeen;
 
   const status: CanvasStatus = isWrongCompound
     ? "wrongCompound"
@@ -258,7 +259,12 @@ export default function CanvasDropZone({
         touchAction: "none",
       }}
     >
-      {!isDragOver && <Toast key={checkKey} status={status} />}
+      {!isDragOver && (
+        status === "positive" ||
+        status === "negative" ||
+        status === "wrongCompound" ||
+        (status === "empty" && !checkToastSeen)
+      ) && <Toast key={checkKey} status={status} />}
       {hintVisible && hintText && <HintPopup text={hintText} />}
 
       {!hintDismissed && (!hasInput || isDragOver) && (

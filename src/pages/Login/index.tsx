@@ -197,7 +197,7 @@ export default function Login() {
 
         <button
           type="button"
-          onClick={() => navigate("/")}
+          onClick={() => navigate("/ionic-concept")}
           style={{
             fontFamily: "var(--font-sans)", fontWeight: 500, fontSize: 13, lineHeight: "18px", letterSpacing: "-0.005em",
             background: "none", border: "none", cursor: "pointer",

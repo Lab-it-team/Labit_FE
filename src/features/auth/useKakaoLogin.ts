@@ -18,7 +18,7 @@ export const useKakaoLogin = () => {
       } catch {
         // 프로필 조회 실패해도 로그인은 유지
       }
-      const redirect = sessionStorage.getItem('lab_redirect') ?? '/';
+      const redirect = sessionStorage.getItem('lab_redirect') ?? '/home';
       sessionStorage.removeItem('lab_redirect');
       // 실습 화면에서 로그인한 경우가 아니면 이전 실습 데이터를 초기화
       const hasPreLoginState =

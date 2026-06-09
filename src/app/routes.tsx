@@ -20,8 +20,8 @@ export default function AppRoutes() {
         <Route path="/login" element={<Login />} />
         <Route path="/auth/kakao/callback" element={<KakaoCallback />} />
         <Route path="/onboarding" element={<Onboarding />} />
+        <Route path="/" element={<Navigate to="/login" replace />} />
         <Route element={<Layout />}>
-          <Route path="/" element={<Home />} />
           <Route path="/home" element={<Home />} />
           <Route path="/Home" element={<Navigate to="/home" replace />} />
         </Route>
@@ -31,7 +31,7 @@ export default function AppRoutes() {
         <Route path="/covalent-concept" element={<CovalentConcept />} />
         <Route path="/covalent-lab" element={<CovalentLab />} />
         <Route path="/quiz" element={<Quiz />} />
-        <Route path="*" element={<Navigate to="/home" replace />} />
+        <Route path="*" element={<Navigate to="/login" replace />} />
       </Routes>
     </Suspense>
   );
