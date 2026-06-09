@@ -8,7 +8,7 @@ export default function Layout() {
   return (
     <div className="flex min-h-screen flex-col">
       <header className="fixed left-0 right-0 top-0 z-10 flex h-[60px] items-center justify-between border-b border-border-light bg-static-white px-10">
-        <button type="button" onClick={() => navigate('/')} className="flex items-center">
+        <button type="button" onClick={() => navigate('/home')} className="flex items-center">
           <img src={logoFullSvg} alt="Labit" />
         </button>
         <ProfileButton />

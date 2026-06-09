@@ -70,7 +70,7 @@ export default function MyPage() {
     <div className="flex min-h-screen flex-col bg-static-white">
       {/* 메인 헤더 */}
       <header className="fixed left-0 right-0 top-0 z-10 flex h-[60px] items-center justify-between border-b border-border-normal bg-static-white px-10">
-        <button type="button" onClick={() => navigate('/')} className="flex items-center">
+        <button type="button" onClick={() => navigate('/home')} className="flex items-center">
           <img src={logoFullSvg} alt="Labit" />
         </button>
         <ProfileButton />
@@ -80,7 +80,7 @@ export default function MyPage() {
       <div className="mt-[60px] flex h-[62px] items-center bg-neutral-5 px-10">
         <button
           type="button"
-          onClick={() => navigate("/")}
+          onClick={() => navigate("/home")}
           className="flex items-center gap-1 rounded-lg px-[10px] py-2 transition-colors hover:bg-neutral-15"
         >
           <img src={leftSvg} alt="" width={24} height={24} />
