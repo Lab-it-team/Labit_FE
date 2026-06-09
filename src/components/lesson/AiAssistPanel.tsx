@@ -144,6 +144,7 @@ const AiAssistPanel = forwardRef<HTMLDivElement, AiAssistPanelProps>(
     const [isWaiting, setIsWaiting] = useState(!!initialQuestion);
     const [hasAiResponse, setHasAiResponse] = useState(false);
     const sessionIdRef = useRef<number | null>(null);
+    const initializedRef = useRef(false);
     const chatContainerRef = useRef<HTMLDivElement>(null);
     const scrollTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
     const isProgrammaticScroll = useRef(false);
@@ -203,7 +204,8 @@ const AiAssistPanel = forwardRef<HTMLDivElement, AiAssistPanelProps>(
     };
 
     useEffect(() => {
-      if (!initialQuestion) return;
+      if (!initialQuestion || initializedRef.current) return;
+      initializedRef.current = true;
       sendToApi(initialQuestion);
       // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
