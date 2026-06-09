@@ -29,8 +29,9 @@ export const useDeleteSession = () => {
   })
 }
 
-export const useSendMessage = () =>
-  useMutation({
+export const useSendMessage = () => {
+  const qc = useQueryClient()
+  return useMutation({
     mutationFn: ({
       sessionId,
       content,
@@ -40,7 +41,10 @@ export const useSendMessage = () =>
       content: string
       context?: string | null
     }) => sendMessage(sessionId, content, context),
+    onSuccess: (_, { sessionId }) =>
+      qc.invalidateQueries({ queryKey: ['chats', 'sessions', sessionId, 'messages'] }),
   })
+}
 
 export const useMessages = (sessionId: number | null) =>
   useQuery({
