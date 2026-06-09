@@ -94,9 +94,9 @@ function parseStoredPieces(value: string | null): Record<number, PlacedPiece[]> 
       Object.entries(data).map(([k, pieces]) => [
         k,
         pieces.map((p) => ({
-          bondedBelowId: null,
-          bondedAboveCationId: null,
           ...p,
+          bondedBelowId: p.bondedBelowId ?? null,
+          bondedAboveCationId: p.bondedAboveCationId ?? null,
         })),
       ]),
     );
