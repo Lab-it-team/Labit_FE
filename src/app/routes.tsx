@@ -24,13 +24,13 @@ export default function AppRoutes() {
           <Route path="/" element={<Home />} />
           <Route path="/home" element={<Home />} />
           <Route path="/Home" element={<Navigate to="/home" replace />} />
+          <Route path="/mypage" element={<MyPage />} />
         </Route>
         <Route path="/ionic-concept" element={<IonicConcept />} />
         <Route path="/ionic-lab" element={<IonicLab />} />
         <Route path="/covalent-concept" element={<CovalentConcept />} />
         <Route path="/covalent-lab" element={<CovalentLab />} />
         <Route path="/quiz" element={<Quiz />} />
-        <Route path="/mypage" element={<MyPage />} />
         <Route path="*" element={<Navigate to="/home" replace />} />
       </Routes>
     </Suspense>
