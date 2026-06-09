@@ -11,6 +11,7 @@ const IonicLab = lazy(() => import("@/pages/IonicLab"));
 const CovalentConcept = lazy(() => import("@/pages/CovalentConcept"));
 const CovalentLab = lazy(() => import("@/pages/CovalentLab"));
 const Quiz = lazy(() => import("@/pages/Quiz"));
+const MyPage = lazy(() => import("@/pages/MyPage"));
 
 export default function AppRoutes() {
   return (
@@ -23,6 +24,7 @@ export default function AppRoutes() {
           <Route path="/" element={<Home />} />
           <Route path="/home" element={<Home />} />
           <Route path="/Home" element={<Navigate to="/home" replace />} />
+          <Route path="/mypage" element={<MyPage />} />
         </Route>
         <Route path="/ionic-concept" element={<IonicConcept />} />
         <Route path="/ionic-lab" element={<IonicLab />} />
