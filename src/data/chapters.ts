@@ -1,6 +1,7 @@
 export type ChapterStatus = "done" | "in-progress" | "upcoming";
 
 export interface Lesson {
+  id?: number;
   title: string;
   inProgress: boolean;
 }
