@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef } from "react";
 import { useNavigate } from "react-router";
 import logoFullSvg from "@/assets/Icon/logo-full.svg";
 import leftSvg from "@/assets/Icon/left.svg";
@@ -24,17 +24,13 @@ export default function MyPage() {
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  useEffect(() => {
-    if (me?.nickname) setNicknameInput(me.nickname);
-  }, [me?.nickname]);
-
   const handleSaveNickname = async () => {
     if (!nicknameInput.trim()) return;
     setSaving(true);
     try {
       await updateProfile({ nickname: nicknameInput.trim() });
-      await refetch();
-      setUser({ nickname: nicknameInput.trim(), profileImageUrl: me?.profile_image ?? null });
+      const { data: updated } = await refetch();
+      setUser({ nickname: nicknameInput.trim(), profileImageUrl: updated?.profile_image ?? null });
       setEditingNickname(false);
     } finally {
       setSaving(false);
@@ -48,8 +44,8 @@ export default function MyPage() {
       const { upload_url, public_url } = await getPresignedUrl(file.type);
       await fetch(upload_url, { method: "PUT", body: file, headers: { "Content-Type": file.type } });
       await updateProfile({ profile_image: public_url });
-      await refetch();
-      setUser({ nickname: me?.nickname ?? "", profileImageUrl: public_url });
+      const { data: updated } = await refetch();
+      setUser({ nickname: updated?.nickname ?? "", profileImageUrl: public_url });
     } catch {
       /* 업로드 실패 시 무시 */
     }
