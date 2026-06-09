@@ -82,7 +82,7 @@ export default function LessonHeader({
         <div className="flex items-center gap-1 flex-1">
           <button
             type="button"
-            onClick={() => navigate('/')}
+            onClick={() => navigate('/home')}
             className="flex items-center gap-1 px-2.5 py-2 rounded-lg hover:bg-neutral-10 transition-colors"
           >
             <img src={homeSvg} alt="" width={20} height={20} />
