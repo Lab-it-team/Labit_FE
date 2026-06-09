@@ -1,6 +1,7 @@
 import { useDraggable, useDroppable } from "@dnd-kit/core";
 
 let canvasHintSeen = false;
+let checkToastSeen = false;
 import PuzzlePiece from "@/components/lab/PuzzlePiece";
 import type { Ion } from "@/data/ions";
 import bellSvg from "@/assets/Icon/bell.svg";
@@ -223,7 +224,7 @@ export default function CanvasDropZone({
 }: CanvasDropZoneProps) {
   const { setNodeRef } = useDroppable({ id: "ionic-canvas" });
   const hasInput = placedPieces.length > 0;
-  if (hasInput) canvasHintSeen = true;
+  if (hasInput) { canvasHintSeen = true; checkToastSeen = true; }
   const hintDismissed = canvasHintSeen;
 
   const status: CanvasStatus = isWrongCompound
@@ -258,7 +259,12 @@ export default function CanvasDropZone({
         touchAction: "none",
       }}
     >
-      {!isDragOver && <Toast key={checkKey} status={status} />}
+      {!isDragOver && (
+        status === "positive" ||
+        status === "negative" ||
+        status === "wrongCompound" ||
+        (status === "empty" && !checkToastSeen)
+      ) && <Toast key={checkKey} status={status} />}
       {hintVisible && hintText && <HintPopup text={hintText} />}
 
       {!hintDismissed && (!hasInput || isDragOver) && (
