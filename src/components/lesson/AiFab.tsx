@@ -2,6 +2,8 @@ import { useState } from "react";
 import tipsSvg from "@/assets/Icon/mingcute_ai-fill.svg";
 import bgSvg from "@/assets/Icon/bg.svg";
 import AiChatPopup from "./AiChatPopup";
+import LoginRequiredModal from "@/components/common/LoginRequiredModal";
+import { useAuthStore } from "@/stores/authStore";
 
 function AiFabTooltip({ onDismiss }: { onDismiss: () => void }) {
   return (
@@ -43,9 +45,11 @@ export default function AiFab({
   onClick,
   className = "",
 }: AiFabProps) {
+  const isLoggedIn = !!useAuthStore((s) => s.accessToken);
   const [interaction, setInteraction] = useState<FabInteraction>("default");
   const [tooltipVisible, setTooltipVisible] = useState(showTooltip);
   const [chatVisible, setChatVisible] = useState(false);
+  const [loginModalVisible, setLoginModalVisible] = useState(false);
 
   const fabBgClass =
     interaction === "pressed"
@@ -56,12 +60,14 @@ export default function AiFab({
 
   const handleClick = () => {
     setTooltipVisible(false);
+    if (!isLoggedIn) { setLoginModalVisible(true); return; }
     setChatVisible((v) => !v);
     onClick?.();
   };
 
   return (
     <div className={`inline-flex flex-col items-end ${className}`}>
+      {loginModalVisible && <LoginRequiredModal onClose={() => setLoginModalVisible(false)} />}
       {chatVisible && (
         <>
           <div
