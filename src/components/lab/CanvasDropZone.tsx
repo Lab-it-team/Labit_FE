@@ -29,6 +29,8 @@ interface CanvasDropZoneProps {
   checkKey?: number;
   draggingPieceId?: string | null;
   height: number;
+  width?: number;
+  hideEmptyToast?: boolean;
   hintVisible?: boolean;
   hintText?: string;
 }
@@ -219,6 +221,8 @@ export default function CanvasDropZone({
   checkKey = 0,
   draggingPieceId = null,
   height,
+  width = 548,
+  hideEmptyToast = false,
   hintVisible = false,
   hintText,
 }: CanvasDropZoneProps) {
@@ -249,7 +253,7 @@ export default function CanvasDropZone({
       style={{
         boxSizing: "border-box",
         position: "relative",
-        width: 548,
+        width,
         height,
         background: bg,
         border,
@@ -263,7 +267,7 @@ export default function CanvasDropZone({
         status === "positive" ||
         status === "negative" ||
         status === "wrongCompound" ||
-        (status === "empty" && !checkToastSeen)
+        (status === "empty" && !checkToastSeen && !hideEmptyToast)
       ) && <Toast key={checkKey} status={status} />}
       {hintVisible && hintText && <HintPopup text={hintText} />}
 
