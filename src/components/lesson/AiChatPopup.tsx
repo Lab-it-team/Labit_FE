@@ -23,6 +23,7 @@ const ICON_FILTER_GRAY = "brightness(0) invert(1) brightness(0.83)";
 
 interface AiChatPopupProps {
   onClose?: () => void;
+  onInquiryClick?: () => void;
   className?: string;
 }
 
@@ -76,7 +77,7 @@ function formatTimestamp(isoString: string): string {
   return `${month}. ${day}. ${ampm} ${displayHours}:${displayMinutes}`;
 }
 
-export default function AiChatPopup({ onClose, className = "" }: AiChatPopupProps) {
+export default function AiChatPopup({ onClose, onInquiryClick, className = "" }: AiChatPopupProps) {
   const [input, setInput] = useState("");
   const [moreOpen, setMoreOpen] = useState(false);
   const [view, setView] = useState<"main" | "history" | "chat">("main");
@@ -418,6 +419,7 @@ export default function AiChatPopup({ onClose, className = "" }: AiChatPopupProp
                 onClick={() => {
                   setMoreOpen(false);
                   if (item === "채팅 기록") setView("history");
+                  if (item === "고객문의") onInquiryClick?.();
                 }}
                 className="w-full py-2 text-[13px] font-medium text-text-normal transition-colors text-center hover:bg-neutral-10 active:bg-neutral-20"
               >
