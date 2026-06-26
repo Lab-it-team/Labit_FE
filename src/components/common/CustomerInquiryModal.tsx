@@ -18,7 +18,6 @@ interface CustomerInquiryModalProps {
 
 type Step = "main" | "email-form";
 
-
 function CloseButton({ onClick }: { onClick: () => void }) {
   return (
     <button
@@ -27,7 +26,7 @@ function CloseButton({ onClick }: { onClick: () => void }) {
       style={{ display: "flex", alignItems: "center", justifyContent: "center", width: 24, height: 24, background: "none", border: "none", cursor: "pointer", padding: 0, flexShrink: 0 }}
     >
       <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
-        <path d="M13 1L1 13M1 1L13 13" stroke="#4E4F52" strokeWidth="1.8" strokeLinecap="round" />
+        <path d="M13 1L1 13M1 1L13 13" stroke="var(--color-text-normal)" strokeWidth="1.8" strokeLinecap="round" />
       </svg>
     </button>
   );
@@ -41,7 +40,7 @@ function BackButton({ onClick }: { onClick: () => void }) {
       style={{ display: "flex", alignItems: "center", justifyContent: "center", width: 24, height: 24, background: "none", border: "none", cursor: "pointer", padding: 0, flexShrink: 0 }}
     >
       <svg width="8" height="14" viewBox="0 0 8 14" fill="none">
-        <path d="M7 1L1 7L7 13" stroke="#4E4F52" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
+        <path d="M7 1L1 7L7 13" stroke="var(--color-text-normal)" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
       </svg>
     </button>
   );
@@ -56,34 +55,34 @@ const POPUP_STYLE: React.CSSProperties = {
   gap: 24,
   width: 362,
   maxWidth: "calc(100vw - 32px)",
-  background: "#FDFDFD",
-  border: "1.5px solid #214dcc",
+  background: "var(--color-bg-normal)",
+  border: "1.5px solid var(--color-primary-strong)",
   boxShadow: "0px 0px 6px #A2B8F9",
   borderRadius: 24,
 };
 
 const LABEL_STYLE: React.CSSProperties = {
-  fontFamily: "Pretendard, sans-serif",
+  fontFamily: "var(--font-sans)",
   fontWeight: 400,
   fontSize: 13,
   lineHeight: "18px",
   letterSpacing: "-0.005em",
-  color: "#4E4F52",
+  color: "var(--color-text-normal)",
 };
 
 const INPUT_STYLE: React.CSSProperties = {
   boxSizing: "border-box",
   width: "100%",
-  background: "#FCFCFC",
-  border: "1px solid #EAEBEE",
+  background: "var(--color-bg-normal)",
+  border: "1px solid var(--color-border-strong)",
   borderRadius: 12,
   padding: "8px 12px",
-  fontFamily: "Pretendard, sans-serif",
+  fontFamily: "var(--font-sans)",
   fontWeight: 500,
   fontSize: 13,
   lineHeight: "18px",
   letterSpacing: "-0.005em",
-  color: "#1C1D20",
+  color: "var(--color-text-strong)",
   outline: "none",
 };
 
@@ -101,10 +100,10 @@ function MainStep({ onClose, onEmailClick }: { onClose: () => void; onEmailClick
       <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 12 }}>
         <img src={mascotPng} alt="" style={{ width: 120, height: 104, objectFit: "contain" }} />
         <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 4 }}>
-          <span style={{ fontFamily: "Pretendard, sans-serif", fontWeight: 700, fontSize: 20, lineHeight: "28px", color: "#1C1D20" }}>
+          <span style={{ fontFamily: "var(--font-sans)", fontWeight: 700, fontSize: 20, lineHeight: "28px", color: "var(--color-text-strong)" }}>
             무엇을 도와드릴까요?
           </span>
-          <span style={{ fontFamily: "Pretendard, sans-serif", fontWeight: 400, fontSize: 13, lineHeight: "18px", letterSpacing: "-0.005em", textAlign: "center", color: "#8A8B8E" }}>
+          <span style={{ fontFamily: "var(--font-sans)", fontWeight: 400, fontSize: 13, lineHeight: "18px", letterSpacing: "-0.005em", textAlign: "center", color: "var(--color-text-sub)" }}>
             궁금한 점이나 불편한 점이 있으신가요?<br />편한 방법으로 문의해 주세요.
           </span>
         </div>
@@ -122,8 +121,8 @@ function MainStep({ onClose, onEmailClick }: { onClose: () => void; onEmailClick
           padding: "14px 16px",
           gap: 12,
           width: "100%",
-          background: "#FFFFFF",
-          border: "1px solid #EAEBEE",
+          background: "var(--color-static-white)",
+          border: "1px solid var(--color-border-strong)",
           borderRadius: 16,
           cursor: "pointer",
           textAlign: "left",
@@ -131,10 +130,10 @@ function MainStep({ onClose, onEmailClick }: { onClose: () => void; onEmailClick
       >
         <img src={mailSvg} alt="" width={24} height={20} />
         <div style={{ display: "flex", flexDirection: "column", gap: 2, flex: 1 }}>
-          <span style={{ fontFamily: "Pretendard, sans-serif", fontWeight: 500, fontSize: 16, lineHeight: "22px", color: "#1C1D20" }}>
+          <span style={{ fontFamily: "var(--font-sans)", fontWeight: 500, fontSize: 16, lineHeight: "22px", color: "var(--color-text-strong)" }}>
             이메일로 문의하기
           </span>
-          <span style={{ fontFamily: "Pretendard, sans-serif", fontWeight: 400, fontSize: 12, lineHeight: "17px", letterSpacing: "-0.005em", color: "#8A8B8E" }}>
+          <span style={{ fontFamily: "var(--font-sans)", fontWeight: 400, fontSize: 12, lineHeight: "17px", letterSpacing: "-0.005em", color: "var(--color-text-sub)" }}>
             보통 1~2일 내에 답변을 보내드려요.
           </span>
         </div>
@@ -168,14 +167,14 @@ function EmailFormStep({ onClose, onBack }: { onClose: () => void; onBack: () =>
         <CloseButton onClick={onClose} />
       </div>
 
-      {/* 이메일 아이콘 + 타이틀 */}
+      {/* 아이콘 + 타이틀 */}
       <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 8, flexShrink: 0 }}>
         <img src={mailSvg} alt="" width={24} height={20} />
         <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 4 }}>
-          <span style={{ fontFamily: "Pretendard, sans-serif", fontWeight: 500, fontSize: 16, lineHeight: "22px", color: "#1C1D20" }}>
+          <span style={{ fontFamily: "var(--font-sans)", fontWeight: 500, fontSize: 16, lineHeight: "22px", color: "var(--color-text-strong)" }}>
             이메일로 문의하기
           </span>
-          <span style={{ fontFamily: "Pretendard, sans-serif", fontWeight: 400, fontSize: 12, lineHeight: "17px", letterSpacing: "-0.005em", textAlign: "center", color: "#8A8B8E" }}>
+          <span style={{ fontFamily: "var(--font-sans)", fontWeight: 400, fontSize: 12, lineHeight: "17px", letterSpacing: "-0.005em", textAlign: "center", color: "var(--color-text-sub)" }}>
             작성해서 보내면 담당자에게 바로 전달돼요.
           </span>
         </div>
@@ -188,7 +187,7 @@ function EmailFormStep({ onClose, onBack }: { onClose: () => void; onBack: () =>
         <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
           <div style={{ display: "flex", flexDirection: "row", gap: 2 }}>
             <span style={LABEL_STYLE}>문의 유형</span>
-            <span style={{ ...LABEL_STYLE, color: "#E04444" }}>*</span>
+            <span style={{ ...LABEL_STYLE, color: "var(--color-element-normal-red)" }}>*</span>
           </div>
           <div style={{ display: "flex", flexDirection: "row", flexWrap: "wrap", gap: 6 }}>
             {INQUIRY_TYPES.map((type) => {
@@ -202,16 +201,16 @@ function EmailFormStep({ onClose, onBack }: { onClose: () => void; onBack: () =>
                     display: "flex", alignItems: "center", justifyContent: "center",
                     padding: "4px 8px",
                     height: 26,
-                    background: isSelected ? "#EEF2FE" : "#F4F5F8",
-                    border: isSelected ? "1px solid #275AF0" : "1px solid transparent",
+                    background: isSelected ? "var(--color-primary-light)" : "var(--color-bg-elevate)",
+                    border: isSelected ? "1px solid var(--color-primary-normal)" : "1px solid transparent",
                     borderRadius: 6,
                     cursor: "pointer",
-                    fontFamily: "Pretendard, sans-serif",
+                    fontFamily: "var(--font-sans)",
                     fontWeight: 500,
                     fontSize: 13,
                     lineHeight: "18px",
                     letterSpacing: "-0.005em",
-                    color: isSelected ? "#275AF0" : "#4E4F52",
+                    color: isSelected ? "var(--color-primary-normal)" : "var(--color-text-normal)",
                     transition: "all 0.15s",
                   }}
                 >
@@ -226,7 +225,7 @@ function EmailFormStep({ onClose, onBack }: { onClose: () => void; onBack: () =>
         <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
           <div style={{ display: "flex", flexDirection: "row", gap: 2 }}>
             <span style={LABEL_STYLE}>연락받을 이메일</span>
-            <span style={{ ...LABEL_STYLE, color: "#E04444" }}>*</span>
+            <span style={{ ...LABEL_STYLE, color: "var(--color-element-normal-red)" }}>*</span>
           </div>
           <input
             type="email"
@@ -235,7 +234,7 @@ function EmailFormStep({ onClose, onBack }: { onClose: () => void; onBack: () =>
             placeholder="answer@example.com"
             style={{ ...INPUT_STYLE, height: 38 }}
           />
-          <span style={{ fontFamily: "Pretendard, sans-serif", fontWeight: 400, fontSize: 12, lineHeight: "17px", letterSpacing: "-0.005em", color: "#8A8B8E" }}>
+          <span style={{ fontFamily: "var(--font-sans)", fontWeight: 400, fontSize: 12, lineHeight: "17px", letterSpacing: "-0.005em", color: "var(--color-text-sub)" }}>
             답변을 받을 이메일 주소를 입력해 주세요.
           </span>
         </div>
@@ -256,12 +255,12 @@ function EmailFormStep({ onClose, onBack }: { onClose: () => void; onBack: () =>
         <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
           <div style={{ display: "flex", flexDirection: "row", gap: 2 }}>
             <span style={LABEL_STYLE}>문의 내용</span>
-            <span style={{ ...LABEL_STYLE, color: "#E04444" }}>*</span>
+            <span style={{ ...LABEL_STYLE, color: "var(--color-element-normal-red)" }}>*</span>
           </div>
           <textarea
             value={content}
             onChange={(e) => setContent(e.target.value)}
-            placeholder={"예) 학년·단원과 함께 자세히 적어주시면 더 빠르게 도와드릴 수 있어요."}
+            placeholder="예) 학년·단원과 함께 자세히 적어주시면 더 빠르게 도와드릴 수 있어요."
             rows={3}
             style={{ ...INPUT_STYLE, height: 80, resize: "none" }}
           />
@@ -276,14 +275,14 @@ function EmailFormStep({ onClose, onBack }: { onClose: () => void; onBack: () =>
             display: "flex", flexDirection: "row", justifyContent: "center", alignItems: "center",
             padding: "8px 10px", gap: 4,
             width: "100%", height: 38,
-            background: isValid ? "#275AF0" : "#E0E1E4",
+            background: isValid ? "var(--color-primary-normal)" : "var(--color-text-disabled)",
             borderRadius: 12,
             border: "none",
             cursor: isValid ? "pointer" : "default",
             transition: "background 0.15s",
           }}
         >
-          <span style={{ fontFamily: "Pretendard, sans-serif", fontWeight: 600, fontSize: 15, lineHeight: "22px", letterSpacing: "-0.005em", color: isValid ? "#FFFFFF" : "#B4B5B8" }}>
+          <span style={{ fontFamily: "var(--font-sans)", fontWeight: 600, fontSize: 15, lineHeight: "22px", letterSpacing: "-0.005em", color: isValid ? "var(--color-static-white)" : "var(--color-neutral-40)" }}>
             문의 보내기
           </span>
           <img src={sendSvg} alt="" width={20} height={20} style={{ filter: isValid ? "brightness(0) invert(1)" : "brightness(0) invert(0.7)" }} />
