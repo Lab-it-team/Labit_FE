@@ -2,6 +2,7 @@ import { useState } from "react";
 import mascotPng from "@/assets/Icon/mascot.png";
 import sendSvg from "@/assets/Icon/mynaui_send-solid.svg";
 import arrowRightSvg from "@/assets/Icon/Arrow/right.svg";
+import mailSvg from "@/assets/Icon/mail.svg";
 
 const INQUIRY_TYPES = [
   { id: "general",  label: "💬 일반 문의" },
@@ -17,20 +18,6 @@ interface CustomerInquiryModalProps {
 
 type Step = "main" | "email-form";
 
-function MailIcon() {
-  return (
-    <svg width="40" height="40" viewBox="0 0 40 40" fill="none">
-      <rect width="40" height="40" rx="12" fill="#275AF0" />
-      <path
-        d="M8 13.5C8 12.672 8.672 12 9.5 12h21c.828 0 1.5.672 1.5 1.5v13c0 .828-.672 1.5-1.5 1.5h-21C8.672 28 8 27.328 8 26.5v-13Z"
-        fill="none"
-        stroke="white"
-        strokeWidth="1.6"
-      />
-      <path d="M8 14l12 8 12-8" stroke="white" strokeWidth="1.6" strokeLinecap="round" />
-    </svg>
-  );
-}
 
 function CloseButton({ onClick }: { onClick: () => void }) {
   return (
@@ -70,6 +57,7 @@ const POPUP_STYLE: React.CSSProperties = {
   width: 362,
   maxWidth: "calc(100vw - 32px)",
   background: "#FDFDFD",
+  border: "1.5px solid #214dcc",
   boxShadow: "0px 0px 6px #A2B8F9",
   borderRadius: 24,
 };
@@ -141,7 +129,7 @@ function MainStep({ onClose, onEmailClick }: { onClose: () => void; onEmailClick
           textAlign: "left",
         }}
       >
-        <MailIcon />
+        <img src={mailSvg} alt="" width={24} height={20} />
         <div style={{ display: "flex", flexDirection: "column", gap: 2, flex: 1 }}>
           <span style={{ fontFamily: "Pretendard, sans-serif", fontWeight: 500, fontSize: 16, lineHeight: "22px", color: "#1C1D20" }}>
             이메일로 문의하기
@@ -182,7 +170,7 @@ function EmailFormStep({ onClose, onBack }: { onClose: () => void; onBack: () =>
 
       {/* 이메일 아이콘 + 타이틀 */}
       <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 8, flexShrink: 0 }}>
-        <MailIcon />
+        <img src={mailSvg} alt="" width={24} height={20} />
         <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 4 }}>
           <span style={{ fontFamily: "Pretendard, sans-serif", fontWeight: 500, fontSize: 16, lineHeight: "22px", color: "#1C1D20" }}>
             이메일로 문의하기
@@ -247,7 +235,7 @@ function EmailFormStep({ onClose, onBack }: { onClose: () => void; onBack: () =>
             placeholder="answer@example.com"
             style={{ ...INPUT_STYLE, height: 38 }}
           />
-          <span style={{ fontFamily: "Pretendard, sans-serif", fontWeight: 400, fontSize: 12, lineHeight: "17px", letterSpacing: "-0.005em", textAlign: "center", color: "#8A8B8E" }}>
+          <span style={{ fontFamily: "Pretendard, sans-serif", fontWeight: 400, fontSize: 12, lineHeight: "17px", letterSpacing: "-0.005em", color: "#8A8B8E" }}>
             답변을 받을 이메일 주소를 입력해 주세요.
           </span>
         </div>
