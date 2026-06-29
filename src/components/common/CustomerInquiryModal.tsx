@@ -1,5 +1,5 @@
 import { useState } from "react";
-import mascotPng from "@/assets/Icon/mascot.png";
+import mascotPng from "@/assets/Icon/labit_thinking.png";
 import sendSvg from "@/assets/Icon/mynaui_send-solid.svg";
 import arrowRightSvg from "@/assets/Icon/Arrow/right.svg";
 import mailSvg from "@/assets/Icon/mail.svg";
@@ -100,10 +100,10 @@ function MainStep({ onClose, onEmailClick }: { onClose: () => void; onEmailClick
       <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 12 }}>
         <img src={mascotPng} alt="" style={{ width: 120, height: 104, objectFit: "contain" }} />
         <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 4 }}>
-          <span style={{ fontFamily: "var(--font-sans)", fontWeight: 700, fontSize: 20, lineHeight: "28px", color: "var(--color-text-strong)" }}>
+          <span style={{ fontFamily: "var(--font-sans)", fontWeight: 600, fontSize: 16, lineHeight: "22px", color: "var(--color-text-strong)" }}>
             무엇을 도와드릴까요?
           </span>
-          <span style={{ fontFamily: "var(--font-sans)", fontWeight: 400, fontSize: 13, lineHeight: "18px", letterSpacing: "-0.005em", textAlign: "center", color: "var(--color-text-sub)" }}>
+          <span style={{ fontFamily: "var(--font-sans)", fontWeight: 400, fontSize: 12, lineHeight: "17px", letterSpacing: "-0.005em", textAlign: "center", color: "var(--color-text-sub)" }}>
             궁금한 점이나 불편한 점이 있으신가요?<br />편한 방법으로 문의해 주세요.
           </span>
         </div>
@@ -130,7 +130,7 @@ function MainStep({ onClose, onEmailClick }: { onClose: () => void; onEmailClick
       >
         <img src={mailSvg} alt="" width={24} height={20} />
         <div style={{ display: "flex", flexDirection: "column", gap: 2, flex: 1 }}>
-          <span style={{ fontFamily: "var(--font-sans)", fontWeight: 500, fontSize: 16, lineHeight: "22px", color: "var(--color-text-strong)" }}>
+          <span style={{ fontFamily: "var(--font-sans)", fontWeight: 500, fontSize: 14, lineHeight: "20px", color: "var(--color-text-normal)" }}>
             이메일로 문의하기
           </span>
           <span style={{ fontFamily: "var(--font-sans)", fontWeight: 400, fontSize: 12, lineHeight: "17px", letterSpacing: "-0.005em", color: "var(--color-text-sub)" }}>
