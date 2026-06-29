@@ -3,7 +3,7 @@ import { useDraggable } from "@dnd-kit/core";
 import { CATIONS, ANIONS } from "@/data/ions";
 import type { Ion } from "@/data/ions";
 import { getPuzzlePath, cardHeight, ionColor } from "@/components/lab/puzzlePaths";
-import tipsSvg from "@/assets/Icon/tips.svg";
+import tipsSvg from "@/assets/icons/tips.svg";
 
 function shapeFill(): string { return "var(--color-bg-normal)"; }
 function shapeStroke(): string { return "var(--color-border-strong)"; }

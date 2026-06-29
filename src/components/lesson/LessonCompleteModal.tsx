@@ -1,4 +1,4 @@
-import mascotPng from "@/assets/Icon/labit_wink.png";
+import mascotPng from "@/assets/mascot/labit_wink.png";
 import confetti from "canvas-confetti";
 import { useEffect, useRef } from "react";
 import { useNavigate } from "react-router";
@@ -55,7 +55,7 @@ export default function LessonCompleteModal({ onClose, completedFormulas }: Less
         style={{
           display: "flex", flexDirection: "column", alignItems: "center",
           padding: 24, gap: 24, width: 400,
-          background: "#FFFFFF",
+          background: "var(--color-static-white)",
           boxShadow: "0px 0px 100px rgba(78, 79, 82, 0.18)",
           borderRadius: 24,
           boxSizing: "border-box",
@@ -70,13 +70,13 @@ export default function LessonCompleteModal({ onClose, completedFormulas }: Less
             style={{ display: "flex", alignItems: "center", justifyContent: "center", width: 24, height: 24, background: "none", border: "none", cursor: "pointer", padding: 0 }}
           >
             <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
-              <path d="M13 1L1 13M1 1L13 13" stroke="#4E4F52" strokeWidth="1.8" strokeLinecap="round" />
+              <path d="M13 1L1 13M1 1L13 13" stroke="var(--color-text-normal)" strokeWidth="1.8" strokeLinecap="round" />
             </svg>
           </button>
         </div>
 
         {/* Mascot */}
-        <img src={mascotPng} alt="" width={158} height={131} style={{ objectFit: "contain" }} />
+        <img src={mascotPng} alt="" width={158} height={131} style={{ objectFit: "contain", marginTop: 16 }} />
 
         {/* Frame 395: text-area (title + body only) */}
         <div style={{ display: "flex", flexDirection: "column", alignItems: "flex-start", gap: 8, width: "100%" }}>
@@ -84,7 +84,7 @@ export default function LessonCompleteModal({ onClose, completedFormulas }: Less
           <div style={{ display: "flex", flexDirection: "row", justifyContent: "center", alignItems: "flex-start", gap: 8, width: "100%" }}>
             <span style={{
               fontFamily: "var(--font-sans)", fontWeight: 700, fontSize: 24, lineHeight: "30px",
-              textAlign: "center", color: "#1C1D20",
+              textAlign: "center", color: "var(--color-text-strong)",
             }}>
               목표 화합물을<br />모두 완성했어요! 🎉
             </span>
@@ -92,7 +92,7 @@ export default function LessonCompleteModal({ onClose, completedFormulas }: Less
           {/* Body */}
           <span style={{
             fontFamily: "var(--font-sans)", fontWeight: 400, fontSize: 13, lineHeight: "20px",
-            letterSpacing: "-0.005em", textAlign: "center", color: "#4E4F52",
+            letterSpacing: "-0.005em", textAlign: "center", color: "var(--color-text-normal)",
             width: "100%",
           }}>
             전하 합 맞추기, 이제 익숙해졌죠?<br />자유 실험실에서 더 많이 연습할 수 있어요.
@@ -108,7 +108,7 @@ export default function LessonCompleteModal({ onClose, completedFormulas }: Less
         }}>
           <span style={{
             fontFamily: "var(--font-sans)", fontWeight: 400, fontSize: 12, lineHeight: "17px",
-            letterSpacing: "-0.005em", color: "#4E4F52",
+            letterSpacing: "-0.005em", color: "var(--color-text-normal)",
           }}>
             내가 만든 화합물
           </span>
@@ -119,13 +119,13 @@ export default function LessonCompleteModal({ onClose, completedFormulas }: Less
                 style={{
                   display: "flex", flexDirection: "row", justifyContent: "center", alignItems: "center",
                   padding: "4px 8px", height: 24,
-                  background: "#FFFFFF", borderRadius: 24,
+                  background: "var(--color-static-white)", borderRadius: 24,
                   boxSizing: "border-box",
                 }}
               >
                 <span style={{
                   fontFamily: "'Bricolage Grotesque', var(--font-sans)", fontWeight: 400, fontSize: 13, lineHeight: "16px",
-                  color: "#4E4F52", whiteSpace: "nowrap",
+                  color: "var(--color-text-normal)", whiteSpace: "nowrap",
                 }}>
                   {formula}
                 </span>
@@ -143,12 +143,12 @@ export default function LessonCompleteModal({ onClose, completedFormulas }: Less
             style={{
               display: "flex", flexDirection: "row", justifyContent: "center", alignItems: "center",
               padding: 12, gap: 4, width: "100%", height: 48,
-              background: "#275AF0", borderRadius: 12, border: "none", cursor: "pointer",
+              background: "var(--color-primary-normal)", borderRadius: 12, border: "none", cursor: "pointer",
             }}
           >
             <span style={{
               fontFamily: "var(--font-sans)", fontWeight: 600, fontSize: 15, lineHeight: "22px",
-              letterSpacing: "-0.005em", color: "#FFFFFF",
+              letterSpacing: "-0.005em", color: "var(--color-text-light)",
             }}>
               공유 결합 학습하기
             </span>
@@ -166,12 +166,12 @@ export default function LessonCompleteModal({ onClose, completedFormulas }: Less
               boxSizing: "border-box",
               display: "flex", flexDirection: "row", justifyContent: "center", alignItems: "center",
               padding: 12, width: "100%", height: 42,
-              background: "#FCFCFC", border: "1px solid #F0F1F4", borderRadius: 12, cursor: "pointer",
+              background: "var(--color-bg-normal)", border: "1px solid var(--color-neutral-15)", borderRadius: 12, cursor: "pointer",
             }}
           >
             <span style={{
               fontFamily: "var(--font-sans)", fontWeight: 500, fontSize: 13, lineHeight: "18px",
-              letterSpacing: "-0.005em", color: "#4E4F52",
+              letterSpacing: "-0.005em", color: "var(--color-text-normal)",
             }}>
               실습 다시 보기
             </span>
@@ -185,12 +185,12 @@ export default function LessonCompleteModal({ onClose, completedFormulas }: Less
               boxSizing: "border-box",
               display: "flex", flexDirection: "row", justifyContent: "center", alignItems: "center",
               padding: 12, width: "100%", height: 42,
-              background: "#FCFCFC", border: "1px solid #F0F1F4", borderRadius: 12, cursor: "pointer",
+              background: "var(--color-bg-normal)", border: "1px solid var(--color-neutral-15)", borderRadius: 12, cursor: "pointer",
             }}
           >
             <span style={{
               fontFamily: "var(--font-sans)", fontWeight: 500, fontSize: 13, lineHeight: "18px",
-              letterSpacing: "-0.005em", color: "#4E4F52",
+              letterSpacing: "-0.005em", color: "var(--color-text-normal)",
             }}>
               자유 실험실
             </span>

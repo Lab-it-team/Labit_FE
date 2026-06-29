@@ -4,8 +4,8 @@ let canvasHintSeen = false;
 let checkToastSeen = false;
 import PuzzlePiece from "@/components/lab/PuzzlePiece";
 import type { Ion } from "@/data/ions";
-import bellSvg from "@/assets/Icon/bell.svg";
-import checkSvg from "@/assets/Icon/check.svg";
+import bellSvg from "@/assets/icons/bell.svg";
+import checkSvg from "@/assets/icons/check.svg";
 
 export interface PlacedPiece {
   id: string;

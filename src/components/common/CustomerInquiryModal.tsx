@@ -1,8 +1,8 @@
 import { useState } from "react";
-import mascotPng from "@/assets/Icon/labit_thinking.png";
-import sendSvg from "@/assets/Icon/mynaui_send-solid.svg";
-import arrowRightSvg from "@/assets/Icon/Arrow/right.svg";
-import mailSvg from "@/assets/Icon/mail.svg";
+import mascotPng from "@/assets/mascot/labit_thinking.png";
+import sendSvg from "@/assets/icons/mynaui_send-solid.svg";
+import arrowRightSvg from "@/assets/icons/arrow/right.svg";
+import mailSvg from "@/assets/icons/mail.svg";
 
 const INQUIRY_TYPES = [
   { id: "general",  label: "💬 일반 문의" },

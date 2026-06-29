@@ -1,4 +1,4 @@
-import rightSvg from "@/assets/Icon/right.svg";
+import rightSvg from "@/assets/icons/right.svg";
 
 interface LessonFooterProps {
   currentPage: number;

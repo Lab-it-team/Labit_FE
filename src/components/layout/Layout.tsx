@@ -1,7 +1,7 @@
 import { Outlet, useNavigate } from 'react-router'
 import Sidebar from './Sidebar'
 import ProfileButton from './ProfileButton'
-import logoFullSvg from '@/assets/Icon/logo-full.svg'
+import logoFullSvg from '@/assets/brand/logo-full.svg'
 
 export default function Layout() {
   const navigate = useNavigate()

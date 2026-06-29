@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router'
-import closeSvg from '@/assets/Icon/close.svg'
-import mascotPng from '@/assets/Icon/labit_peeking.png'
+import closeSvg from '@/assets/icons/close.svg'
+import mascotPng from '@/assets/mascot/labit_peeking.png'
 import { deleteAccount } from '@/features/auth/api'
 import { useAuthStore } from '@/stores/authStore'
 

@@ -1,11 +1,11 @@
 import { useState, useRef } from "react";
 import { useNavigate } from "react-router";
-import logoFullSvg from "@/assets/Icon/logo-full.svg";
-import leftSvg from "@/assets/Icon/left.svg";
-import pencilFilledSvg from "@/assets/Icon/pencil-filled.svg";
-import kakaoIconSvg from "@/assets/Icon/kakao.svg";
-import chatBubbleSvg from "@/assets/Icon/chat-bubble.svg";
-import logoutSvg from "@/assets/Icon/logout.svg";
+import logoFullSvg from "@/assets/brand/logo-full.svg";
+import leftSvg from "@/assets/icons/left.svg";
+import pencilFilledSvg from "@/assets/icons/pencil-filled.svg";
+import kakaoIconSvg from "@/assets/brand/kakao.svg";
+import chatBubbleSvg from "@/assets/icons/chat-bubble.svg";
+import logoutSvg from "@/assets/icons/logout.svg";
 import ProfileButton from "@/components/layout/ProfileButton";
 import { useMe } from "@/queries/user";
 import { useAuthStore } from "@/stores/authStore";
