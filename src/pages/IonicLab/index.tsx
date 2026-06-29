@@ -19,6 +19,7 @@ import PuzzleGhost from "@/components/lab/PuzzleGhost";
 import CanvasDropZone from "@/components/lab/CanvasDropZone";
 import ToolBtn from "@/components/lab/ToolBtn";
 import KakaoLoginModal from "@/components/lab/KakaoLoginModal";
+import LessonCompleteModal from "@/components/lesson/LessonCompleteModal";
 import type { PlacedPiece } from "@/components/lab/CanvasDropZone";
 import { CATIONS, ANIONS } from "@/data/ions";
 import type { Ion } from "@/data/ions";
@@ -236,6 +237,7 @@ export default function IonicLab() {
   const [isWrongCompound,    setIsWrongCompound]    = useState(false);
   const [showHint,           setShowHint]           = useState(false);
   const [showLoginModal,     setShowLoginModal]     = useState(false);
+  const [showCompleteModal,  setShowCompleteModal]  = useState(false);
   const [justSolved,         setJustSolved]         = useState(false);
   const [activeDragIon,      setActiveDragIon]      = useState<Ion | null>(null);
   const [isDragOver,         setIsDragOver]         = useState(false);
@@ -474,10 +476,17 @@ export default function IonicLab() {
     return () => clearTimeout(timer);
   }, [justSolved, isLastProblem, isLoggedIn]);
 
+  useEffect(() => {
+    if (!justSolved || !isLastProblem || !isLoggedIn) return;
+    const timer = setTimeout(() => setShowCompleteModal(true), 1500);
+    return () => clearTimeout(timer);
+  }, [justSolved, isLastProblem, isLoggedIn]);
+
   const handleAnswerButtonClick = () => {
     if (justSolved) {
       if (isLastProblem) {
         if (!isLoggedIn) setShowLoginModal(true);
+        else setShowCompleteModal(true);
         return;
       }
       moveToNextProblem();
@@ -713,6 +722,12 @@ export default function IonicLab() {
         <KakaoLoginModal
           onClose={() => setShowLoginModal(false)}
           nextProblemIndex={FREE_LIMIT}
+        />
+      )}
+      {showCompleteModal && (
+        <LessonCompleteModal
+          onClose={() => setShowCompleteModal(false)}
+          completedFormulas={PROBLEMS.map((p) => p.formula)}
         />
       )}
     </div>
