@@ -1,5 +1,5 @@
 import { useState } from "react";
-import quizBoxSvg from "@/assets/Icon/quizBox.svg";
+import quizBoxSvg from "@/assets/lesson/quizBox.svg";
 
 const BG = "Bricolage Grotesque, sans-serif";
 const KR = "Pretendard, sans-serif";

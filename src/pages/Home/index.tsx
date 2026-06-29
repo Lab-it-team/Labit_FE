@@ -1,11 +1,11 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router";
-import arrowRightSvg from "@/assets/Icon/right.svg";
-import arrowDownSvg from "@/assets/Icon/Arrow/down.svg";
-import arrowUpSvg from "@/assets/Icon/Arrow/up.svg";
-import checkCircleSvg from "@/assets/Icon/check-c.svg";
-import dotActiveSvg from "@/assets/Icon/dot-active.svg";
-import dotInactiveSvg from "@/assets/Icon/dot-inactive.svg";
+import arrowRightSvg from "@/assets/icons/right.svg";
+import arrowDownSvg from "@/assets/icons/arrow/down.svg";
+import arrowUpSvg from "@/assets/icons/arrow/up.svg";
+import checkCircleSvg from "@/assets/icons/check-c.svg";
+import dotActiveSvg from "@/assets/icons/dot-active.svg";
+import dotInactiveSvg from "@/assets/icons/dot-inactive.svg";
 import { useUnits } from "@/queries/learning";
 import { useMe } from "@/queries/user";
 import { chapters } from "@/data/chapters";

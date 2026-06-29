@@ -1,9 +1,9 @@
 import { useState, useRef, useEffect } from "react";
-import aiSvg from "@/assets/Icon/mingcute_ai-fill.svg";
-import sendSvg from "@/assets/Icon/mynaui_send-solid.svg";
-import closeSvg from "@/assets/Icon/close.svg";
-import moreSvg from "@/assets/Icon/more.svg";
-import leftSvg from "@/assets/Icon/left.svg";
+import aiSvg from "@/assets/icons/mingcute_ai-fill.svg";
+import sendSvg from "@/assets/icons/mynaui_send-solid.svg";
+import closeSvg from "@/assets/icons/close.svg";
+import moreSvg from "@/assets/icons/more.svg";
+import leftSvg from "@/assets/icons/left.svg";
 import { useSessions, useCreateSession, useDeleteSession, useSendMessage, useMessages } from "@/queries/chat";
 
 const EXAMPLE_QUESTIONS = [

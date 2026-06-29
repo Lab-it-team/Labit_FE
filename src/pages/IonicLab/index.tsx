@@ -24,7 +24,7 @@ import type { PlacedPiece } from "@/components/lab/CanvasDropZone";
 import { CATIONS, ANIONS } from "@/data/ions";
 import type { Ion } from "@/data/ions";
 import { useAuthStore } from "@/stores/authStore";
-import lockSvg from "@/assets/Icon/lock.svg";
+import lockSvg from "@/assets/icons/lock.svg";
 
 // ── Puzzle geometry (matches puzzlePaths.ts) ──────────────────────────────
 const PIECE_W   = 120;   // cation & anion both 120px wide

@@ -1,16 +1,16 @@
 import { useNavigate } from "react-router";
-import mascot from "@/assets/Icon/mascot.png";
-import logoSvg from "@/assets/Icon/logo.svg";
-import backIconSvg from "@/assets/Icon/icon-back.svg";
-import kakaoIconSvg from "@/assets/Icon/kakao-icon.svg";
-import decoWater from "@/assets/Icon/deco-water.svg";
-import decoFlask from "@/assets/Icon/deco-flask.svg";
-import decoMoleculeRight from "@/assets/Icon/deco-molecule-right.svg";
-import decoMoleculeBottom from "@/assets/Icon/deco-molecule-bottom.svg";
-import decoLines from "@/assets/Icon/deco-lines.svg";
-import decoLines2 from "@/assets/Icon/deco-line-2.svg"
-import decoDotBlue from "@/assets/Icon/deco-dot-blue.svg";
-import decoDotYellow from "@/assets/Icon/deco-dot-yellow.svg";
+import mascot from "@/assets/mascot/mascot.png";
+import logoSvg from "@/assets/brand/logo.svg";
+import backIconSvg from "@/assets/icons/icon-back.svg";
+import kakaoIconSvg from "@/assets/brand/kakao-icon.svg";
+import decoWater from "@/assets/deco/deco-water.svg";
+import decoFlask from "@/assets/deco/deco-flask.svg";
+import decoMoleculeRight from "@/assets/deco/deco-molecule-right.svg";
+import decoMoleculeBottom from "@/assets/deco/deco-molecule-bottom.svg";
+import decoLines from "@/assets/deco/deco-lines.svg";
+import decoLines2 from "@/assets/deco/deco-line-2.svg"
+import decoDotBlue from "@/assets/deco/deco-dot-blue.svg";
+import decoDotYellow from "@/assets/deco/deco-dot-yellow.svg";
 
 interface DecoProps {
   src: string;

@@ -1,12 +1,12 @@
 import { useState } from 'react'
-import naSvg from '@/assets/Icon/na.svg'
-import clSvg from '@/assets/Icon/cl.svg'
-import plusSvg from '@/assets/Icon/+.svg'
-import leftSvg from '@/assets/Icon/left.svg'
-import rightSvg from '@/assets/Icon/right.svg'
-import pinkDotSvg from '@/assets/Icon/pink_dot.svg'
-import blueDotSvg from '@/assets/Icon/blue-dot.svg'
-import arrowRightSvg from '@/assets/Icon/Arrow/right.svg'
+import naSvg from '@/assets/lesson/na.svg'
+import clSvg from '@/assets/lesson/cl.svg'
+import plusSvg from '@/assets/icons/+.svg'
+import leftSvg from '@/assets/icons/left.svg'
+import rightSvg from '@/assets/icons/right.svg'
+import pinkDotSvg from '@/assets/lesson/pink_dot.svg'
+import blueDotSvg from '@/assets/lesson/blue-dot.svg'
+import arrowRightSvg from '@/assets/icons/arrow/right.svg'
 
 interface StepData {
   label: string

@@ -1,6 +1,6 @@
 import { useState } from "react";
-import tipsSvg from "@/assets/Icon/mingcute_ai-fill.svg";
-import bgSvg from "@/assets/Icon/bg.svg";
+import tipsSvg from "@/assets/icons/mingcute_ai-fill.svg";
+import bgSvg from "@/assets/icons/bg.svg";
 import AiChatPopup from "./AiChatPopup";
 import LoginRequiredModal from "@/components/common/LoginRequiredModal";
 import CustomerInquiryModal from "@/components/common/CustomerInquiryModal";
