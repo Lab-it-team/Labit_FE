@@ -6,9 +6,10 @@ import { useNavigate } from "react-router";
 interface LessonCompleteModalProps {
   onClose: () => void;
   completedFormulas: string[];
+  onOpenFreeLab: () => void;
 }
 
-export default function LessonCompleteModal({ onClose, completedFormulas }: LessonCompleteModalProps) {
+export default function LessonCompleteModal({ onClose, completedFormulas, onOpenFreeLab }: LessonCompleteModalProps) {
   const navigate = useNavigate();
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
@@ -180,7 +181,7 @@ export default function LessonCompleteModal({ onClose, completedFormulas }: Less
           {/* Secondary: 자유 실험실 */}
           <button
             type="button"
-            onClick={() => navigate("/free-lab")}
+            onClick={onOpenFreeLab}
             style={{
               boxSizing: "border-box",
               display: "flex", flexDirection: "row", justifyContent: "center", alignItems: "center",
