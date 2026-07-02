@@ -169,13 +169,17 @@ function EmailFormStep({ onClose, onBack }: { onClose: () => void; onBack: () =>
     setIsLoading(true);
     setErrorMsg(null);
     try {
-      await submitContact({
+      const result = await submitContact({
         category: type.category,
         email: email.trim(),
         title: title.trim() || undefined,
         message: content.trim(),
       });
-      setIsSuccess(true);
+      if (result.success) {
+        setIsSuccess(true);
+      } else {
+        setErrorMsg(result.message || "문의 전송에 실패했어요. 잠시 후 다시 시도해 주세요.");
+      }
     } catch {
       setErrorMsg("문의 전송에 실패했어요. 잠시 후 다시 시도해 주세요.");
     } finally {
