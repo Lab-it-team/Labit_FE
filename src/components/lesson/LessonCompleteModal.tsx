@@ -14,6 +14,14 @@ export default function LessonCompleteModal({ onClose, completedFormulas, onOpen
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
   useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === "Escape") onClose();
+    };
+    document.addEventListener("keydown", handleKeyDown);
+    return () => document.removeEventListener("keydown", handleKeyDown);
+  }, [onClose]);
+
+  useEffect(() => {
     if (!canvasRef.current) return;
     const myConfetti = confetti.create(canvasRef.current, { resize: true, useWorker: false });
     const colors = ["#F6FCFF", "#0085FF", "#B8DCFF", "#5DFFF2"];
