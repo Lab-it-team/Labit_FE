@@ -19,9 +19,12 @@ export default function QuitLessonModal({ onClose, onQuit }: QuitLessonModalProp
   }, [onClose]);
 
   const handleKakaoLogin = () => {
-    if (!KAKAO_CLIENT_ID || !KAKAO_REDIRECT) return;
+    if (!KAKAO_CLIENT_ID || !KAKAO_REDIRECT) {
+      console.warn("카카오 로그인 환경 변수가 설정되지 않았습니다.");
+      return;
+    }
     sessionStorage.setItem("lab_redirect", window.location.pathname);
-    const state = crypto.randomUUID();
+    const state = typeof crypto.randomUUID === "function" ? crypto.randomUUID() : String(Date.now());
     sessionStorage.setItem("kakao_oauth_state", state);
     const params = new URLSearchParams({
       client_id: KAKAO_CLIENT_ID,
