@@ -1,15 +1,17 @@
 import { useState } from "react";
 import mascotPng from "@/assets/mascot/labit_thinking.png";
+import mascotWinkPng from "@/assets/mascot/labit_wink.png";
 import sendSvg from "@/assets/icons/mynaui_send-solid.svg";
 import arrowRightSvg from "@/assets/icons/arrow/right.svg";
 import mailSvg from "@/assets/icons/mail.svg";
+import { submitContact, type ContactCategory } from "@/features/contact/api";
 
-const INQUIRY_TYPES = [
-  { id: "general",  label: "💬 일반 문의" },
-  { id: "bug",      label: "🐛 버그 신고" },
-  { id: "feature",  label: "💡 기능 제안" },
-  { id: "account",  label: "🔑 계정·결제" },
-  { id: "etc",      label: "기타" },
+const INQUIRY_TYPES: { id: string; label: string; category: ContactCategory }[] = [
+  { id: "general",  label: "💬 일반 문의", category: "GENERAL" },
+  { id: "bug",      label: "🐛 버그 신고", category: "BUG" },
+  { id: "feature",  label: "💡 기능 제안", category: "FEATURE" },
+  { id: "account",  label: "🔑 계정·결제", category: "ACCOUNT_PAYMENT" },
+  { id: "etc",      label: "기타",         category: "OTHER" },
 ];
 
 interface CustomerInquiryModalProps {
@@ -149,15 +151,66 @@ function EmailFormStep({ onClose, onBack }: { onClose: () => void; onBack: () =>
   const [email, setEmail]               = useState("");
   const [title, setTitle]               = useState("");
   const [content, setContent]           = useState("");
+  const [isLoading, setIsLoading]       = useState(false);
+  const [isSuccess, setIsSuccess]       = useState(false);
+  const [errorMsg, setErrorMsg]         = useState<string | null>(null);
 
-  const isValid = selectedType !== null && email.trim() !== "" && content.trim() !== "";
+  const isValid = selectedType !== null && email.trim() !== "" && content.trim().length >= 10;
 
-  const handleSubmit = () => {
-    if (!isValid) return;
-    // TODO: API 연동
-    console.log({ type: selectedType, email, title, content });
-    onClose();
+  const handleSubmit = async () => {
+    if (!isValid || isLoading) return;
+    const type = INQUIRY_TYPES.find((t) => t.id === selectedType);
+    if (!type) return;
+
+    setIsLoading(true);
+    setErrorMsg(null);
+    try {
+      await submitContact({
+        category: type.category,
+        email: email.trim(),
+        title: title.trim() || undefined,
+        message: content.trim(),
+      });
+      setIsSuccess(true);
+    } catch {
+      setErrorMsg("문의 전송에 실패했어요. 잠시 후 다시 시도해 주세요.");
+    } finally {
+      setIsLoading(false);
+    }
   };
+
+  if (isSuccess) {
+    return (
+      <div style={POPUP_STYLE} onClick={(e) => e.stopPropagation()}>
+        <div style={{ display: "flex", justifyContent: "flex-end", width: "100%" }}>
+          <CloseButton onClick={onClose} />
+        </div>
+        <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 16 }}>
+          <img src={mascotWinkPng} alt="" style={{ width: 180, height: 156, objectFit: "contain" }} />
+          <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 4 }}>
+            <span style={{ fontFamily: "var(--font-sans)", fontWeight: 600, fontSize: 16, lineHeight: "22px", color: "var(--color-text-strong)" }}>
+              문의가 접수되었어요!
+            </span>
+            <span style={{ fontFamily: "var(--font-sans)", fontWeight: 400, fontSize: 12, lineHeight: "17px", letterSpacing: "-0.005em", textAlign: "center", color: "var(--color-text-sub)" }}>
+              보통 1~2일 내에 답변을 보내드려요.
+            </span>
+          </div>
+        </div>
+        <button
+          type="button"
+          onClick={onClose}
+          style={{
+            width: "100%", height: 38, border: "none", borderRadius: 12, cursor: "pointer",
+            background: "var(--color-primary-normal)",
+            fontFamily: "var(--font-sans)", fontWeight: 600, fontSize: 15, lineHeight: "22px",
+            color: "var(--color-static-white)",
+          }}
+        >
+          확인
+        </button>
+      </div>
+    );
+  }
 
   return (
     <div style={{ ...POPUP_STYLE, maxHeight: "calc(100vh - 32px)", overflowY: "auto" }} onClick={(e) => e.stopPropagation()}>
@@ -264,28 +317,45 @@ function EmailFormStep({ onClose, onBack }: { onClose: () => void; onBack: () =>
             rows={3}
             style={{ ...INPUT_STYLE, height: 80, resize: "none" }}
           />
+          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+            <span style={{ fontFamily: "var(--font-sans)", fontWeight: 400, fontSize: 12, lineHeight: "17px", letterSpacing: "-0.005em", color: content.trim().length > 0 && content.trim().length < 10 ? "var(--color-red-500)" : "var(--color-text-sub)" }}>
+              {content.trim().length > 0 && content.trim().length < 10 ? "최소 10자 이상 입력해 주세요." : ""}
+            </span>
+            <span style={{ fontFamily: "var(--font-sans)", fontWeight: 400, fontSize: 12, lineHeight: "17px", color: content.trim().length < 10 ? "var(--color-text-sub)" : "var(--color-text-normal)" }}>
+              {content.trim().length} / 2000
+            </span>
+          </div>
         </div>
+
+        {/* 에러 메시지 */}
+        {errorMsg && (
+          <span style={{ fontFamily: "var(--font-sans)", fontWeight: 400, fontSize: 12, lineHeight: "17px", color: "var(--color-red-500)", textAlign: "center" }}>
+            {errorMsg}
+          </span>
+        )}
 
         {/* 제출 버튼 */}
         <button
           type="button"
           onClick={handleSubmit}
-          disabled={!isValid}
+          disabled={!isValid || isLoading}
           style={{
             display: "flex", flexDirection: "row", justifyContent: "center", alignItems: "center",
             padding: "8px 10px", gap: 4,
             width: "100%", height: 38,
-            background: isValid ? "var(--color-primary-normal)" : "var(--color-text-disabled)",
+            background: isValid && !isLoading ? "var(--color-primary-normal)" : "var(--color-text-disabled)",
             borderRadius: 12,
             border: "none",
-            cursor: isValid ? "pointer" : "default",
+            cursor: isValid && !isLoading ? "pointer" : "default",
             transition: "background 0.15s",
           }}
         >
-          <span style={{ fontFamily: "var(--font-sans)", fontWeight: 600, fontSize: 15, lineHeight: "22px", letterSpacing: "-0.005em", color: isValid ? "var(--color-static-white)" : "var(--color-neutral-40)" }}>
-            문의 보내기
+          <span style={{ fontFamily: "var(--font-sans)", fontWeight: 600, fontSize: 15, lineHeight: "22px", letterSpacing: "-0.005em", color: isValid && !isLoading ? "var(--color-static-white)" : "var(--color-neutral-40)" }}>
+            {isLoading ? "전송 중..." : "문의 보내기"}
           </span>
-          <img src={sendSvg} alt="" width={20} height={20} style={{ filter: isValid ? "brightness(0) invert(1)" : "brightness(0) invert(0.7)" }} />
+          {!isLoading && (
+            <img src={sendSvg} alt="" width={20} height={20} style={{ filter: isValid ? "brightness(0) invert(1)" : "brightness(0) invert(0.7)" }} />
+          )}
         </button>
       </div>
     </div>
