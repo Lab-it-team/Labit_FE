@@ -12,11 +12,11 @@ export interface IonicCompoundResponse {
 }
 
 export const getIonicCompound = async (
-  cation_id: string,
-  anion_id: string,
+  cationId: string,
+  anionId: string,
 ): Promise<IonicCompoundResponse> => {
   const { data } = await apiClient.get<IonicCompoundResponse>('/ionic-compounds', {
-    params: { cation_id, anion_id },
+    params: { cation_id: cationId, anion_id: anionId },
   })
   return data
 }
