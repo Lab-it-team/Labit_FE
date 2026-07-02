@@ -729,7 +729,7 @@ export default function IonicLab() {
       {showCompleteModal && (
         <LessonCompleteModal
           onClose={() => setShowCompleteModal(false)}
-          completedFormulas={PROBLEMS.map((p) => p.formula)}
+          completedFormulas={PROBLEMS.filter((_, i) => solvedProblems.has(i)).map((p) => p.formula)}
           onOpenFreeLab={() => { setShowCompleteModal(false); setShowFreeLabModal(true); }}
         />
       )}
