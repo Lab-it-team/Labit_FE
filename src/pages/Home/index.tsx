@@ -177,7 +177,7 @@ export default function Home() {
                     <div className="flex flex-col gap-3 py-3 pr-4" style={{ paddingLeft: 6 }}>
                       {chapter.lessons.map((lesson, i) => (
                         <div
-                          key={lesson.id}
+                          key={`${chapter.id}-${i}`}
                           className="relative flex items-center gap-3"
                         >
                           {i < chapter.lessons.length - 1 && (
