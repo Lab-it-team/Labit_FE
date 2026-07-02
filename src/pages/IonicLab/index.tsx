@@ -479,10 +479,10 @@ export default function IonicLab() {
   }, [justSolved, isLastProblem, isLoggedIn]);
 
   useEffect(() => {
-    if (!justSolved || !isLastProblem || !isLoggedIn) return;
+    if (!justSolved || !isLastProblem || !isLoggedIn || showCompleteModal) return;
     const timer = setTimeout(() => setShowCompleteModal(true), 1500);
     return () => clearTimeout(timer);
-  }, [justSolved, isLastProblem, isLoggedIn]);
+  }, [justSolved, isLastProblem, isLoggedIn, showCompleteModal]);
 
   const handleAnswerButtonClick = () => {
     if (justSolved) {
