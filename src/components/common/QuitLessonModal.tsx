@@ -43,6 +43,7 @@ export default function QuitLessonModal({ onClose, onQuit }: QuitLessonModalProp
           <button
             type="button"
             onClick={onClose}
+            aria-label="닫기"
             style={{ display: "flex", alignItems: "center", justifyContent: "center", width: 24, height: 24, background: "none", border: "none", cursor: "pointer", padding: 0 }}
           >
             <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
