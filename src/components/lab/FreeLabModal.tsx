@@ -501,6 +501,7 @@ export default function FreeLabModal({ onClose }: FreeLabModalProps) {
             <button
               type="button"
               onClick={onClose}
+              aria-label="닫기"
               style={{ width: 24, height: 24, background: "none", border: "none", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", padding: 0, flexShrink: 0 }}
             >
               <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
