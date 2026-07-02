@@ -285,10 +285,11 @@ function EmailFormStep({ onClose, onBack }: { onClose: () => void; onBack: () =>
         {/* 연락받을 이메일 */}
         <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
           <div style={{ display: "flex", flexDirection: "row", gap: 2 }}>
-            <span style={LABEL_STYLE}>연락받을 이메일</span>
+            <label htmlFor="inquiry-email" style={LABEL_STYLE}>연락받을 이메일</label>
             <span style={{ ...LABEL_STYLE, color: "var(--color-element-normal-red)" }}>*</span>
           </div>
           <input
+            id="inquiry-email"
             type="email"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
@@ -302,8 +303,9 @@ function EmailFormStep({ onClose, onBack }: { onClose: () => void; onBack: () =>
 
         {/* 제목 */}
         <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
-          <span style={LABEL_STYLE}>제목</span>
+          <label htmlFor="inquiry-title" style={LABEL_STYLE}>제목</label>
           <input
+            id="inquiry-title"
             type="text"
             value={title}
             onChange={(e) => setTitle(e.target.value)}
@@ -315,10 +317,11 @@ function EmailFormStep({ onClose, onBack }: { onClose: () => void; onBack: () =>
         {/* 문의 내용 */}
         <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
           <div style={{ display: "flex", flexDirection: "row", gap: 2 }}>
-            <span style={LABEL_STYLE}>문의 내용</span>
+            <label htmlFor="inquiry-content" style={LABEL_STYLE}>문의 내용</label>
             <span style={{ ...LABEL_STYLE, color: "var(--color-element-normal-red)" }}>*</span>
           </div>
           <textarea
+            id="inquiry-content"
             value={content}
             onChange={(e) => setContent(e.target.value)}
             placeholder="예) 학년·단원과 함께 자세히 적어주시면 더 빠르게 도와드릴 수 있어요."
