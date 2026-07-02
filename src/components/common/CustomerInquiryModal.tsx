@@ -25,6 +25,7 @@ function CloseButton({ onClick }: { onClick: () => void }) {
     <button
       type="button"
       onClick={onClick}
+      aria-label="닫기"
       style={{ display: "flex", alignItems: "center", justifyContent: "center", width: 24, height: 24, background: "none", border: "none", cursor: "pointer", padding: 0, flexShrink: 0 }}
     >
       <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
@@ -39,6 +40,7 @@ function BackButton({ onClick }: { onClick: () => void }) {
     <button
       type="button"
       onClick={onClick}
+      aria-label="뒤로가기"
       style={{ display: "flex", alignItems: "center", justifyContent: "center", width: 24, height: 24, background: "none", border: "none", cursor: "pointer", padding: 0, flexShrink: 0 }}
     >
       <svg width="8" height="14" viewBox="0 0 8 14" fill="none">
