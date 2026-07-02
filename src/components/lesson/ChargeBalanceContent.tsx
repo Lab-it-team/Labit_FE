@@ -213,7 +213,7 @@ export default function ChargeBalanceContent() {
               borderRadius: "0 0 12px 12px",
             }}
           >
-            {TABLE_ROWS.map((row) => (
+            {TABLE_ROWS.map((row, i) => (
                 <div
                   key={row.formula}
                   style={{
