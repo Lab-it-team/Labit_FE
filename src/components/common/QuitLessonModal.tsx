@@ -1,3 +1,4 @@
+import { useEffect } from "react";
 import kakaoIconSvg from "@/assets/brand/kakao-icon.svg";
 
 const KAKAO_CLIENT_ID = import.meta.env.VITE_KAKAO_REST_API_KEY as string | undefined;
@@ -9,6 +10,14 @@ interface QuitLessonModalProps {
 }
 
 export default function QuitLessonModal({ onClose, onQuit }: QuitLessonModalProps) {
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === "Escape") onClose();
+    };
+    document.addEventListener("keydown", handleKeyDown);
+    return () => document.removeEventListener("keydown", handleKeyDown);
+  }, [onClose]);
+
   const handleKakaoLogin = () => {
     if (!KAKAO_CLIENT_ID || !KAKAO_REDIRECT) return;
     sessionStorage.setItem("lab_redirect", window.location.pathname);
@@ -29,6 +38,9 @@ export default function QuitLessonModal({ onClose, onQuit }: QuitLessonModalProp
       onClick={onClose}
     >
       <div
+        role="dialog"
+        aria-modal="true"
+        aria-label="학습 그만하기"
         style={{
           display: "flex", flexDirection: "column", alignItems: "center",
           padding: 24, gap: 24, width: 365,
