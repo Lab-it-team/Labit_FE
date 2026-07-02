@@ -1,4 +1,4 @@
-import { useQuery, useMutation } from '@tanstack/react-query'
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { getQuizzes, submitQuiz, getResults, getResultDetail } from '@/features/quiz/api'
 import type { QuizAnswerRequest } from '@/types'
 
@@ -8,10 +8,15 @@ export const useQuizzes = () =>
     queryFn: getQuizzes,
   })
 
-export const useSubmitQuiz = () =>
-  useMutation({
+export const useSubmitQuiz = () => {
+  const queryClient = useQueryClient()
+  return useMutation({
     mutationFn: (answers: QuizAnswerRequest[]) => submitQuiz(answers),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['quizzes', 'results'] })
+    },
   })
+}
 
 export const useResults = () =>
   useQuery({
