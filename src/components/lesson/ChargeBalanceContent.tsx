@@ -213,9 +213,9 @@ export default function ChargeBalanceContent() {
               borderRadius: "0 0 12px 12px",
             }}
           >
-            {TABLE_ROWS.map((row, i) => (
+            {TABLE_ROWS.map((row) => (
                 <div
-                  key={i}
+                  key={row.formula}
                   style={{
                     display: "grid",
                     gridTemplateColumns: "repeat(5, 1fr)",
