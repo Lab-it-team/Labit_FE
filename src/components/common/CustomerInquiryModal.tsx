@@ -326,6 +326,7 @@ function EmailFormStep({ onClose, onBack }: { onClose: () => void; onBack: () =>
             onChange={(e) => setContent(e.target.value)}
             placeholder="예) 학년·단원과 함께 자세히 적어주시면 더 빠르게 도와드릴 수 있어요."
             rows={3}
+            maxLength={2000}
             style={{ ...INPUT_STYLE, height: 80, resize: "none" }}
           />
           <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
