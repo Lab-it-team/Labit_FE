@@ -157,7 +157,9 @@ function EmailFormStep({ onClose, onBack }: { onClose: () => void; onBack: () =>
   const [isSuccess, setIsSuccess]       = useState(false);
   const [errorMsg, setErrorMsg]         = useState<string | null>(null);
 
-  const isValid = selectedType !== null && email.trim() !== "" && content.trim().length >= 10;
+  const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  const isEmailValid = EMAIL_REGEX.test(email.trim());
+  const isValid = selectedType !== null && isEmailValid && content.trim().length >= 10;
 
   const handleSubmit = async () => {
     if (!isValid || isLoading) return;
