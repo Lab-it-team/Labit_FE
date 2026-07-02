@@ -149,7 +149,7 @@ function MainStep({ onClose, onEmailClick }: { onClose: () => void; onEmailClick
 
 // ── Step 2: 이메일 폼 ─────────────────────────────────────────────────────────
 function EmailFormStep({ onClose, onBack }: { onClose: () => void; onBack: () => void }) {
-  const [selectedType, setSelectedType] = useState<string | null>(null);
+  const [selectedType, setSelectedType] = useState<string | null>("general");
   const [email, setEmail]               = useState("");
   const [title, setTitle]               = useState("");
   const [content, setContent]           = useState("");
