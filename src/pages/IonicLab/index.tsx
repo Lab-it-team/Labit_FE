@@ -250,6 +250,7 @@ export default function IonicLab() {
   const idCounter          = useRef(getNextPieceId(allPieces));
   const currentProblemRef  = useRef(currentProblem);
   const pendingSnapRef     = useRef<{ dropId: string; dropX: number; dropY: number } | null>(null);
+  const hasShownCompleteModal = useRef(false);
   const pointerRef         = useRef({ x: 0, y: 0 });
   const sensors = useSensors(
     useSensor(PointerSensor, {
@@ -479,10 +480,11 @@ export default function IonicLab() {
   }, [justSolved, isLastProblem, isLoggedIn]);
 
   useEffect(() => {
-    if (!justSolved || !isLastProblem || !isLoggedIn || showCompleteModal) return;
+    if (!justSolved || !isLastProblem || !isLoggedIn || hasShownCompleteModal.current) return;
+    hasShownCompleteModal.current = true;
     const timer = setTimeout(() => setShowCompleteModal(true), 1500);
     return () => clearTimeout(timer);
-  }, [justSolved, isLastProblem, isLoggedIn, showCompleteModal]);
+  }, [justSolved, isLastProblem, isLoggedIn]);
 
   const handleAnswerButtonClick = () => {
     if (justSolved) {
