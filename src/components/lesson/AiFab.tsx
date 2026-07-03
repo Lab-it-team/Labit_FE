@@ -72,7 +72,7 @@ export default function AiFab({
       {loginModalVisible && <LoginRequiredModal onClose={() => setLoginModalVisible(false)} />}
       {(chatVisible || inquiryModalVisible) && (
         <div
-          className="fixed inset-0 z-20"
+          className="fixed inset-0 z-10"
           onClick={() => { setChatVisible(false); setInquiryModalVisible(false); }}
         />
       )}
