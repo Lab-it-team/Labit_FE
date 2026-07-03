@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect, forwardRef } from "react";
-import closeSvg from "@/assets/Icon/close.svg";
-import rightSvg from "@/assets/Icon/send.svg";
+import closeSvg from "@/assets/icons/close.svg";
+import rightSvg from "@/assets/icons/send.svg";
 import { createSession, sendMessage } from "@/features/chat/api";
 
 interface Message {

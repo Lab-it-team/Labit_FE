@@ -3,7 +3,7 @@ import { useDraggable } from "@dnd-kit/core";
 import { CATIONS, ANIONS } from "@/data/ions";
 import type { Ion } from "@/data/ions";
 import { getPuzzlePath, cardHeight, ionColor } from "@/components/lab/puzzlePaths";
-import tipsSvg from "@/assets/Icon/tips.svg";
+import tipsSvg from "@/assets/icons/tips.svg";
 
 function shapeFill(): string { return "var(--color-bg-normal)"; }
 function shapeStroke(): string { return "var(--color-border-strong)"; }
@@ -113,9 +113,10 @@ type TabType = "cation" | "anion";
 
 interface IonTabListProps {
   draggingIonId: string | null;
+  height?: number;
 }
 
-export default function IonTabList({ draggingIonId }: IonTabListProps) {
+export default function IonTabList({ draggingIonId, height = 556 }: IonTabListProps) {
   const [activeTab, setActiveTab] = useState<TabType>("cation");
   const ions = activeTab === "cation" ? CATIONS : ANIONS;
   const rows: Ion[][] = [];
@@ -131,7 +132,7 @@ export default function IonTabList({ draggingIonId }: IonTabListProps) {
         padding: 20,
         gap: 24,
         width: 296,
-        height: 556,
+        height,
         background: "var(--color-static-white)",
         boxShadow: "inset 0 0 0 1px var(--color-border-strong)",
         borderRadius: 12,

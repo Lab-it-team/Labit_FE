@@ -1,54 +1,19 @@
-import { useState, useEffect, useMemo } from "react";
-import failSvg from "@/assets/Icon/fail.svg";
-import checkCircleSvg from "@/assets/Icon/check-c.svg";
-import arrowUpSvg from "@/assets/Icon/Arrow/up.svg";
-import arrowDownSvg from "@/assets/Icon/Arrow/down.svg";
-import dotActiveSvg from "@/assets/Icon/dot-active.svg";
-import dotInactiveSvg from "@/assets/Icon/dot-inactive.svg";
-import { useUnits } from "@/queries/learning";
-import { chapters as staticChapters } from "@/data/chapters";
-import type { UnitWithLessons } from "@/types";
+import { useState, useEffect } from "react";
+import failSvg from "@/assets/icons/fail.svg";
+import checkCircleSvg from "@/assets/icons/check-c.svg";
+import arrowUpSvg from "@/assets/icons/arrow/up.svg";
+import arrowDownSvg from "@/assets/icons/arrow/down.svg";
+import dotActiveSvg from "@/assets/icons/dot-active.svg";
+import dotInactiveSvg from "@/assets/icons/dot-inactive.svg";
+import { chapters } from "@/data/chapters";
 
 interface CourseModalProps {
   onClose: () => void;
 }
 
-function getUnitStatus(unit: UnitWithLessons): "done" | "in-progress" | "upcoming" {
-  const { lessons } = unit;
-  if (lessons.length === 0) return "upcoming";
-  if (lessons.every((l) => l.status === "completed")) return "done";
-  if (lessons.some((l) => l.status !== "not_started")) return "in-progress";
-  return "upcoming";
-}
-
 export default function CourseModal({ onClose }: CourseModalProps) {
-  const { data: homeData } = useUnits();
-
-  const units = homeData?.units ?? [];
-  const hasApiData = units.length > 0;
-
-  const chapters = useMemo(() => {
-    if (!hasApiData) return staticChapters;
-    return units.map((unit) => ({
-      id: unit.id,
-      title: unit.title,
-      status: getUnitStatus(unit),
-      lessonCount: unit.lessons.length,
-      lessons: unit.lessons.map((l) => ({
-        id: l.id,
-        title: l.title,
-        inProgress: l.status === "in_progress",
-      })),
-    }));
-  }, [units, hasApiData]);
-
-  const allLessons = hasApiData ? units.flatMap((u) => u.lessons) : [];
-  const completedCount = hasApiData
-    ? allLessons.filter((l) => l.status === "completed").length
-    : staticChapters.filter((c) => c.status === "done").length;
-  const totalCount = hasApiData
-    ? allLessons.length
-    : staticChapters.reduce((sum, c) => sum + c.lessonCount, 0);
+  const completedCount = chapters.filter((c) => c.status === "done").length;
+  const totalCount = chapters.reduce((sum, c) => sum + c.lessonCount, 0);
 
   const inProgressId = chapters.find((c) => c.status === "in-progress")?.id;
   const [expanded, setExpanded] = useState<number[]>([]);
@@ -107,14 +72,18 @@ export default function CourseModal({ onClose }: CourseModalProps) {
         </div>
 
         {/* 챕터 목록 */}
-        <div className="flex flex-col pb-4 max-h-[calc(100vh-160px)] overflow-y-auto gap-3 px-4">
-          {chapters.map((chapter) => {
+        <div className="flex flex-col pb-4 max-h-[calc(100vh-160px)] overflow-y-auto px-4">
+          {chapters.map((chapter, idx) => {
             const isExpanded = expanded.includes(chapter.id);
             const isDone = chapter.status === "done";
             const isInProgress = chapter.status === "in-progress";
+            const hasLessons = chapter.lessonCount > 0;
 
             return (
               <div key={chapter.id}>
+                {idx > 0 && (
+                  <div className="border-t border-dashed border-border-light mx-1" />
+                )}
                 {/* 챕터 행 */}
                 <button
                   type="button"
@@ -154,24 +123,31 @@ export default function CourseModal({ onClose }: CourseModalProps) {
                     </div>
                   </div>
 
-                  {/* 레슨 수 + 화살표 */}
-                  <div className="flex items-center gap-1 text-caption-lg font-normal text-neutral-50 shrink-0">
-                    <span>{chapter.lessonCount}</span>
-                    <img
-                      src={isExpanded ? arrowDownSvg : arrowUpSvg}
-                      alt=""
-                      width={20}
-                      height={20}
-                    />
-                  </div>
+                  {/* 레슨 수 + 화살표 (레슨이 있을 때만) */}
+                  {hasLessons && (
+                    <div className="flex items-center gap-1 text-caption-lg font-normal text-neutral-50 shrink-0">
+                      <span>{chapter.lessonCount}</span>
+                      <img
+                        src={isExpanded ? arrowDownSvg : arrowUpSvg}
+                        alt=""
+                        width={20}
+                        height={20}
+                      />
+                    </div>
+                  )}
                 </button>
 
                 {/* 서브 레슨 */}
                 {isExpanded && chapter.lessons.length > 0 && (
-                  <div className="relative flex flex-col gap-3 px-4 py-3">
-                    <div className="absolute left-[34px] top-0 bottom-[30px] w-px bg-neutral-20" />
+                  <div className="flex flex-col gap-3 py-3 pr-4" style={{ paddingLeft: 6 }}>
                     {chapter.lessons.map((lesson, i) => (
                       <div key={lesson.id} className="relative flex items-center gap-3">
+                        {i < chapter.lessons.length - 1 && (
+                          <div
+                            className="absolute left-[18px] top-1/2 w-px bg-neutral-20"
+                            style={{ height: "calc(100% + 12px)" }}
+                          />
+                        )}
                         <img
                           src={lesson.inProgress ? dotActiveSvg : dotInactiveSvg}
                           alt=""

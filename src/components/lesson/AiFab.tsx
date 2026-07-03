@@ -1,8 +1,9 @@
 import { useState } from "react";
-import tipsSvg from "@/assets/Icon/mingcute_ai-fill.svg";
-import bgSvg from "@/assets/Icon/bg.svg";
+import tipsSvg from "@/assets/icons/mingcute_ai-fill.svg";
+import bgSvg from "@/assets/icons/bg.svg";
 import AiChatPopup from "./AiChatPopup";
 import LoginRequiredModal from "@/components/common/LoginRequiredModal";
+import CustomerInquiryModal from "@/components/common/CustomerInquiryModal";
 import { useAuthStore } from "@/stores/authStore";
 
 function AiFabTooltip({ onDismiss }: { onDismiss: () => void }) {
@@ -50,6 +51,7 @@ export default function AiFab({
   const [tooltipVisible, setTooltipVisible] = useState(showTooltip);
   const [chatVisible, setChatVisible] = useState(false);
   const [loginModalVisible, setLoginModalVisible] = useState(false);
+  const [inquiryModalVisible, setInquiryModalVisible] = useState(false);
 
   const fabBgClass =
     interaction === "pressed"
@@ -68,16 +70,24 @@ export default function AiFab({
   return (
     <div className={`inline-flex flex-col items-end ${className}`}>
       {loginModalVisible && <LoginRequiredModal onClose={() => setLoginModalVisible(false)} />}
+      {(chatVisible || inquiryModalVisible) && (
+        <div
+          className="fixed inset-0 z-20"
+          onClick={() => { setChatVisible(false); setInquiryModalVisible(false); }}
+        />
+      )}
       {chatVisible && (
-        <>
-          <div
-            className="fixed inset-0 z-20"
-            onClick={() => setChatVisible(false)}
+        <div className="relative z-30 mb-6">
+          <AiChatPopup
+            onClose={() => setChatVisible(false)}
+            onInquiryClick={() => { setChatVisible(false); setInquiryModalVisible(true); }}
           />
-          <div className="relative z-30 mb-6">
-            <AiChatPopup onClose={() => setChatVisible(false)} />
-          </div>
-        </>
+        </div>
+      )}
+      {inquiryModalVisible && (
+        <div className="relative z-30 mb-6">
+          <CustomerInquiryModal onClose={() => setInquiryModalVisible(false)} />
+        </div>
       )}
       {tooltipVisible && !chatVisible && (
         <div className="mb-2">

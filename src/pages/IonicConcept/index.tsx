@@ -9,6 +9,7 @@ import AiAssistPanel from "@/components/lesson/AiAssistPanel";
 import AiFab from "@/components/lesson/AiFab";
 import LoginRequiredModal from "@/components/common/LoginRequiredModal";
 import FormationContent from "@/components/lesson/FormationContent";
+import ChargeBalanceContent from "@/components/lesson/ChargeBalanceContent";
 import { useTextSelection } from "@/hooks/useTextSelection";
 import { useAuthStore } from "@/stores/authStore";
 
@@ -163,7 +164,8 @@ export default function IonicConcept() {
           />
           {currentPage === 1 && <StudyCard />}
           {currentPage === 2 && <FormationContent />}
-          {currentPage > 2 && (
+          {currentPage === 3 && <ChargeBalanceContent />}
+          {currentPage > 3 && (
             <div className="bg-white border border-border-light rounded-3xl p-6 text-text-normal text-body-md">
               준비 중이에요.
             </div>

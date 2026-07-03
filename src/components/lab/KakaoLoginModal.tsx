@@ -1,5 +1,5 @@
-import kakaoIconSvg from "@/assets/Icon/kakao-icon.svg";
-import mascotPng from "@/assets/Icon/mascot.png";
+import kakaoIconSvg from "@/assets/brand/kakao-icon.svg";
+import mascotPng from "@/assets/mascot/mascot.png";
 
 const KAKAO_CLIENT_ID  = import.meta.env.VITE_KAKAO_REST_API_KEY  as string | undefined;
 const KAKAO_REDIRECT   = import.meta.env.VITE_KAKAO_REDIRECT_URI  as string | undefined;

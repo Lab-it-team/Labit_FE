@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router'
-import closeSvg from '@/assets/Icon/close.svg'
-import mascotPng from '@/assets/Icon/mascot.png'
+import closeSvg from '@/assets/icons/close.svg'
+import mascotPng from '@/assets/mascot/labit_peeking.png'
 import { deleteAccount } from '@/features/auth/api'
 import { useAuthStore } from '@/stores/authStore'
 
@@ -114,8 +114,8 @@ export default function DeleteAccountModal({ onClose }: Props) {
       <div className="flex flex-col gap-4">
         {/* Frame 485: 이미지 + 헤딩 (gap: 8px) */}
         <div className="flex flex-col gap-2">
-          <img src={mascotPng} alt="" width={112} height={87} className="object-contain" />
-          <div className="flex flex-col gap-2">
+          <img src={mascotPng} alt="" width={140} height={90} className="object-cover" style={{ objectPosition: 'left bottom', marginTop: -32, marginLeft: -23 }} />
+          <div className="flex flex-col gap-2" style={{ marginTop: -25 }}>
             <h2 className="text-heading-md font-bold text-text-strong">정말 떠나시나요?</h2>
             <div className="flex items-center gap-1">
               <span className="text-body-xxs font-normal text-text-normal">떠나시는 이유를 알려주세요.</span>

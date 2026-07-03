@@ -1,13 +1,15 @@
 import { useState, useRef, useEffect } from 'react'
 import { useNavigate } from 'react-router'
 import LoginRequiredModal from '@/components/common/LoginRequiredModal'
+import QuitLessonModal from '@/components/common/QuitLessonModal'
+import FreeLabModal from '@/components/lab/FreeLabModal'
 import { logout } from '@/features/auth/api'
-import homeSvg from '@/assets/Icon/home.svg'
-import listSvg from '@/assets/Icon/list.svg'
-import leftSvg from '@/assets/Icon/left.svg'
-import rightSvg from '@/assets/Icon/right.svg'
-import multiplySvg from '@/assets/Icon/multiply.svg'
-import lockSvg from '@/assets/Icon/lock2.svg'
+import homeSvg from '@/assets/icons/home.svg'
+import listSvg from '@/assets/icons/list.svg'
+import leftSvg from '@/assets/icons/left.svg'
+import rightSvg from '@/assets/icons/right.svg'
+import multiplySvg from '@/assets/icons/multiply.svg'
+import lockSvg from '@/assets/icons/lock2.svg'
 import { useAuthStore } from '@/stores/authStore'
 
 const KAKAO_CLIENT_ID = import.meta.env.VITE_KAKAO_REST_API_KEY as string | undefined
@@ -53,6 +55,8 @@ export default function LessonHeader({
   const user = useAuthStore((s) => s.user)
   const clearAuth = useAuthStore((s) => s.clearAuth)
   const [showLoginModal, setShowLoginModal] = useState(false)
+  const [showQuitModal, setShowQuitModal] = useState(false)
+  const [showFreeLabModal, setShowFreeLabModal] = useState(false)
   const [profileOpen, setProfileOpen] = useState(false)
   const profileRef = useRef<HTMLDivElement>(null)
 
@@ -75,6 +79,8 @@ export default function LessonHeader({
   return (
     <>
     {showLoginModal && <LoginRequiredModal onClose={() => setShowLoginModal(false)} />}
+    {showQuitModal && <QuitLessonModal onClose={() => setShowQuitModal(false)} onQuit={() => navigate('/home')} />}
+    {showFreeLabModal && <FreeLabModal onClose={() => setShowFreeLabModal(false)} />}
     <header className="fixed top-0 left-0 right-0 z-20 bg-white border-b border-border-light">
       <div className="flex items-center justify-between px-10 h-[60px]">
 
@@ -82,7 +88,7 @@ export default function LessonHeader({
         <div className="flex items-center gap-1 flex-1">
           <button
             type="button"
-            onClick={() => navigate('/home')}
+            onClick={() => { if (isLoggedIn) navigate('/home'); else setShowQuitModal(true); }}
             className="flex items-center gap-1 px-2.5 py-2 rounded-lg hover:bg-neutral-10 transition-colors"
           >
             <img src={homeSvg} alt="" width={20} height={20} />
@@ -161,7 +167,7 @@ export default function LessonHeader({
           )}
           <button
             type="button"
-            onClick={() => { if (!isLoggedIn) setShowLoginModal(true) }}
+            onClick={() => { if (isLoggedIn) setShowFreeLabModal(true); else setShowLoginModal(true); }}
             className="flex items-center gap-1.5 h-[38px] px-2.5 py-1.5 rounded-lg border border-border-normal bg-neutral-5 text-label-xl font-semibold text-text-normal hover:bg-neutral-10 transition-colors"
           >
             {!isLoggedIn && <img src={lockSvg} alt="" width={10} height={10} />}

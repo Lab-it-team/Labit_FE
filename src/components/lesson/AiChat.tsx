@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect, forwardRef } from 'react'
-import aiSvg from '@/assets/Icon/mingcute_ai-fill.svg'
-import sendSvg from '@/assets/Icon/mynaui_send-solid.svg'
+import aiSvg from '@/assets/icons/mingcute_ai-fill.svg'
+import sendSvg from '@/assets/icons/mynaui_send-solid.svg'
 
 type AiChatState = 'default' | 'hover' | 'press' | 'typing'
 

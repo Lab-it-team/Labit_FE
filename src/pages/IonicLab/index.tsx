@@ -19,11 +19,13 @@ import PuzzleGhost from "@/components/lab/PuzzleGhost";
 import CanvasDropZone from "@/components/lab/CanvasDropZone";
 import ToolBtn from "@/components/lab/ToolBtn";
 import KakaoLoginModal from "@/components/lab/KakaoLoginModal";
+import FreeLabModal from "@/components/lab/FreeLabModal";
+import LessonCompleteModal from "@/components/lesson/LessonCompleteModal";
 import type { PlacedPiece } from "@/components/lab/CanvasDropZone";
 import { CATIONS, ANIONS } from "@/data/ions";
 import type { Ion } from "@/data/ions";
 import { useAuthStore } from "@/stores/authStore";
-import lockSvg from "@/assets/Icon/lock.svg";
+import lockSvg from "@/assets/icons/lock.svg";
 
 // ── Puzzle geometry (matches puzzlePaths.ts) ──────────────────────────────
 const PIECE_W   = 120;   // cation & anion both 120px wide
@@ -236,6 +238,8 @@ export default function IonicLab() {
   const [isWrongCompound,    setIsWrongCompound]    = useState(false);
   const [showHint,           setShowHint]           = useState(false);
   const [showLoginModal,     setShowLoginModal]     = useState(false);
+  const [showCompleteModal,  setShowCompleteModal]  = useState(false);
+  const [showFreeLabModal,   setShowFreeLabModal]   = useState(false);
   const [justSolved,         setJustSolved]         = useState(false);
   const [activeDragIon,      setActiveDragIon]      = useState<Ion | null>(null);
   const [isDragOver,         setIsDragOver]         = useState(false);
@@ -246,6 +250,7 @@ export default function IonicLab() {
   const idCounter          = useRef(getNextPieceId(allPieces));
   const currentProblemRef  = useRef(currentProblem);
   const pendingSnapRef     = useRef<{ dropId: string; dropX: number; dropY: number } | null>(null);
+  const hasShownCompleteModal = useRef(false);
   const pointerRef         = useRef({ x: 0, y: 0 });
   const sensors = useSensors(
     useSensor(PointerSensor, {
@@ -474,10 +479,18 @@ export default function IonicLab() {
     return () => clearTimeout(timer);
   }, [justSolved, isLastProblem, isLoggedIn]);
 
+  useEffect(() => {
+    if (!justSolved || !isLastProblem || !isLoggedIn || hasShownCompleteModal.current) return;
+    hasShownCompleteModal.current = true;
+    const timer = setTimeout(() => setShowCompleteModal(true), 1500);
+    return () => clearTimeout(timer);
+  }, [justSolved, isLastProblem, isLoggedIn]);
+
   const handleAnswerButtonClick = () => {
     if (justSolved) {
       if (isLastProblem) {
         if (!isLoggedIn) setShowLoginModal(true);
+        else setShowCompleteModal(true);
         return;
       }
       moveToNextProblem();
@@ -714,6 +727,16 @@ export default function IonicLab() {
           onClose={() => setShowLoginModal(false)}
           nextProblemIndex={FREE_LIMIT}
         />
+      )}
+      {showCompleteModal && (
+        <LessonCompleteModal
+          onClose={() => setShowCompleteModal(false)}
+          completedFormulas={PROBLEMS.filter((_, i) => solvedProblems.has(i)).map((p) => p.formula)}
+          onOpenFreeLab={() => { setShowCompleteModal(false); setShowFreeLabModal(true); }}
+        />
+      )}
+      {showFreeLabModal && (
+        <FreeLabModal onClose={() => setShowFreeLabModal(false)} />
       )}
     </div>
   );

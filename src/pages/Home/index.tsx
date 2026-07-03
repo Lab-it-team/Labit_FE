@@ -1,47 +1,21 @@
-import { useState, useEffect, useMemo } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router";
-import arrowRightSvg from "@/assets/Icon/right.svg";
-import arrowDownSvg from "@/assets/Icon/Arrow/down.svg";
-import arrowUpSvg from "@/assets/Icon/Arrow/up.svg";
-import checkCircleSvg from "@/assets/Icon/check-c.svg";
-import dotActiveSvg from "@/assets/Icon/dot-active.svg";
-import dotInactiveSvg from "@/assets/Icon/dot-inactive.svg";
+import arrowRightSvg from "@/assets/icons/right.svg";
+import arrowDownSvg from "@/assets/icons/arrow/down.svg";
+import arrowUpSvg from "@/assets/icons/arrow/up.svg";
+import checkCircleSvg from "@/assets/icons/check-c.svg";
+import dotActiveSvg from "@/assets/icons/dot-active.svg";
+import dotInactiveSvg from "@/assets/icons/dot-inactive.svg";
 import { useUnits } from "@/queries/learning";
 import { useMe } from "@/queries/user";
-import { chapters as staticChapters } from "@/data/chapters";
-import type { UnitWithLessons } from "@/types";
-
-function getUnitStatus(unit: UnitWithLessons): "done" | "in-progress" | "upcoming" {
-  const { lessons } = unit;
-  if (lessons.length === 0) return "upcoming";
-  if (lessons.every((l) => l.status === "completed")) return "done";
-  if (lessons.some((l) => l.status !== "not_started")) return "in-progress";
-  return "upcoming";
-}
+import { chapters } from "@/data/chapters";
 
 export default function Home() {
   const navigate = useNavigate();
   const { data: homeData } = useUnits();
   const { data: me } = useMe();
 
-  const units = homeData?.units ?? [];
-  const hasApiData = units.length > 0;
   const progressRate = Math.round(homeData?.progress_rate ?? 0);
-
-  const chapters = useMemo(() => {
-    if (!hasApiData) return staticChapters;
-    return units.map((unit) => ({
-      id: unit.id,
-      title: unit.title,
-      status: getUnitStatus(unit),
-      lessonCount: unit.lessons.length,
-      lessons: unit.lessons.map((l) => ({
-        id: l.id,
-        title: l.title,
-        inProgress: l.status === "in_progress",
-      })),
-    }));
-  }, [units, hasApiData]);
 
   const inProgressId = chapters.find((c) => c.status === "in-progress")?.id;
   const [expanded, setExpanded] = useState<number[]>([]);
@@ -52,13 +26,8 @@ export default function Home() {
     }
   }, [inProgressId]);
 
-  const allLessons = hasApiData ? units.flatMap((u) => u.lessons) : [];
-  const completedCount = hasApiData
-    ? allLessons.filter((l) => l.status === "completed").length
-    : staticChapters.filter((c) => c.status === "done").length;
-  const totalCount = hasApiData
-    ? allLessons.length
-    : staticChapters.reduce((sum, c) => sum + c.lessonCount, 0);
+  const completedCount = chapters.filter((c) => c.status === "done").length;
+  const totalCount = chapters.reduce((sum, c) => sum + c.lessonCount, 0);
 
   const toggleChapter = (id: number, lessonCount: number) => {
     if (lessonCount === 0) return;
@@ -139,6 +108,7 @@ export default function Home() {
               const isExpanded = expanded.includes(chapter.id);
               const isInProgress = chapter.status === "in-progress";
               const isDone = chapter.status === "done";
+              const hasLessons = chapter.lessonCount > 0;
 
               return (
                 <div key={chapter.id}>
@@ -188,27 +158,34 @@ export default function Home() {
                       </div>
                     </div>
 
-                    {/* 레슨 수 + 화살표 */}
-                    <div className="flex shrink-0 items-center gap-1 text-label-md font-normal text-neutral-50">
-                      <span>{chapter.lessonCount}</span>
-                      <img
-                        src={isExpanded ? arrowDownSvg : arrowUpSvg}
-                        alt=""
-                        width={20}
-                        height={20}
-                      />
-                    </div>
+                    {/* 레슨 수 + 화살표 (레슨이 있을 때만) */}
+                    {hasLessons && (
+                      <div className="flex shrink-0 items-center gap-1 text-label-md font-normal text-neutral-50">
+                        <span>{chapter.lessonCount}</span>
+                        <img
+                          src={isExpanded ? arrowDownSvg : arrowUpSvg}
+                          alt=""
+                          width={20}
+                          height={20}
+                        />
+                      </div>
+                    )}
                   </button>
 
                   {/* 서브 레슨 목록 (펼쳐진 경우) */}
                   {isExpanded && chapter.lessons.length > 0 && (
-                    <div className="relative flex flex-col gap-3 px-4 py-3">
-                      <div className="absolute bottom-[30px] left-[34px] top-0 w-px bg-neutral-20" />
+                    <div className="flex flex-col gap-3 py-3 pr-4" style={{ paddingLeft: 6 }}>
                       {chapter.lessons.map((lesson, i) => (
                         <div
-                          key={lesson.id}
+                          key={`${chapter.id}-${i}`}
                           className="relative flex items-center gap-3"
                         >
+                          {i < chapter.lessons.length - 1 && (
+                            <div
+                              className="absolute left-[18px] top-1/2 w-px bg-neutral-20"
+                              style={{ height: "calc(100% + 12px)" }}
+                            />
+                          )}
                           <img
                             src={lesson.inProgress ? dotActiveSvg : dotInactiveSvg}
                             alt=""
