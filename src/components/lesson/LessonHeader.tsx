@@ -79,7 +79,7 @@ export default function LessonHeader({
   return (
     <>
     {showLoginModal && <LoginRequiredModal onClose={() => setShowLoginModal(false)} />}
-    {showQuitModal && <QuitLessonModal onClose={() => setShowQuitModal(false)} onQuit={() => navigate('/home')} />}
+    {showQuitModal && <QuitLessonModal onClose={() => setShowQuitModal(false)} onQuit={() => navigate('/login')} />}
     {showFreeLabModal && <FreeLabModal onClose={() => setShowFreeLabModal(false)} />}
     <header className="fixed top-0 left-0 right-0 z-20 bg-white border-b border-border-light">
       <div className="flex items-center justify-between px-10 h-[60px]">
