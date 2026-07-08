@@ -79,7 +79,7 @@ export default function Login() {
         minHeight: "100vh",
         overflow: "hidden",
         background: `
-          radial-gradient(110.08% 63.09% at 50% 34.75%, #F6F9FC 0%, rgba(255,255,255,0.4) 15.08%, #E9EFFE 100%),
+          radial-gradient(110.08% 68% at 50% 34.75%, #F6F9FC 0%, rgba(255,255,255,0.4) 15.08%, #E9EFFE 100%),
           var(--color-neutral-10)
         `,
       }}

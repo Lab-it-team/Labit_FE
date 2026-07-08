@@ -23,7 +23,7 @@ export default function QuitLessonModal({ onClose, onQuit }: QuitLessonModalProp
       console.warn("카카오 로그인 환경 변수가 설정되지 않았습니다.");
       return;
     }
-    sessionStorage.setItem("lab_redirect", window.location.pathname);
+    sessionStorage.setItem("lab_redirect", "/home");
     const state = typeof crypto.randomUUID === "function" ? crypto.randomUUID() : String(Date.now());
     sessionStorage.setItem("kakao_oauth_state", state);
     const params = new URLSearchParams({
