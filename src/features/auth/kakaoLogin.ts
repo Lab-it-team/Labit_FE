@@ -10,6 +10,8 @@ export function startKakaoLogin(redirectTo?: string): void {
   }
   if (redirectTo !== undefined) {
     sessionStorage.setItem("lab_redirect", redirectTo);
+  } else {
+    sessionStorage.removeItem("lab_redirect");
   }
   const state =
     typeof crypto.randomUUID === "function" ? crypto.randomUUID() : String(Date.now());
