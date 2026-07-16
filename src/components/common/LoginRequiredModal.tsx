@@ -1,28 +1,13 @@
 import kakaoIconSvg from "@/assets/brand/kakao-icon.svg";
 import mascotPng from "@/assets/mascot/mascot.png";
-
-const KAKAO_CLIENT_ID = import.meta.env.VITE_KAKAO_REST_API_KEY as string | undefined;
-const KAKAO_REDIRECT  = import.meta.env.VITE_KAKAO_REDIRECT_URI  as string | undefined;
-const kakaoConfigReady = Boolean(KAKAO_CLIENT_ID && KAKAO_REDIRECT);
+import { startKakaoLogin, kakaoConfigReady } from "@/features/auth/kakaoLogin";
 
 interface LoginRequiredModalProps {
   onClose: () => void;
 }
 
 export default function LoginRequiredModal({ onClose }: LoginRequiredModalProps) {
-  const handleKakaoLogin = () => {
-    if (!kakaoConfigReady) return;
-    sessionStorage.setItem("lab_redirect", window.location.pathname);
-    const state = crypto.randomUUID();
-    sessionStorage.setItem("kakao_oauth_state", state);
-    const params = new URLSearchParams({
-      client_id: KAKAO_CLIENT_ID!,
-      redirect_uri: KAKAO_REDIRECT!,
-      response_type: "code",
-      state,
-    });
-    window.location.href = `https://kauth.kakao.com/oauth/authorize?${params}`;
-  };
+  const handleKakaoLogin = () => startKakaoLogin(window.location.pathname);
 
   return (
     <div

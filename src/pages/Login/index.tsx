@@ -1,4 +1,5 @@
 import { useNavigate } from "react-router";
+import { startKakaoLogin } from "@/features/auth/kakaoLogin";
 import mascot from "@/assets/mascot/mascot.png";
 import logoSvg from "@/assets/brand/logo.svg";
 import backIconSvg from "@/assets/icons/icon-back.svg";
@@ -58,19 +59,7 @@ function Deco({ src, left, top, width, height, rotate = 0, opacity = 1, animatio
 export default function Login() {
   const navigate = useNavigate();
 
-  const handleKakaoLogin = () => {
-    const state = crypto.randomUUID();
-    sessionStorage.setItem("kakao_oauth_state", state);
-
-    const params = new URLSearchParams({
-      client_id: import.meta.env.VITE_KAKAO_REST_API_KEY ?? "",
-      redirect_uri: import.meta.env.VITE_KAKAO_REDIRECT_URI ?? "",
-      response_type: "code",
-      state,
-    });
-
-    window.location.href = `https://kauth.kakao.com/oauth/authorize?${params}`;
-  };
+  const handleKakaoLogin = () => startKakaoLogin();
 
   return (
     <div

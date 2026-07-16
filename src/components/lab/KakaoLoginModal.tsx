@@ -1,9 +1,6 @@
 import kakaoIconSvg from "@/assets/brand/kakao-icon.svg";
 import mascotPng from "@/assets/mascot/mascot.png";
-
-const KAKAO_CLIENT_ID  = import.meta.env.VITE_KAKAO_REST_API_KEY  as string | undefined;
-const KAKAO_REDIRECT   = import.meta.env.VITE_KAKAO_REDIRECT_URI  as string | undefined;
-const kakaoConfigReady = Boolean(KAKAO_CLIENT_ID && KAKAO_REDIRECT);
+import { startKakaoLogin, kakaoConfigReady } from "@/features/auth/kakaoLogin";
 
 interface KakaoLoginModalProps {
   onClose: () => void;
@@ -13,26 +10,11 @@ interface KakaoLoginModalProps {
 export default function KakaoLoginModal({ onClose, nextProblemIndex }: KakaoLoginModalProps) {
   const handleKakaoLogin = () => {
     sessionStorage.setItem("lab_current_problem", String(nextProblemIndex));
-    sessionStorage.setItem("lab_redirect", "/ionic-lab");
     const solvedProblems = sessionStorage.getItem("lab_solved_problems");
-    if (solvedProblems) {
-      sessionStorage.setItem("lab_pre_login_solved_problems", solvedProblems);
-    }
+    if (solvedProblems) sessionStorage.setItem("lab_pre_login_solved_problems", solvedProblems);
     const placedPieces = sessionStorage.getItem("lab_placed_pieces");
-    if (placedPieces) {
-      sessionStorage.setItem("lab_pre_login_placed_pieces", placedPieces);
-    }
-
-    const state = crypto.randomUUID();
-    sessionStorage.setItem("kakao_oauth_state", state);
-    if (!kakaoConfigReady) return;
-    const params = new URLSearchParams({
-      client_id: KAKAO_CLIENT_ID!,
-      redirect_uri: KAKAO_REDIRECT!,
-      response_type: "code",
-      state,
-    });
-    window.location.href = `https://kauth.kakao.com/oauth/authorize?${params}`;
+    if (placedPieces) sessionStorage.setItem("lab_pre_login_placed_pieces", placedPieces);
+    startKakaoLogin("/ionic-lab");
   };
 
   return (

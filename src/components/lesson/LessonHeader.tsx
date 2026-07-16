@@ -12,21 +12,10 @@ import multiplySvg from '@/assets/icons/multiply.svg'
 import lockSvg from '@/assets/icons/lock2.svg'
 import { useAuthStore } from '@/stores/authStore'
 
-const KAKAO_CLIENT_ID = import.meta.env.VITE_KAKAO_REST_API_KEY as string | undefined
-const KAKAO_REDIRECT  = import.meta.env.VITE_KAKAO_REDIRECT_URI  as string | undefined
+import { startKakaoLogin } from '@/features/auth/kakaoLogin'
 
 function handleKakaoLogin() {
-  if (!KAKAO_CLIENT_ID || !KAKAO_REDIRECT) return
-  sessionStorage.setItem('lab_redirect', window.location.pathname)
-  const state = crypto.randomUUID()
-  sessionStorage.setItem('kakao_oauth_state', state)
-  const params = new URLSearchParams({
-    client_id: KAKAO_CLIENT_ID,
-    redirect_uri: KAKAO_REDIRECT,
-    response_type: 'code',
-    state,
-  })
-  window.location.href = `https://kauth.kakao.com/oauth/authorize?${params}`
+  startKakaoLogin(window.location.pathname)
 }
 
 interface LessonHeaderProps {
