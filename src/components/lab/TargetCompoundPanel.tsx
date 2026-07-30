@@ -6,6 +6,7 @@ interface TargetCompoundPanelProps {
   totalCharge: number;
   isCorrect: boolean;
   hasInput: boolean;
+  highlighted?: boolean;
 }
 
 export default function TargetCompoundPanel({
@@ -16,6 +17,7 @@ export default function TargetCompoundPanel({
   totalCharge,
   isCorrect,
   hasInput,
+  highlighted = false,
 }: TargetCompoundPanelProps) {
   return (
     <div
@@ -29,10 +31,12 @@ export default function TargetCompoundPanel({
         gap: 12,
         width: 900,
         height: 137,
-        background: 'var(--color-bg-elevate)',
+        background: highlighted ? 'var(--color-static-white)' : 'var(--color-bg-elevate)',
         borderRadius: 12,
         alignSelf: 'stretch',
         flexShrink: 0,
+        position: highlighted ? 'relative' : undefined,
+        zIndex: highlighted ? 40 : undefined,
       }}
     >
       {/* 좌측: 목표 화합물 */}

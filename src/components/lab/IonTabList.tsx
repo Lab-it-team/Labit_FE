@@ -28,9 +28,49 @@ function pressedStroke(ion: Ion): string { return `var(--color-element-pressed-s
 interface PuzzleCardProps {
   ion: Ion;
   isDragging: boolean;
+  highlighted?: boolean;
 }
 
-function PuzzleCard({ ion, isDragging }: PuzzleCardProps) {
+function GrabCallout({ text }: { text: string }) {
+  return (
+    <div
+      style={{
+        position: "absolute",
+        bottom: "100%",
+        left: "50%",
+        transform: "translateX(-50%)",
+        marginBottom: 10,
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+        padding: "8px 16px",
+        background: "var(--color-primary-normal)",
+        borderRadius: 12,
+        whiteSpace: "nowrap",
+        zIndex: 41,
+      }}
+    >
+      <span style={{ fontFamily: "var(--font-sans)", fontWeight: 400, fontSize: 14, lineHeight: "18px", letterSpacing: "-0.005em", color: "var(--color-static-white)" }}>
+        {text}
+      </span>
+      <div
+        style={{
+          position: "absolute",
+          bottom: -7,
+          left: "50%",
+          transform: "translateX(-50%)",
+          width: 0,
+          height: 0,
+          borderLeft: "7px solid transparent",
+          borderRight: "7px solid transparent",
+          borderTop: "8px solid var(--color-primary-normal)",
+        }}
+      />
+    </div>
+  );
+}
+
+function PuzzleCard({ ion, isDragging, highlighted = false }: PuzzleCardProps) {
   const { attributes, listeners, setNodeRef } = useDraggable({
     id: `palette:${ion.id}`,
     data: { source: "palette", ion },
@@ -68,12 +108,14 @@ function PuzzleCard({ ion, isDragging }: PuzzleCardProps) {
         cursor: "grab",
         touchAction: "none",
         userSelect: "none",
+        zIndex: highlighted ? 40 : undefined,
         "--card-hover-fill":     hoverFill(ion),
         "--card-hover-stroke":   hoverStroke(ion),
         "--card-pressed-fill":   pressedFill(ion),
         "--card-pressed-stroke": pressedStroke(ion),
       } as React.CSSProperties}
     >
+      {highlighted && <GrabCallout text="여기를 꾹 잡고" />}
       <svg
         width="100%"
         height="100%"
@@ -82,7 +124,7 @@ function PuzzleCard({ ion, isDragging }: PuzzleCardProps) {
         fill="none"
         style={{ position: "absolute", inset: 0 }}
       >
-        <path d={path} fill={shapeFill()} stroke={shapeStroke()} />
+        <path d={path} fill={highlighted ? "var(--color-static-white)" : shapeFill()} stroke={shapeStroke()} />
       </svg>
       <div
         style={{
@@ -114,10 +156,15 @@ type TabType = "cation" | "anion";
 interface IonTabListProps {
   draggingIonId: string | null;
   height?: number;
+  highlighted?: boolean;
+  highlightIonId?: string | null;
+  forceActiveTab?: TabType | null;
 }
 
-export default function IonTabList({ draggingIonId, height = 556 }: IonTabListProps) {
-  const [activeTab, setActiveTab] = useState<TabType>("cation");
+export default function IonTabList({ draggingIonId, height = 556, highlighted = false, highlightIonId = null, forceActiveTab = null }: IonTabListProps) {
+  const [manualTab, setManualTab] = useState<TabType>("cation");
+  const activeTab = forceActiveTab ?? manualTab;
+
   const ions = activeTab === "cation" ? CATIONS : ANIONS;
   const rows: Ion[][] = [];
   for (let i = 0; i < ions.length; i += 2) rows.push(ions.slice(i, i + 2));
@@ -137,7 +184,9 @@ export default function IonTabList({ draggingIonId, height = 556 }: IonTabListPr
         boxShadow: "inset 0 0 0 1px var(--color-border-strong)",
         borderRadius: 12,
         flexShrink: 0,
-        overflow: "hidden",
+        overflow: highlightIonId ? "visible" : "hidden",
+        position: highlighted ? "relative" : undefined,
+        zIndex: highlighted ? 40 : undefined,
       }}
     >
       {/* Tab header */}
@@ -145,7 +194,7 @@ export default function IonTabList({ draggingIonId, height = 556 }: IonTabListPr
         {(["cation", "anion"] as const).map((tab) => (
           <button
             key={tab}
-            onClick={() => setActiveTab(tab)}
+            onClick={() => { if (!forceActiveTab) setManualTab(tab); }}
             className={[
               "font-sans flex justify-center items-center flex-1 h-9",
               "bg-transparent border-none cursor-pointer",
@@ -164,10 +213,10 @@ export default function IonTabList({ draggingIonId, height = 556 }: IonTabListPr
       </div>
 
       {/* Scrollable ion list */}
-      <div style={{ flex: 1, overflowY: "auto", overflowX: "hidden", width: "100%", display: "flex", flexDirection: "column", gap: 16 }}>
+      <div style={{ flex: 1, overflowY: highlightIonId ? "visible" : "auto", overflowX: "hidden", width: "100%", display: "flex", flexDirection: "column", gap: 16 }}>
         <div style={{ display: "flex", flexDirection: "row", alignItems: "center", gap: 4, flexShrink: 0 }}>
-          <img src={tipsSvg} width={24} height={24} alt="" />
-          <span className="text-body-xxs text-text-normal whitespace-nowrap">
+          <img src={tipsSvg} width={24} height={24} style={{ flexShrink: 0 }} alt="" />
+          <span className="text-body-xxs text-text-normal">
             {activeTab === "cation" ? "양이온의 오른쪽 홈에 음이온이 끼워져요" : "왼쪽 돌출부가 양이온 홈에 끼워져요"}
           </span>
         </div>
@@ -175,7 +224,7 @@ export default function IonTabList({ draggingIonId, height = 556 }: IonTabListPr
           {rows.map((row, ri) => (
             <div key={ri} style={{ display: "flex", flexDirection: "row", alignItems: "flex-start", gap: 16 }}>
               {row.map((ion) => (
-                <PuzzleCard key={ion.id} ion={ion} isDragging={draggingIonId === ion.id} />
+                <PuzzleCard key={ion.id} ion={ion} isDragging={draggingIonId === ion.id} highlighted={highlightIonId === ion.id} />
               ))}
             </div>
           ))}
