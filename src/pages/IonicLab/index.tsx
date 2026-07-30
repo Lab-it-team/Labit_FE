@@ -261,8 +261,7 @@ export default function IonicLab() {
   const [draggingPaletteId,  setDraggingPaletteId]  = useState<string | null>(null);
   const [draggingPieceId,    setDraggingPieceId]    = useState<string | null>(null);
   const [onboardingStep,     setOnboardingStep]     = useState<0 | 1 | 2 | 3 | 4 | null>(() => {
-    // TEMP(테스트용): 로그인/재방문 여부와 상관없이 항상 온보딩을 띄움 — 테스트 끝나면 아래 원래 조건으로 복구
-    // if (isLoggedIn || localStorage.getItem(ONBOARDING_STORAGE_KEY)) return null;
+    if (isLoggedIn || localStorage.getItem(ONBOARDING_STORAGE_KEY)) return null;
     return 0;
   });
   const [demoPhase,          setDemoPhase]          = useState<"cation" | "anion">("cation");
@@ -836,6 +835,7 @@ export default function IonicLab() {
                 height={canvasHeight}
                 hintVisible={showHint}
                 hintText={hintText}
+                hideAutoBondHint={onboardingStep !== null}
               />
             </div>
           </div>
