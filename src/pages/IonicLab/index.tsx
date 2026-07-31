@@ -821,7 +821,7 @@ export default function IonicLab() {
                   <ToolBtn onClick={() => setShowHint((v) => !v)} bordered>힌트 보기</ToolBtn>
                   <ToolBtn
                     onClick={handleAnswerButtonClick}
-                    disabled={placedPieces.length === 0}
+                    disabled={onboardingStep !== 4 && placedPieces.length === 0}
                     primary
                   >
                     {answerButtonLabel}
