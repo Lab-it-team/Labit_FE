@@ -33,6 +33,7 @@ interface CanvasDropZoneProps {
   hideEmptyToast?: boolean;
   hintVisible?: boolean;
   hintText?: string;
+  hideAutoBondHint?: boolean;
 }
 
 type CanvasStatus = "empty" | "active" | "positive" | "negative" | "wrongCompound";
@@ -225,6 +226,7 @@ export default function CanvasDropZone({
   hideEmptyToast = false,
   hintVisible = false,
   hintText,
+  hideAutoBondHint = false,
 }: CanvasDropZoneProps) {
   const { setNodeRef } = useDroppable({ id: "ionic-canvas" });
   const hasInput = placedPieces.length > 0;
@@ -271,7 +273,7 @@ export default function CanvasDropZone({
       ) && <Toast key={checkKey} status={status} />}
       {hintVisible && hintText && <HintPopup text={hintText} />}
 
-      {!hintDismissed && (!hasInput || isDragOver) && (
+      {!hideAutoBondHint && !hintDismissed && (!hasInput || isDragOver) && (
         <span
           style={{
             position: "absolute",

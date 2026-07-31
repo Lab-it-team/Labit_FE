@@ -20,10 +20,15 @@ import CanvasDropZone from "@/components/lab/CanvasDropZone";
 import ToolBtn from "@/components/lab/ToolBtn";
 import KakaoLoginModal from "@/components/lab/KakaoLoginModal";
 import FreeLabModal from "@/components/lab/FreeLabModal";
+import OnboardingStartModal from "@/components/lab/OnboardingStartModal";
+import GuideTooltip from "@/components/lab/GuideTooltip";
+import DragDemoOverlay from "@/components/lab/DragDemoOverlay";
+import MergedPiecesPreview from "@/components/lab/MergedPiecesPreview";
 import LessonCompleteModal from "@/components/lesson/LessonCompleteModal";
 import type { PlacedPiece } from "@/components/lab/CanvasDropZone";
 import { CATIONS, ANIONS } from "@/data/ions";
 import type { Ion } from "@/data/ions";
+import { cardHeight } from "@/components/lab/puzzlePaths";
 import { useAuthStore } from "@/stores/authStore";
 import lockSvg from "@/assets/icons/lock.svg";
 
@@ -45,6 +50,25 @@ interface Problem {
 }
 
 const FREE_LIMIT = 3; // 비로그인 사용자에게 제공되는 문제 수
+const ONBOARDING_STORAGE_KEY = "lab_onboarding_seen";
+const ONBOARDING_TOOLTIP_STEPS = 4;
+const ONBOARDING_DEMO_CYCLE_MS = 4400;
+
+// IonTabList 팔레트 그리드(2열, gap16)에서 index번째 칸의 중심 좌표
+// ("이온 목록 + 캔버스" row 기준 상대 좌표) — 전하가 큰 이온은 카드가 더 높아지므로
+// 실제 각 행의 카드 높이(cardHeight)를 누적해서 y축을 계산한다.
+function paletteSlotCenter(ions: Ion[], index: number) {
+  const col = index % 2;
+  const row = Math.floor(index / 2);
+  const rowHeight = (r: number) => {
+    const a = ions[r * 2];
+    const b = ions[r * 2 + 1];
+    return Math.max(cardHeight(a), b ? cardHeight(b) : 0);
+  };
+  let yOffset = 0;
+  for (let r = 0; r < row; r++) yOffset += rowHeight(r) + 16;
+  return { x: col === 0 ? 80 : 216, y: 120 + yOffset + rowHeight(row) / 2 };
+}
 
 const PROBLEMS: Problem[] = [
   {
@@ -245,6 +269,39 @@ export default function IonicLab() {
   const [isDragOver,         setIsDragOver]         = useState(false);
   const [draggingPaletteId,  setDraggingPaletteId]  = useState<string | null>(null);
   const [draggingPieceId,    setDraggingPieceId]    = useState<string | null>(null);
+  const [onboardingStep,     setOnboardingStep]     = useState<0 | 1 | 2 | 3 | 4 | null>(() => {
+    if (isLoggedIn || localStorage.getItem(ONBOARDING_STORAGE_KEY)) return null;
+    return 0;
+  });
+  const [demoPhase,          setDemoPhase]          = useState<"cation" | "anion">("cation");
+  const [demoSubPhase,       setDemoSubPhase]       = useState<"grab" | "dragging" | "idle">("grab");
+
+  const dismissOnboarding = useCallback(() => {
+    localStorage.setItem(ONBOARDING_STORAGE_KEY, "1");
+    setOnboardingStep(null);
+  }, []);
+
+  // STEP3 "끌어다 놓기" 데모: 잡기 힌트 → 드래그 중 → 대기, 매 사이클마다 양이온/음이온 번갈아 반복
+  useEffect(() => {
+    if (onboardingStep !== 3) return;
+    let hideTimer: ReturnType<typeof setTimeout>;
+    let idleTimer: ReturnType<typeof setTimeout>;
+    const runCycle = () => {
+      setDemoSubPhase("grab");
+      hideTimer = setTimeout(() => setDemoSubPhase("dragging"), ONBOARDING_DEMO_CYCLE_MS * 0.08);
+      idleTimer = setTimeout(() => setDemoSubPhase("idle"), ONBOARDING_DEMO_CYCLE_MS * 0.92);
+    };
+    runCycle();
+    const interval = setInterval(() => {
+      setDemoPhase((p) => (p === "cation" ? "anion" : "cation"));
+      runCycle();
+    }, ONBOARDING_DEMO_CYCLE_MS);
+    return () => {
+      clearTimeout(hideTimer);
+      clearTimeout(idleTimer);
+      clearInterval(interval);
+    };
+  }, [onboardingStep]);
 
   const canvasRef          = useRef<HTMLDivElement>(null);
   const idCounter          = useRef(getNextPieceId(allPieces));
@@ -305,6 +362,11 @@ export default function IonicLab() {
   const mkId = () => `p${idCounter.current++}`;
 
   const problem = PROBLEMS[currentProblem];
+
+  const demoIon = demoPhase === "cation" ? problem.cation : problem.anion;
+  const demoStart = demoPhase === "cation"
+    ? paletteSlotCenter(CATIONS, CATIONS.findIndex((i) => i.id === demoIon.id))
+    : paletteSlotCenter(ANIONS, ANIONS.findIndex((i) => i.id === demoIon.id));
 
   const canvasHeight = Math.max(
     470,
@@ -630,20 +692,85 @@ export default function IonicLab() {
         </div>
 
         {/* Target compound + lab area */}
-        <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 16, width: 900 }}>
+        <div style={{ position: "relative", display: "flex", flexDirection: "column", alignItems: "center", gap: 16, width: 900 }}>
+          {onboardingStep === 2 && (
+            <GuideTooltip
+              stepLabel="STEP 2"
+              title="이온 조각 고르기"
+              description={"왼쪽에는 양이온(+)과 음이온(-) 조각이 있어요.\n탭을 눌러 바꿔 볼 수 있어요."}
+              current={2}
+              total={ONBOARDING_TOOLTIP_STEPS}
+              onPrev={() => setOnboardingStep(1)}
+              onNext={() => setOnboardingStep(3)}
+              onClose={dismissOnboarding}
+              style={{ top: 52, left: 336 }}
+            />
+          )}
+          {onboardingStep === 3 && (
+            <GuideTooltip
+              stepLabel="STEP 3"
+              title="끌어다 놓기"
+              description={"이온 조각을 잡아서 오른쪽 캔버스로 드래그하세요.\n마우스를 따라 이렇게 옮겨 주면 돼요."}
+              current={3}
+              total={ONBOARDING_TOOLTIP_STEPS}
+              onPrev={() => setOnboardingStep(2)}
+              onNext={() => setOnboardingStep(4)}
+              onClose={dismissOnboarding}
+              style={{ top: -135, left: 687, zIndex: 41 }}
+            />
+          )}
+          {onboardingStep === 4 && (
+            <GuideTooltip
+              stepLabel="STEP 4"
+              title="정답을 확인하고 다음 문제로!"
+              description={"정답을 확인하고 다음 문제로 넘어갈 수 있어요.\n헷갈리는 건 힌트로 확인해요."}
+              current={4}
+              total={ONBOARDING_TOOLTIP_STEPS}
+              onPrev={() => setOnboardingStep(3)}
+              onNext={dismissOnboarding}
+              onClose={dismissOnboarding}
+              nextLabel="실습 시작하기"
+              style={{ top: -102, left: 586, zIndex: 41 }}
+            />
+          )}
           <TargetCompoundPanel
             formula={problem.formula}
             name={problem.name}
-            cationSum={cationSum}
-            anionSum={anionSum}
-            totalCharge={totalCharge}
-            isCorrect={isCorrect}
-            hasInput={placedPieces.length > 0}
+            cationSum={onboardingStep === 4 ? problem.cation.charge : cationSum}
+            anionSum={onboardingStep === 4 ? problem.anion.charge : anionSum}
+            totalCharge={onboardingStep === 4 ? problem.cation.charge - problem.anion.charge : totalCharge}
+            isCorrect={onboardingStep === 4 ? true : isCorrect}
+            hasInput={onboardingStep === 4 ? true : placedPieces.length > 0}
+            highlighted={onboardingStep === 1}
           />
 
           {/* Ion list + canvas */}
-          <div style={{ display: "flex", flexDirection: "row", alignItems: "flex-start", gap: 16, width: 900 }}>
-            <IonTabList draggingIonId={draggingPaletteId} />
+          <div style={{ position: "relative", display: "flex", flexDirection: "row", alignItems: "flex-start", gap: 16, width: 900 }}>
+            {onboardingStep === 1 && (
+              <GuideTooltip
+                stepLabel="STEP 1"
+                title="전하 합을 0으로 만들어요"
+                description={"목표 화합물을 보고 이온 수를 맞춰,\n전하 합을 0으로 만들면 정답이에요."}
+                current={1}
+                total={ONBOARDING_TOOLTIP_STEPS}
+                onPrev={() => setOnboardingStep(0)}
+                onNext={() => setOnboardingStep(2)}
+                onClose={dismissOnboarding}
+                style={{ top: 0, left: 626 }}
+              />
+            )}
+            {onboardingStep === 3 && (
+              <DragDemoOverlay ion={demoIon} start={demoStart} cycleMs={ONBOARDING_DEMO_CYCLE_MS} />
+            )}
+            {onboardingStep === 4 && (
+              <MergedPiecesPreview cation={problem.cation} anion={problem.anion} />
+            )}
+            <IonTabList
+              draggingIonId={onboardingStep === 3 && demoSubPhase === "dragging" ? demoIon.id : draggingPaletteId}
+              highlighted={onboardingStep === 2 || onboardingStep === 4}
+              highlightIonId={onboardingStep === 3 && demoSubPhase === "grab" ? demoIon.id : null}
+              forceActiveTab={onboardingStep === 3 ? demoPhase : null}
+            />
 
             {/* Canvas panel */}
             <div
@@ -652,6 +779,8 @@ export default function IonicLab() {
                 alignItems: "flex-start", padding: 20, gap: 12, width: 588,
                 background: "var(--color-static-white)", border: "1px solid var(--color-border-normal)",
                 borderRadius: 12, flexGrow: 1,
+                position: (onboardingStep === 3 && demoSubPhase !== "grab") || onboardingStep === 4 ? "relative" : undefined,
+                zIndex: (onboardingStep === 3 && demoSubPhase !== "grab") || onboardingStep === 4 ? 40 : undefined,
               }}
             >
               {/* Toolbar */}
@@ -692,7 +821,7 @@ export default function IonicLab() {
                   <ToolBtn onClick={() => setShowHint((v) => !v)} bordered>힌트 보기</ToolBtn>
                   <ToolBtn
                     onClick={handleAnswerButtonClick}
-                    disabled={placedPieces.length === 0}
+                    disabled={onboardingStep !== 4 && placedPieces.length === 0}
                     primary
                   >
                     {answerButtonLabel}
@@ -704,7 +833,7 @@ export default function IonicLab() {
                 onCanvasReady={handleCanvasReady}
                 placedPieces={placedPieces}
                 onRemove={handleRemovePiece}
-                isDragOver={isDragOver}
+                isDragOver={isDragOver || (onboardingStep === 3 && demoSubPhase !== "grab")}
                 isCorrect={justSolved && isCorrect}
                 isWrong={isWrong}
                 isWrongCompound={isWrongCompound}
@@ -713,12 +842,17 @@ export default function IonicLab() {
                 height={canvasHeight}
                 hintVisible={showHint}
                 hintText={hintText}
+                hideAutoBondHint={onboardingStep !== null}
               />
             </div>
           </div>
         </div>
         </div>
       </DndContext>
+
+      {onboardingStep !== null && onboardingStep > 0 && (
+        <div style={{ position: "fixed", inset: 0, zIndex: 35, background: "var(--color-bg-overlay)" }} />
+      )}
 
       <AiFab showTooltip={false} className="fixed bottom-[90px] right-10 z-30" />
 
@@ -737,6 +871,12 @@ export default function IonicLab() {
       )}
       {showFreeLabModal && (
         <FreeLabModal onClose={() => setShowFreeLabModal(false)} />
+      )}
+      {onboardingStep === 0 && (
+        <OnboardingStartModal
+          onClose={dismissOnboarding}
+          onNext={() => setOnboardingStep(1)}
+        />
       )}
     </div>
   );

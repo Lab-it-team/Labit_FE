@@ -144,7 +144,7 @@ export default function CourseModal({ onClose }: CourseModalProps) {
                       <div key={lesson.id} className="relative flex items-center gap-3">
                         {i < chapter.lessons.length - 1 && (
                           <div
-                            className="absolute left-[18px] top-1/2 w-px bg-neutral-20"
+                            className="absolute left-[18px] top-1/2 w-px -translate-x-1/2 bg-neutral-20"
                             style={{ height: "calc(100% + 12px)" }}
                           />
                         )}
@@ -156,7 +156,7 @@ export default function CourseModal({ onClose }: CourseModalProps) {
                           className="z-[1] shrink-0"
                         />
                         <span className="text-body-sm font-medium text-text-normal">
-                          {i + 1}. {lesson.title}
+                          {lesson.title}
                         </span>
                       </div>
                     ))}
