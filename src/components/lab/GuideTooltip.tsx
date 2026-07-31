@@ -65,6 +65,7 @@ export default function GuideTooltip({
         <button
           type="button"
           onClick={onClose}
+          aria-label="닫기"
           style={{ display: "flex", alignItems: "center", justifyContent: "center", width: 24, height: 24, background: "none", border: "none", cursor: "pointer", padding: 0, flexShrink: 0 }}
         >
           <svg width="13" height="13" viewBox="0 0 14 14" fill="none">

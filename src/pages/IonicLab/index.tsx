@@ -28,6 +28,7 @@ import LessonCompleteModal from "@/components/lesson/LessonCompleteModal";
 import type { PlacedPiece } from "@/components/lab/CanvasDropZone";
 import { CATIONS, ANIONS } from "@/data/ions";
 import type { Ion } from "@/data/ions";
+import { cardHeight } from "@/components/lab/puzzlePaths";
 import { useAuthStore } from "@/stores/authStore";
 import lockSvg from "@/assets/icons/lock.svg";
 
@@ -53,12 +54,20 @@ const ONBOARDING_STORAGE_KEY = "lab_onboarding_seen";
 const ONBOARDING_TOOLTIP_STEPS = 4;
 const ONBOARDING_DEMO_CYCLE_MS = 4400;
 
-// IonTabList 팔레트 그리드(2열, 카드 100px + gap16)에서 index번째 칸의 중심 좌표
-// ("이온 목록 + 캔버스" row 기준 상대 좌표)
-function paletteSlotCenter(index: number) {
+// IonTabList 팔레트 그리드(2열, gap16)에서 index번째 칸의 중심 좌표
+// ("이온 목록 + 캔버스" row 기준 상대 좌표) — 전하가 큰 이온은 카드가 더 높아지므로
+// 실제 각 행의 카드 높이(cardHeight)를 누적해서 y축을 계산한다.
+function paletteSlotCenter(ions: Ion[], index: number) {
   const col = index % 2;
   const row = Math.floor(index / 2);
-  return { x: col === 0 ? 80 : 216, y: 170 + row * 116 };
+  const rowHeight = (r: number) => {
+    const a = ions[r * 2];
+    const b = ions[r * 2 + 1];
+    return Math.max(cardHeight(a), b ? cardHeight(b) : 0);
+  };
+  let yOffset = 0;
+  for (let r = 0; r < row; r++) yOffset += rowHeight(r) + 16;
+  return { x: col === 0 ? 80 : 216, y: 120 + yOffset + rowHeight(row) / 2 };
 }
 
 const PROBLEMS: Problem[] = [
@@ -355,11 +364,9 @@ export default function IonicLab() {
   const problem = PROBLEMS[currentProblem];
 
   const demoIon = demoPhase === "cation" ? problem.cation : problem.anion;
-  const demoStart = paletteSlotCenter(
-    demoPhase === "cation"
-      ? CATIONS.findIndex((i) => i.id === demoIon.id)
-      : ANIONS.findIndex((i) => i.id === demoIon.id),
-  );
+  const demoStart = demoPhase === "cation"
+    ? paletteSlotCenter(CATIONS, CATIONS.findIndex((i) => i.id === demoIon.id))
+    : paletteSlotCenter(ANIONS, ANIONS.findIndex((i) => i.id === demoIon.id));
 
   const canvasHeight = Math.max(
     470,
