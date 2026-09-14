@@ -492,7 +492,7 @@ export default function FreeLabModal({ onClose }: FreeLabModalProps) {
           <div style={{ display: "flex", flexDirection: "row", justifyContent: "space-between", alignItems: "flex-start", flexShrink: 0 }}>
             <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
               <h3 style={{ margin: 0, fontFamily: "var(--font-sans)", fontWeight: 700, fontSize: 24, lineHeight: "30px", color: "var(--color-text-strong)" }}>
-                자유 실험실
+                학습참조
               </h3>
               <p style={{ margin: 0, fontFamily: "var(--font-sans)", fontWeight: 500, fontSize: 15, lineHeight: "24px", letterSpacing: "-0.005em", color: "var(--color-text-sub)" }}>
                 이온 퍼즐을 조합해서 다양한 화합물을 만들어 보세요!

@@ -105,7 +105,7 @@ export default function LessonCompleteModal({ onClose, completedFormulas, onOpen
             letterSpacing: "-0.005em", textAlign: "center", color: "var(--color-text-normal)",
             width: "100%",
           }}>
-            전하 합 맞추기, 이제 익숙해졌죠?<br />자유 실험실에서 더 많이 연습할 수 있어요.
+            전하 합 맞추기, 이제 익숙해졌죠?<br />학습참조에서 더 많이 연습할 수 있어요.
           </span>
         </div>
 
@@ -187,7 +187,7 @@ export default function LessonCompleteModal({ onClose, completedFormulas, onOpen
             </span>
           </button>
 
-          {/* Secondary: 자유 실험실 */}
+          {/* Secondary: 학습참조 */}
           <button
             type="button"
             onClick={onOpenFreeLab}
@@ -202,7 +202,7 @@ export default function LessonCompleteModal({ onClose, completedFormulas, onOpen
               fontFamily: "var(--font-sans)", fontWeight: 500, fontSize: 13, lineHeight: "18px",
               letterSpacing: "-0.005em", color: "var(--color-text-normal)",
             }}>
-              자유 실험실
+              학습참조
             </span>
           </button>
         </div>

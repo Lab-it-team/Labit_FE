@@ -307,3 +307,21 @@
   fill: var(--card-pressed-fill);
   stroke: var(--card-pressed-stroke);
 }
+
+/* ── Periodic table element card hover / pressed ─────────────────────────── */
+.element-card {
+  appearance: none;
+  -webkit-appearance: none;
+  font: inherit;
+  outline: none;
+  border: 1px solid transparent;
+  transition: border-color 0.12s, box-shadow 0.12s;
+}
+.element-card:not(:disabled):hover,
+.element-card:not(:disabled):focus-visible {
+  border-color: var(--el-color);
+}
+.element-card:not(:disabled):active {
+  border-color: var(--el-color);
+  box-shadow: 0 0 4px color-mix(in srgb, var(--el-color) 60%, transparent);
+}
