@@ -1,5 +1,5 @@
 import { useState, type ReactNode } from "react";
-import { useNavigate } from "react-router";
+import { useLocation, useNavigate } from "react-router";
 import LessonHeader from "@/components/lesson/LessonHeader";
 import LessonFooter from "@/components/lesson/LessonFooter";
 import ContentTab from "@/components/lesson/ContentTab";
@@ -184,8 +184,12 @@ function IonSymbolCard() {
 
 export default function IonFormationConcept() {
   const navigate = useNavigate();
+  const location = useLocation();
   const [activeTab, setActiveTab] = useState<"learn" | "practice">("learn");
-  const [currentPage, setCurrentPage] = useState(1);
+  const [currentPage, setCurrentPage] = useState(() => {
+    const page = (location.state as { page?: number } | null)?.page;
+    return page && page >= 1 && page <= TOTAL_PAGES ? page : 1;
+  });
   const [showProgressBadge, setShowProgressBadge] = useState(true);
   const [completed, setCompleted] = useState(false);
   const [showCourseModal, setShowCourseModal] = useState(false);

@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef, type ReactNode } from "react";
-import { useNavigate } from "react-router";
+import { useLocation, useNavigate } from "react-router";
 import LessonHeader from "@/components/lesson/LessonHeader";
 import LessonFooter from "@/components/lesson/LessonFooter";
 import ContentTab from "@/components/lesson/ContentTab";
@@ -439,7 +439,7 @@ function FormulaWritingCard() {
 
       <div className="flex flex-col gap-1.5 w-full">
         <p className="text-body-md font-medium text-text-normal m-0">
-          이온 결합 화합물의 이름은 음이온 이름을 먼저, 양이온 이름을 나중에 읽습니다. 금속 원소는 원소 이름 뒤에 &apos;화&apos;를 붙입니다.
+          이온 결합 화합물의 이름은 음이온 이름을 먼저, 양이온 이름을 나중에 읽습니다. 비금속 원소는 원소 이름 뒤에 &apos;화&apos;를 붙입니다.
         </p>
         <p className="text-caption-lg text-text-normal rounded-3xl py-2 px-3 m-0 text-center" style={{ background: "var(--color-element-drag-fill-blue)" }}>
           예) NaCl = 염화 나트륨 / MgO = 산화 마그네슘
@@ -451,9 +451,13 @@ function FormulaWritingCard() {
 
 export default function IonicConcept() {
   const navigate = useNavigate();
+  const location = useLocation();
   const isLoggedIn = !!useAuthStore((s) => s.accessToken);
   const [activeTab, setActiveTab] = useState<"learn" | "practice">("learn");
-  const [currentPage, setCurrentPage] = useState(1);
+  const [currentPage, setCurrentPage] = useState(() => {
+    const page = (location.state as { page?: number } | null)?.page;
+    return page && page >= 1 && page <= TOTAL_PAGES ? page : 1;
+  });
   const [showProgressBadge, setShowProgressBadge] = useState(true);
   const [completed, setCompleted] = useState(false);
   const [showCourseModal, setShowCourseModal] = useState(false);
@@ -470,7 +474,7 @@ export default function IonicConcept() {
 
   useEffect(() => {
     if (!completed) return;
-    const timer = setTimeout(() => navigate("/"), 600);
+    const timer = setTimeout(() => navigate("/covalent-concept"), 600);
     return () => clearTimeout(timer);
   }, [completed, navigate]);
 

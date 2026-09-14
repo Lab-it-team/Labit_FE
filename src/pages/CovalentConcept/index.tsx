@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import type { KeyboardEvent, ReactNode } from "react";
-import { useNavigate } from "react-router";
+import { useLocation, useNavigate } from "react-router";
 import LessonHeader from "@/components/lesson/LessonHeader";
 import LessonFooter from "@/components/lesson/LessonFooter";
 import ContentTab from "@/components/lesson/ContentTab";
@@ -92,34 +92,30 @@ function IonicVsCovalentCard() {
   );
 }
 
-function useIsTouchDevice() {
-  const [isTouch, setIsTouch] = useState(false);
+function matchesMediaQuery(query: string) {
+  return typeof window !== "undefined" && !!window.matchMedia && window.matchMedia(query).matches;
+}
+
+function useMediaQuery(query: string) {
+  const [matches, setMatches] = useState(() => matchesMediaQuery(query));
 
   useEffect(() => {
     if (typeof window === "undefined" || !window.matchMedia) return;
-    const mq = window.matchMedia("(hover: none), (pointer: coarse)");
-    setIsTouch(mq.matches);
-    const handler = (e: MediaQueryListEvent) => setIsTouch(e.matches);
+    const mq = window.matchMedia(query);
+    const handler = (e: MediaQueryListEvent) => setMatches(e.matches);
     mq.addEventListener("change", handler);
     return () => mq.removeEventListener("change", handler);
-  }, []);
+  }, [query]);
 
-  return isTouch;
+  return matches;
+}
+
+function useIsTouchDevice() {
+  return useMediaQuery("(hover: none), (pointer: coarse)");
 }
 
 function usePrefersReducedMotion() {
-  const [reduced, setReduced] = useState(false);
-
-  useEffect(() => {
-    if (typeof window === "undefined" || !window.matchMedia) return;
-    const mq = window.matchMedia("(prefers-reduced-motion: reduce)");
-    setReduced(mq.matches);
-    const handler = (e: MediaQueryListEvent) => setReduced(e.matches);
-    mq.addEventListener("change", handler);
-    return () => mq.removeEventListener("change", handler);
-  }, []);
-
-  return reduced;
+  return useMediaQuery("(prefers-reduced-motion: reduce)");
 }
 
 interface PairKind {
@@ -395,8 +391,12 @@ function ElectronPairSharingCard() {
 
 export default function CovalentConcept() {
   const navigate = useNavigate();
+  const location = useLocation();
   const [activeTab, setActiveTab] = useState<"learn" | "practice">("learn");
-  const [currentPage, setCurrentPage] = useState(1);
+  const [currentPage, setCurrentPage] = useState(() => {
+    const page = (location.state as { page?: number } | null)?.page;
+    return page && page >= 1 && page <= TOTAL_PAGES ? page : 1;
+  });
   const [showProgressBadge, setShowProgressBadge] = useState(true);
   const [completed, setCompleted] = useState(false);
   const [showCourseModal, setShowCourseModal] = useState(false);

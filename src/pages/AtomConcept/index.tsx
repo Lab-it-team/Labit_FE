@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useNavigate } from "react-router";
+import { useLocation, useNavigate } from "react-router";
 import LessonHeader from "@/components/lesson/LessonHeader";
 import LessonFooter from "@/components/lesson/LessonFooter";
 import ContentTab from "@/components/lesson/ContentTab";
@@ -233,7 +233,7 @@ function AtomShellCard() {
       {/* 전자껍질 표 */}
       <div className="w-full rounded-xl overflow-hidden">
         <div className="flex flex-row justify-between items-center px-3 py-3 bg-neutral-10 border border-border-strong rounded-t-xl">
-          {["전자껍질", "에너지 크기", "최대 전자 수"].map((h) => (
+          {["전자껍질", "에너지 크기", "중학교 과정 전자 수"].map((h) => (
             <span key={h} className="text-label-md text-text-sub text-center flex-1">{h}</span>
           ))}
         </div>
@@ -443,8 +443,12 @@ function AtomNumberCard() {
 
 export default function AtomConcept() {
   const navigate = useNavigate();
+  const location = useLocation();
   const [activeTab, setActiveTab] = useState<"learn" | "practice">("learn");
-  const [currentPage, setCurrentPage] = useState(1);
+  const [currentPage, setCurrentPage] = useState(() => {
+    const page = (location.state as { page?: number } | null)?.page;
+    return page && page >= 1 && page <= TOTAL_PAGES ? page : 1;
+  });
   const [showProgressBadge, setShowProgressBadge] = useState(true);
   const [completed, setCompleted] = useState(false);
   const [showCourseModal, setShowCourseModal] = useState(false);

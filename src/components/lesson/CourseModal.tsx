@@ -29,10 +29,10 @@ export default function CourseModal({ onClose }: CourseModalProps) {
     setTimeout(onClose, CLOSE_DURATION_MS);
   };
 
-  const goToChapter = (path: string) => {
+  const goToChapter = (path: string, page?: number) => {
     setClosing(true);
     setTimeout(() => {
-      navigate(path);
+      navigate(path, page ? { state: { page } } : undefined);
       onClose();
     }, CLOSE_DURATION_MS);
   };
@@ -41,13 +41,7 @@ export default function CourseModal({ onClose }: CourseModalProps) {
   const totalCount = chapters.reduce((sum, c) => sum + c.lessonCount, 0);
 
   const inProgressId = chapters.find((c) => c.status === "in-progress")?.id;
-  const [expanded, setExpanded] = useState<number[]>([]);
-
-  useEffect(() => {
-    if (inProgressId !== undefined) {
-      setExpanded([inProgressId]);
-    }
-  }, [inProgressId]);
+  const [expanded, setExpanded] = useState<number[]>(() => (inProgressId !== undefined ? [inProgressId] : []));
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
@@ -183,7 +177,7 @@ export default function CourseModal({ onClose }: CourseModalProps) {
                         )}
                         <button
                           type="button"
-                          onClick={() => goToChapter(chapter.path)}
+                          onClick={() => goToChapter(chapter.path, lesson.page)}
                           className="relative z-[1] flex items-center gap-3 text-left"
                         >
                           <img

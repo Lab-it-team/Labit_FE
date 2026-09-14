@@ -10,7 +10,15 @@ export function useSwipeNavigation(onNext: () => void, onPrev: () => void) {
   const start = useRef<{ x: number; y: number } | null>(null);
 
   useEffect(() => {
+    const IGNORE_SELECTOR =
+      'button, a, input, textarea, select, [role="button"], .overflow-x-auto, .overflow-x-scroll, [data-no-swipe]';
+
     const handleTouchStart = (e: TouchEvent) => {
+      const target = e.target;
+      if (target instanceof Element && target.closest(IGNORE_SELECTOR)) {
+        start.current = null;
+        return;
+      }
       const touch = e.touches[0];
       start.current = { x: touch.clientX, y: touch.clientY };
     };
