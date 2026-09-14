@@ -5,6 +5,8 @@ export interface Lesson {
   title: string;
   inProgress: boolean;
   page: number;
+  /** 이론 페이지가 아닌 다른 경로(실습 등)로 이동해야 할 때만 지정. 없으면 chapter.path를 사용 */
+  path?: string;
 }
 
 export interface Chapter {
@@ -55,22 +57,24 @@ export const chapters: Chapter[] = [
     id: 4,
     title: "이온 결합",
     status: "upcoming",
-    lessonCount: 2,
+    lessonCount: 3,
     path: "/ionic-concept",
     lessons: [
       { title: "이온 결합이란? (소금 NaCl 생성 과정)", inProgress: false, page: 1 },
       { title: "이온 결합 물질의 성질 | 화학식 작성법", inProgress: false, page: 2 },
+      { title: "이온 결합 실습", inProgress: false, page: 1, path: "/ionic-lab" },
     ],
   },
   {
     id: 5,
     title: "공유 결합",
     status: "upcoming",
-    lessonCount: 2,
+    lessonCount: 3,
     path: "/covalent-concept",
     lessons: [
       { title: "비금속끼리 왜 다르게 결합하는가?", inProgress: false, page: 1 },
       { title: "전자쌍 공유 개념", inProgress: false, page: 2 },
+      { title: "공유 결합 실습", inProgress: false, page: 1, path: "/covalent-lab" },
     ],
   },
   {

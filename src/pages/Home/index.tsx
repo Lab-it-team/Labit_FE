@@ -36,6 +36,16 @@ export default function Home() {
     );
   };
 
+  const goToLesson = (path: string, page?: number) => {
+    navigate(path, page ? { state: { page } } : undefined);
+  };
+
+  const inProgressChapter = chapters.find((c) => c.status === "in-progress");
+  const currentLesson =
+    inProgressChapter?.lessons.find((l) => l.inProgress) ?? inProgressChapter?.lessons[0];
+  const continuePath = currentLesson?.path ?? inProgressChapter?.path ?? "/ionic-concept";
+  const continuePage = currentLesson?.page;
+
   return (
     <div className="flex min-h-full flex-col gap-20 bg-neutral-5 px-10 py-[60px]">
       {/* 인사말 */}
@@ -88,7 +98,7 @@ export default function Home() {
             {/* 이어하기 버튼 */}
             <button
               type="button"
-              onClick={() => navigate("/ionic-concept")}
+              onClick={() => goToLesson(continuePath, continuePage)}
               className="flex h-[38px] shrink-0 items-center gap-1 rounded-lg bg-blue-500 px-2.5 py-2 text-label-xl font-semibold text-white transition-colors hover:bg-blue-600"
             >
               이어하기
@@ -116,7 +126,9 @@ export default function Home() {
                   <button
                     type="button"
                     onClick={() =>
-                      toggleChapter(chapter.id, chapter.lessonCount)
+                      hasLessons
+                        ? toggleChapter(chapter.id, chapter.lessonCount)
+                        : goToLesson(chapter.path)
                     }
                     className={`flex w-full items-center justify-between rounded-xl p-3 text-left transition-colors ${
                       isInProgress ? "bg-bg-elevate" : "bg-transparent"
@@ -186,16 +198,22 @@ export default function Home() {
                               style={{ height: "calc(100% + 12px)" }}
                             />
                           )}
-                          <img
-                            src={lesson.inProgress ? dotActiveSvg : dotInactiveSvg}
-                            alt=""
-                            width={36}
-                            height={36}
-                            className="z-[1] shrink-0"
-                          />
-                          <span className="text-body-sm font-medium text-text-normal">
-                            {i + 1}. {lesson.title}
-                          </span>
+                          <button
+                            type="button"
+                            onClick={() => goToLesson(lesson.path ?? chapter.path, lesson.page)}
+                            className="relative z-[1] flex items-center gap-3 text-left"
+                          >
+                            <img
+                              src={lesson.inProgress ? dotActiveSvg : dotInactiveSvg}
+                              alt=""
+                              width={36}
+                              height={36}
+                              className="shrink-0"
+                            />
+                            <span className="text-body-sm font-medium text-text-normal">
+                              {i + 1}. {lesson.title}
+                            </span>
+                          </button>
                         </div>
                       ))}
                     </div>
