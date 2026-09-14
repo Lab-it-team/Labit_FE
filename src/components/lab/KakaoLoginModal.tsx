@@ -5,16 +5,26 @@ import { startKakaoLogin, kakaoConfigReady } from "@/features/auth/kakaoLogin";
 interface KakaoLoginModalProps {
   onClose: () => void;
   nextProblemIndex: number;
+  /** 로그인 후 돌아올 실습 페이지 경로 */
+  redirectPath?: string;
+  /** 진행 상태를 저장할 sessionStorage 키 접두사 (실습 페이지별로 달라야 진행도가 섞이지 않음) */
+  storageKeyPrefix?: string;
 }
 
-export default function KakaoLoginModal({ onClose, nextProblemIndex }: KakaoLoginModalProps) {
+export default function KakaoLoginModal({
+  onClose,
+  nextProblemIndex,
+  redirectPath = "/ionic-lab",
+  storageKeyPrefix = "lab",
+}: KakaoLoginModalProps) {
   const handleKakaoLogin = () => {
-    sessionStorage.setItem("lab_current_problem", String(nextProblemIndex));
-    const solvedProblems = sessionStorage.getItem("lab_solved_problems");
-    if (solvedProblems) sessionStorage.setItem("lab_pre_login_solved_problems", solvedProblems);
-    const placedPieces = sessionStorage.getItem("lab_placed_pieces");
-    if (placedPieces) sessionStorage.setItem("lab_pre_login_placed_pieces", placedPieces);
-    startKakaoLogin("/ionic-lab");
+    sessionStorage.setItem("kakao_login_storage_prefix", storageKeyPrefix);
+    sessionStorage.setItem(`${storageKeyPrefix}_current_problem`, String(nextProblemIndex));
+    const solvedProblems = sessionStorage.getItem(`${storageKeyPrefix}_solved_problems`);
+    if (solvedProblems) sessionStorage.setItem(`${storageKeyPrefix}_pre_login_solved_problems`, solvedProblems);
+    const placedPieces = sessionStorage.getItem(`${storageKeyPrefix}_placed_pieces`);
+    if (placedPieces) sessionStorage.setItem(`${storageKeyPrefix}_pre_login_placed_pieces`, placedPieces);
+    startKakaoLogin(redirectPath);
   };
 
   return (

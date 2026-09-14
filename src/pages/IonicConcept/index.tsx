@@ -456,7 +456,14 @@ export default function IonicConcept() {
   const [activeTab, setActiveTab] = useState<"learn" | "practice">("learn");
   const [currentPage, setCurrentPage] = useState(() => {
     const page = (location.state as { page?: number } | null)?.page;
-    return page && page >= 1 && page <= TOTAL_PAGES ? page : 1;
+    if (page && page >= 1 && page <= TOTAL_PAGES) return page;
+    const saved = sessionStorage.getItem("concept_resume_page");
+    if (saved !== null) {
+      sessionStorage.removeItem("concept_resume_page");
+      const resumed = parseInt(saved);
+      if (resumed >= 1 && resumed <= TOTAL_PAGES) return resumed;
+    }
+    return 1;
   });
   const [showProgressBadge, setShowProgressBadge] = useState(true);
   const [completed, setCompleted] = useState(false);
@@ -474,7 +481,7 @@ export default function IonicConcept() {
 
   useEffect(() => {
     if (!completed) return;
-    const timer = setTimeout(() => navigate("/covalent-concept"), 600);
+    const timer = setTimeout(() => navigate("/ionic-lab"), 600);
     return () => clearTimeout(timer);
   }, [completed, navigate]);
 
@@ -508,7 +515,9 @@ export default function IonicConcept() {
         onListClick={() => setShowCourseModal(true)}
       />
       {showCourseModal && <CourseModal onClose={() => setShowCourseModal(false)} />}
-      {showLoginModal && <LoginRequiredModal onClose={() => setShowLoginModal(false)} />}
+      {showLoginModal && (
+        <LoginRequiredModal onClose={() => setShowLoginModal(false)} resumePage={currentPage} />
+      )}
 
       {assistPanel && (
         <AiAssistPanel

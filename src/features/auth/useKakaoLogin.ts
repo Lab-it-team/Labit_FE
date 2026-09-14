@@ -20,13 +20,17 @@ export const useKakaoLogin = () => {
       }
       const redirect = sessionStorage.getItem('lab_redirect') ?? '/home';
       sessionStorage.removeItem('lab_redirect');
-      // 실습 화면에서 로그인한 경우가 아니면 이전 실습 데이터를 초기화
-      const hasPreLoginState =
-        sessionStorage.getItem('lab_pre_login_placed_pieces') !== null ||
-        sessionStorage.getItem('lab_pre_login_solved_problems') !== null
-      if (!hasPreLoginState) {
-        sessionStorage.removeItem('lab_placed_pieces')
-        sessionStorage.removeItem('lab_solved_problems')
+      // 실습 화면(이온/공유 결합 등)에서 로그인한 경우가 아니면 그 실습의 이전 데이터를 초기화
+      const storagePrefix = sessionStorage.getItem('kakao_login_storage_prefix')
+      sessionStorage.removeItem('kakao_login_storage_prefix')
+      if (storagePrefix) {
+        const hasPreLoginState =
+          sessionStorage.getItem(`${storagePrefix}_pre_login_placed_pieces`) !== null ||
+          sessionStorage.getItem(`${storagePrefix}_pre_login_solved_problems`) !== null
+        if (!hasPreLoginState) {
+          sessionStorage.removeItem(`${storagePrefix}_placed_pieces`)
+          sessionStorage.removeItem(`${storagePrefix}_solved_problems`)
+        }
       }
       navigate(redirect)
     },
