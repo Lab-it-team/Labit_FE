@@ -26,6 +26,7 @@ interface LessonHeaderProps {
   showProgressBadge: boolean
   onCloseProgressBadge: () => void
   nextLesson?: { label: string; path: string }
+  prevPath?: string
   onListClick?: () => void
 }
 
@@ -37,6 +38,7 @@ export default function LessonHeader({
   showProgressBadge,
   onCloseProgressBadge,
   nextLesson,
+  prevPath,
   onListClick,
 }: LessonHeaderProps) {
   const navigate = useNavigate()
@@ -93,7 +95,7 @@ export default function LessonHeader({
           </button>
           <button
             type="button"
-            onClick={() => navigate(-1)}
+            onClick={() => { if (prevPath) navigate(prevPath); else navigate(-1); }}
             className="flex items-center gap-1 px-2.5 py-2 rounded-lg hover:bg-neutral-10 transition-colors"
           >
             <img src={leftSvg} alt="" width={24} height={24} />
@@ -160,7 +162,7 @@ export default function LessonHeader({
             className="flex items-center gap-1.5 h-[38px] px-2.5 py-1.5 rounded-lg border border-border-normal bg-neutral-5 text-label-xl font-semibold text-text-normal hover:bg-neutral-10 transition-colors"
           >
             {!isLoggedIn && <img src={lockSvg} alt="" width={10} height={10} />}
-            자유 실험실
+            학습참조
           </button>
           {nextLesson && (
             <button

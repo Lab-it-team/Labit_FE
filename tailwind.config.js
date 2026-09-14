@@ -166,6 +166,9 @@ export default {
         "heading-sm": ["16px", { lineHeight: "22px", fontWeight: "600" }],
 
         /* Content */
+        "content-sm": ["16px", { lineHeight: "22px", fontWeight: "500" }],
+        "content-lg": ["18px", { lineHeight: "22px", fontWeight: "500" }],
+        "content-md": ["24px", { lineHeight: "30px", fontWeight: "700" }],
         "content-xl": ["28px", { lineHeight: "28px", fontWeight: "700" }],
 
         /* Body */

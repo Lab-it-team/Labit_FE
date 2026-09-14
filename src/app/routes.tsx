@@ -6,6 +6,9 @@ const Home = lazy(() => import("@/pages/Home"));
 const Login = lazy(() => import("@/pages/Login"));
 const KakaoCallback = lazy(() => import("@/pages/KakaoCallback"));
 const Onboarding = lazy(() => import("@/pages/Onboarding"));
+const ElementConcept = lazy(() => import("@/pages/ElementConcept"));
+const AtomConcept = lazy(() => import("@/pages/AtomConcept"));
+const IonFormationConcept = lazy(() => import("@/pages/IonFormationConcept"));
 const IonicConcept = lazy(() => import("@/pages/IonicConcept"));
 const IonicLab = lazy(() => import("@/pages/IonicLab"));
 const CovalentConcept = lazy(() => import("@/pages/CovalentConcept"));
@@ -26,6 +29,9 @@ export default function AppRoutes() {
           <Route path="/Home" element={<Navigate to="/home" replace />} />
         </Route>
         <Route path="/mypage" element={<MyPage />} />
+        <Route path="/element-concept" element={<ElementConcept />} />
+        <Route path="/atom-concept" element={<AtomConcept />} />
+        <Route path="/ion-formation-concept" element={<IonFormationConcept />} />
         <Route path="/ionic-concept" element={<IonicConcept />} />
         <Route path="/ionic-lab" element={<IonicLab />} />
         <Route path="/covalent-concept" element={<CovalentConcept />} />
