@@ -4,10 +4,17 @@ import { startKakaoLogin, kakaoConfigReady } from "@/features/auth/kakaoLogin";
 
 interface LoginRequiredModalProps {
   onClose: () => void;
+  /** 로그인 후 같은 위치(페이지)에서 이어서 볼 수 있도록 저장할 현재 학습 페이지 번호 */
+  resumePage?: number;
 }
 
-export default function LoginRequiredModal({ onClose }: LoginRequiredModalProps) {
-  const handleKakaoLogin = () => startKakaoLogin(window.location.pathname);
+export default function LoginRequiredModal({ onClose, resumePage }: LoginRequiredModalProps) {
+  const handleKakaoLogin = () => {
+    if (resumePage !== undefined) {
+      sessionStorage.setItem("concept_resume_page", String(resumePage));
+    }
+    startKakaoLogin(window.location.pathname);
+  };
 
   return (
     <div

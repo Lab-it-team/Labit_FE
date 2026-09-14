@@ -412,7 +412,7 @@ export default function CovalentConcept() {
       setCurrentPage((p) => p + 1);
     } else {
       setCompleted(true);
-      navigate("/quiz");
+      navigate("/covalent-lab");
     }
   };
 
