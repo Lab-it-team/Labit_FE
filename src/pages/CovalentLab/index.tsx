@@ -19,7 +19,7 @@ import ElementPalette from "@/components/lab/ElementPalette";
 import MoleculeTargetPanel from "@/components/lab/MoleculeTargetPanel";
 import ToolBtn from "@/components/lab/ToolBtn";
 import KakaoLoginModal from "@/components/lab/KakaoLoginModal";
-import FreeLabModal from "@/components/lab/FreeLabModal";
+import LearningReferenceModal from "@/components/lesson/LearningReferenceModal";
 import BohrAtom from "@/components/lab/BohrAtom";
 import { bohrAtomSize } from "@/components/lab/bohrGeometry";
 import CovalentCanvasDropZone, { type PlacedAtom } from "@/components/lab/CovalentCanvasDropZone";
@@ -120,7 +120,7 @@ export default function CovalentLab() {
   const [showHint, setShowHint] = useState(false);
   const [showLoginModal, setShowLoginModal] = useState(false);
   const [showCompleteModal, setShowCompleteModal] = useState(false);
-  const [showFreeLabModal, setShowFreeLabModal] = useState(false);
+  const [showReferenceModal, setShowReferenceModal] = useState(false);
   const [activeDragElement, setActiveDragElement] = useState<ElementSymbol | null>(null);
   const [isDragOver, setIsDragOver] = useState(false);
   const [draggingPaletteElement, setDraggingPaletteElement] = useState<ElementSymbol | null>(null);
@@ -493,10 +493,10 @@ export default function CovalentLab() {
         <LessonCompleteModal
           onClose={() => setShowCompleteModal(false)}
           completedFormulas={MOLECULES.filter((_, i) => solvedProblems.has(i)).map((m) => m.formula)}
-          onOpenFreeLab={() => { setShowCompleteModal(false); setShowFreeLabModal(true); }}
+          onOpenFreeLab={() => { setShowCompleteModal(false); setShowReferenceModal(true); }}
         />
       )}
-      {showFreeLabModal && <FreeLabModal onClose={() => setShowFreeLabModal(false)} />}
+      {showReferenceModal && <LearningReferenceModal onClose={() => setShowReferenceModal(false)} />}
     </div>
   );
 }
