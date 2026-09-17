@@ -13,6 +13,7 @@ import { useNavigate } from "react-router";
 import LessonHeader from "@/components/lesson/LessonHeader";
 import ContentTab from "@/components/lesson/ContentTab";
 import AiFab from "@/components/lesson/AiFab";
+import CourseModal from "@/components/lesson/CourseModal";
 import IonTabList from "@/components/lab/IonTabList";
 import TargetCompoundPanel from "@/components/lab/TargetCompoundPanel";
 import PuzzleGhost from "@/components/lab/PuzzleGhost";
@@ -264,6 +265,7 @@ export default function IonicLab() {
   const [showLoginModal,     setShowLoginModal]     = useState(false);
   const [showCompleteModal,  setShowCompleteModal]  = useState(false);
   const [showReferenceModal, setShowReferenceModal] = useState(false);
+  const [showCourseModal,    setShowCourseModal]    = useState(false);
   const [justSolved,         setJustSolved]         = useState(false);
   const [activeDragIon,      setActiveDragIon]      = useState<Ion | null>(null);
   const [isDragOver,         setIsDragOver]         = useState(false);
@@ -590,7 +592,7 @@ export default function IonicLab() {
         showProgressBadge={showProgressBadge}
         onCloseProgressBadge={() => setShowProgressBadge(false)}
         nextLesson={{ label: "공유 결합 학습", path: "/covalent-concept" }}
-        onListClick={() => {}}
+        onListClick={() => setShowCourseModal(true)}
       />
 
       <DndContext
@@ -856,6 +858,7 @@ export default function IonicLab() {
 
       <AiFab showTooltip={false} className="fixed bottom-[90px] right-10 z-30" />
 
+      {showCourseModal && <CourseModal onClose={() => setShowCourseModal(false)} />}
       {showLoginModal && (
         <KakaoLoginModal
           onClose={() => setShowLoginModal(false)}

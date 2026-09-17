@@ -174,7 +174,7 @@ export default function CourseModal({ onClose }: CourseModalProps) {
                         )}
                         <button
                           type="button"
-                          onClick={() => goToChapter(chapter.path, lesson.page)}
+                          onClick={() => goToChapter(lesson.path ?? chapter.path, lesson.page)}
                           className="relative z-[1] flex items-center gap-3 text-left"
                         >
                           <img
