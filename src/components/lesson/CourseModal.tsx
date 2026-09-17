@@ -97,7 +97,7 @@ export default function CourseModal({ onClose }: CourseModalProps) {
 
         {/* 챕터 목록 */}
         <div className="flex flex-col pb-4 max-h-[calc(100vh-160px)] overflow-y-auto px-4">
-          {chapters.map((chapter, idx) => {
+          {chapters.map((chapter) => {
             const isExpanded = expanded.includes(chapter.id);
             const isDone = chapter.status === "done";
             const isInProgress = chapter.status === "in-progress";
@@ -105,9 +105,6 @@ export default function CourseModal({ onClose }: CourseModalProps) {
 
             return (
               <div key={chapter.id}>
-                {idx > 0 && (
-                  <div className="border-t border-dashed border-border-light mx-1" />
-                )}
                 {/* 챕터 행: 레슨이 있으면 펼치기/접기, 없으면(단원 퀴즈 등) 바로 이동 */}
                 <button
                   type="button"
