@@ -156,12 +156,13 @@ type TabType = "cation" | "anion";
 interface IonTabListProps {
   draggingIonId: string | null;
   height?: number;
+  width?: number;
   highlighted?: boolean;
   highlightIonId?: string | null;
   forceActiveTab?: TabType | null;
 }
 
-export default function IonTabList({ draggingIonId, height = 556, highlighted = false, highlightIonId = null, forceActiveTab = null }: IonTabListProps) {
+export default function IonTabList({ draggingIonId, height = 556, width = 296, highlighted = false, highlightIonId = null, forceActiveTab = null }: IonTabListProps) {
   const [manualTab, setManualTab] = useState<TabType>("cation");
   const activeTab = forceActiveTab ?? manualTab;
 
@@ -178,7 +179,7 @@ export default function IonTabList({ draggingIonId, height = 556, highlighted = 
         alignItems: "flex-start",
         padding: 20,
         gap: 24,
-        width: 296,
+        width,
         height,
         background: "var(--color-static-white)",
         boxShadow: "inset 0 0 0 1px var(--color-border-strong)",
