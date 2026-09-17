@@ -217,7 +217,7 @@ export default function IonTabList({ draggingIonId, height = 556, highlighted = 
         <div style={{ display: "flex", flexDirection: "row", alignItems: "center", gap: 4, flexShrink: 0 }}>
           <img src={tipsSvg} width={24} height={24} style={{ flexShrink: 0 }} alt="" />
           <span className="text-body-xxs text-text-normal whitespace-nowrap">
-            {activeTab === "cation" ? "오른쪽 홈에 음이온이 껴요" : "왼쪽이 양이온 홈에 껴요"}
+            {activeTab === "cation" ? "오른쪽 홈에 음이온이 껴요" : "왼쪽 홈에 양이온이 껴요"}
           </span>
         </div>
         <div style={{ display: "flex", flexDirection: "column", alignItems: "flex-start", gap: 16 }}>

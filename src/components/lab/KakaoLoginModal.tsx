@@ -18,13 +18,12 @@ export default function KakaoLoginModal({
   storageKeyPrefix = "lab",
 }: KakaoLoginModalProps) {
   const handleKakaoLogin = () => {
-    sessionStorage.setItem("kakao_login_storage_prefix", storageKeyPrefix);
     sessionStorage.setItem(`${storageKeyPrefix}_current_problem`, String(nextProblemIndex));
     const solvedProblems = sessionStorage.getItem(`${storageKeyPrefix}_solved_problems`);
     if (solvedProblems) sessionStorage.setItem(`${storageKeyPrefix}_pre_login_solved_problems`, solvedProblems);
     const placedPieces = sessionStorage.getItem(`${storageKeyPrefix}_placed_pieces`);
     if (placedPieces) sessionStorage.setItem(`${storageKeyPrefix}_pre_login_placed_pieces`, placedPieces);
-    startKakaoLogin(redirectPath);
+    startKakaoLogin(redirectPath, storageKeyPrefix);
   };
 
   return (

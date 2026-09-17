@@ -210,7 +210,8 @@ function DraggableCanvasAtom({
   });
   const size = bohrAtomSize(renderAtom.element);
   const [hovered, setHovered] = useState(false);
-  const showRemove = hovered || isDragging;
+  const [focused, setFocused] = useState(false);
+  const showRemove = hovered || focused || isDragging;
 
   return (
     <div
@@ -244,6 +245,8 @@ function DraggableCanvasAtom({
         aria-label="원자 제거"
         onPointerDown={(e) => e.stopPropagation()}
         onClick={(e) => { e.stopPropagation(); onRemove(renderAtom.id); }}
+        onFocus={() => setFocused(true)}
+        onBlur={() => setFocused(false)}
         style={{
           position: "absolute",
           top: -4,

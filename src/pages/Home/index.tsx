@@ -9,6 +9,21 @@ import dotInactiveSvg from "@/assets/icons/dot-inactive.svg";
 import { useUnits } from "@/queries/learning";
 import { useMe } from "@/queries/user";
 import { chapters } from "@/data/chapters";
+import type { UnitWithLessons } from "@/types";
+
+/** homeData.units(백엔드 진행 상태)에서 현재 이어서 학습할 단원/레슨의 인덱스를 찾는다 */
+function findCurrentLessonIndex(units: UnitWithLessons[] | undefined): { unitIndex: number; lessonIndex: number } | null {
+  if (!units) return null;
+  for (let ui = 0; ui < units.length; ui++) {
+    const li = units[ui].lessons.findIndex((l) => l.status === "in_progress");
+    if (li !== -1) return { unitIndex: ui, lessonIndex: li };
+  }
+  for (let ui = 0; ui < units.length; ui++) {
+    const li = units[ui].lessons.findIndex((l) => l.status !== "completed");
+    if (li !== -1) return { unitIndex: ui, lessonIndex: li };
+  }
+  return null;
+}
 
 export default function Home() {
   const navigate = useNavigate();
@@ -40,9 +55,12 @@ export default function Home() {
     navigate(path, page ? { state: { page } } : undefined);
   };
 
-  const inProgressChapter = chapters.find((c) => c.status === "in-progress");
+  const progressLocation = findCurrentLessonIndex(homeData?.units);
+  const progressChapter = progressLocation ? chapters[progressLocation.unitIndex] : undefined;
+  const progressLesson = progressLocation ? progressChapter?.lessons[progressLocation.lessonIndex] : undefined;
+  const inProgressChapter = progressChapter ?? chapters.find((c) => c.status === "in-progress");
   const currentLesson =
-    inProgressChapter?.lessons.find((l) => l.inProgress) ?? inProgressChapter?.lessons[0];
+    progressLesson ?? inProgressChapter?.lessons.find((l) => l.inProgress) ?? inProgressChapter?.lessons[0];
   const continuePath = currentLesson?.path ?? inProgressChapter?.path ?? "/ionic-concept";
   const continuePage = currentLesson?.page;
 

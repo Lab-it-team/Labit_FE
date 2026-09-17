@@ -152,6 +152,9 @@ export default function CovalentLab() {
       const idx = currentProblemRef.current;
       const cur = prev[idx] ?? [];
       const next = typeof update === "function" ? update(cur) : update;
+      if (isMoleculeComplete(next, MOLECULES[idx])) {
+        setSolvedProblems((sp) => (sp.has(idx) ? sp : new Set([...sp, idx])));
+      }
       return { ...prev, [idx]: next };
     });
   }, []);
@@ -178,11 +181,6 @@ export default function CovalentLab() {
   useEffect(() => {
     sessionStorage.setItem(`${STORAGE_PREFIX}_placed_atoms`, JSON.stringify(allAtoms));
   }, [allAtoms]);
-
-  useEffect(() => {
-    if (!isComplete) return;
-    setSolvedProblems((prev) => (prev.has(currentProblem) ? prev : new Set([...prev, currentProblem])));
-  }, [isComplete, currentProblem]);
 
   const lastAccessible = isLoggedIn ? MOLECULES.length - 1 : FREE_LIMIT - 1;
   const isLastProblem = currentProblem === lastAccessible;
@@ -220,6 +218,7 @@ export default function CovalentLab() {
   };
 
   const mkId = () => `a${idCounter.current++}`;
+  const preDragAtomsRef = useRef<PlacedAtom[] | null>(null);
 
   const handleDragStart = ({ active }: DragStartEvent) => {
     const data = active.data.current as CovalentDragData | undefined;
@@ -232,16 +231,25 @@ export default function CovalentLab() {
       return;
     }
     setDraggingAtomId(data.pieceId);
-    updateAtoms((prev) => detachAtom(prev, molecule, data.pieceId));
+    updateAtoms((prev) => {
+      preDragAtomsRef.current = prev;
+      return detachAtom(prev, molecule, data.pieceId);
+    });
   };
 
   const handleDragOver = ({ over }: DragOverEvent) => {
     setIsDragOver(over?.id === "covalent-canvas");
   };
 
-  const handleDragCancel = () => resetDragState();
+  const handleDragCancel = () => {
+    const snapshot = preDragAtomsRef.current;
+    preDragAtomsRef.current = null;
+    if (snapshot) updateAtoms(snapshot);
+    resetDragState();
+  };
 
   const handleDragEnd = ({ active, over, delta }: DragEndEvent) => {
+    preDragAtomsRef.current = null;
     const data = active.data.current as CovalentDragData | undefined;
     const rect = canvasRef.current?.getBoundingClientRect();
     const initialRect = active.rect.current.initial;
