@@ -19,7 +19,7 @@ import PuzzleGhost from "@/components/lab/PuzzleGhost";
 import CanvasDropZone from "@/components/lab/CanvasDropZone";
 import ToolBtn from "@/components/lab/ToolBtn";
 import KakaoLoginModal from "@/components/lab/KakaoLoginModal";
-import FreeLabModal from "@/components/lab/FreeLabModal";
+import LearningReferenceModal from "@/components/lesson/LearningReferenceModal";
 import OnboardingStartModal from "@/components/lab/OnboardingStartModal";
 import GuideTooltip from "@/components/lab/GuideTooltip";
 import DragDemoOverlay from "@/components/lab/DragDemoOverlay";
@@ -263,7 +263,7 @@ export default function IonicLab() {
   const [showHint,           setShowHint]           = useState(false);
   const [showLoginModal,     setShowLoginModal]     = useState(false);
   const [showCompleteModal,  setShowCompleteModal]  = useState(false);
-  const [showFreeLabModal,   setShowFreeLabModal]   = useState(false);
+  const [showReferenceModal, setShowReferenceModal] = useState(false);
   const [justSolved,         setJustSolved]         = useState(false);
   const [activeDragIon,      setActiveDragIon]      = useState<Ion | null>(null);
   const [isDragOver,         setIsDragOver]         = useState(false);
@@ -866,11 +866,11 @@ export default function IonicLab() {
         <LessonCompleteModal
           onClose={() => setShowCompleteModal(false)}
           completedFormulas={PROBLEMS.filter((_, i) => solvedProblems.has(i)).map((p) => p.formula)}
-          onOpenFreeLab={() => { setShowCompleteModal(false); setShowFreeLabModal(true); }}
+          onOpenFreeLab={() => { setShowCompleteModal(false); setShowReferenceModal(true); }}
         />
       )}
-      {showFreeLabModal && (
-        <FreeLabModal onClose={() => setShowFreeLabModal(false)} />
+      {showReferenceModal && (
+        <LearningReferenceModal onClose={() => setShowReferenceModal(false)} defaultTab="ionicLab" />
       )}
       {onboardingStep === 0 && (
         <OnboardingStartModal
