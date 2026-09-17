@@ -138,7 +138,7 @@ function PeriodicTableFrame({ renderCard }: { renderCard: (period: number, group
             </span>
           </div>
           {GROUPS.map((g) => (
-            <div key={g} className="font-display text-content-md text-line-strong" style={{ textAlign: "center", alignSelf: "end" }}>
+            <div key={g} className="font-display text-content-md text-line-strong" style={{ textAlign: "center", alignSelf: "end", marginBottom: 20 }}>
               {g}
             </div>
           ))}
