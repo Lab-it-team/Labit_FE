@@ -2,6 +2,7 @@ import { Navigate, Routes, Route } from "react-router";
 import { lazy, Suspense } from "react";
 import Layout from "@/components/layout/Layout";
 
+const Landing = lazy(() => import("@/pages/Landing"));
 const Home = lazy(() => import("@/pages/Home"));
 const Login = lazy(() => import("@/pages/Login"));
 const KakaoCallback = lazy(() => import("@/pages/KakaoCallback"));
@@ -23,7 +24,7 @@ export default function AppRoutes() {
         <Route path="/login" element={<Login />} />
         <Route path="/auth/kakao/callback" element={<KakaoCallback />} />
         <Route path="/onboarding" element={<Onboarding />} />
-        <Route path="/" element={<Navigate to="/login" replace />} />
+        <Route path="/" element={<Landing />} />
         <Route element={<Layout />}>
           <Route path="/home" element={<Home />} />
           <Route path="/Home" element={<Navigate to="/home" replace />} />
