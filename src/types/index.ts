@@ -64,10 +64,11 @@ export interface QuizResultResponse {
 export interface QuizAnswerDetail {
   quiz_id: number
   question: string
+  options: string[]
   selected_answer: number
-  correct_answer: number
-  explanation: string
+  answer: number
   is_correct: boolean
+  explanation: string | null
 }
 
 export interface QuizResultDetailResponse {
