@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useNavigate } from "react-router";
+import { Link } from "react-router";
 import logoFullSvg from "@/assets/brand/logo-full.svg";
 import rightSvg from "@/assets/icons/right.svg";
 import decoWater from "@/assets/deco/deco-water.svg";
@@ -91,15 +91,38 @@ function StatItem({ big, label, last = false }: { big: string; label: string; la
   );
 }
 
+function useBondToggle() {
+  const [hovered, setHovered] = useState(false);
+  const [active, setActive] = useState(false);
+  const bonded = hovered || active;
+  const toggle = () => setActive((prev) => !prev);
+  const handlers = {
+    onMouseEnter: () => setHovered(true),
+    onMouseLeave: () => setHovered(false),
+    onFocus: () => setHovered(true),
+    onBlur: () => setHovered(false),
+    onClick: toggle,
+    onKeyDown: (e: React.KeyboardEvent) => {
+      if (e.key === "Enter" || e.key === " ") {
+        e.preventDefault();
+        toggle();
+      }
+    },
+  };
+  return { bonded, active, handlers };
+}
+
 function IonicMiniIllustration() {
-  const [bonded, setBonded] = useState(false);
+  const { bonded, active, handlers } = useBondToggle();
   return (
     <div
-      className="w-full flex items-center justify-center rounded-xl bg-bg-normal"
+      role="button"
+      tabIndex={0}
+      aria-pressed={active}
+      aria-label="나트륨 이온과 염화 이온의 결합 미리보기"
+      className="w-full flex items-center justify-center rounded-xl bg-bg-normal focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary-normal"
       style={{ height: 180, cursor: "pointer" }}
-      onMouseEnter={() => setBonded(true)}
-      onMouseLeave={() => setBonded(false)}
-      onClick={() => setBonded(true)}
+      {...handlers}
     >
       <PuzzlePiece ion={NA_ION} interaction={bonded ? "placed" : "default"} />
       <div
@@ -115,14 +138,16 @@ function IonicMiniIllustration() {
 }
 
 function CovalentMiniIllustration() {
-  const [bonded, setBonded] = useState(false);
+  const { bonded, active, handlers } = useBondToggle();
   return (
     <div
-      className="relative w-full flex items-center justify-center rounded-xl bg-bg-normal"
+      role="button"
+      tabIndex={0}
+      aria-pressed={active}
+      aria-label="수소 원자 두 개의 공유 결합 미리보기"
+      className="relative w-full flex items-center justify-center rounded-xl bg-bg-normal focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary-normal"
       style={{ height: 180, cursor: "pointer" }}
-      onMouseEnter={() => setBonded(true)}
-      onMouseLeave={() => setBonded(false)}
-      onClick={() => setBonded(true)}
+      {...handlers}
     >
       <div style={{ marginRight: bonded ? -18 : 10, transition: "margin-right 0.45s cubic-bezier(0.34, 1.4, 0.64, 1)" }}>
         <BohrAtom element="H" occupiedAngles={bonded ? [0] : []} remainingValence={bonded ? 0 : undefined} />
@@ -144,25 +169,21 @@ function CovalentMiniIllustration() {
 }
 
 export default function Landing() {
-  const navigate = useNavigate();
-  const goToLogin = () => navigate("/login");
-
   return (
     <div className="relative min-h-screen bg-bg-normal">
       <header className="fixed top-0 left-0 right-0 z-20 flex items-center justify-between h-[60px] px-10 bg-white border-b border-border-light">
         <img src={logoFullSvg} alt="Labit" width={90} height={25} />
         <div className="flex items-center gap-4">
-          <button type="button" onClick={goToLogin} className="text-label-xl font-semibold text-text-normal px-2.5 py-2">
+          <Link to="/login" className="text-label-xl font-semibold text-text-normal px-2.5 py-2">
             로그인
-          </button>
-          <button
-            type="button"
-            onClick={goToLogin}
-            className="h-[38px] px-4 rounded-lg text-label-xl font-semibold text-static-white"
+          </Link>
+          <Link
+            to="/login"
+            className="h-[38px] px-4 rounded-lg text-label-xl font-semibold text-static-white flex items-center"
             style={{ background: "var(--color-primary-normal)" }}
           >
             체험하기
-          </button>
+          </Link>
         </div>
       </header>
 
@@ -224,15 +245,14 @@ export default function Landing() {
                 <br />
                 인터랙티브 실습으로 직접 분자를 만들어 보세요.
               </p>
-              <button
-                type="button"
-                onClick={goToLogin}
+              <Link
+                to="/login"
                 className="flex items-center gap-1 h-12 px-5 rounded-xl text-label-xl font-semibold text-static-white"
                 style={{ background: "var(--color-primary-normal)" }}
               >
                 지금 바로 체험하기
                 <img src={rightSvg} alt="" width={20} height={20} className="brightness-0 invert" />
-              </button>
+              </Link>
             </div>
           </div>
 
@@ -358,15 +378,14 @@ export default function Landing() {
               복잡한 가입 절차 없이, 지금 바로 첫 번째 단원부터 화학 결합의 세계를 조작해 보세요.
             </p>
           </div>
-          <button
-            type="button"
-            onClick={goToLogin}
+          <Link
+            to="/login"
             className="flex items-center gap-1 h-[38px] px-4 rounded-lg text-label-xl font-semibold text-text-normal bg-bg-normal"
             style={{ border: "1px solid var(--color-border-strong)" }}
           >
             지금 바로 체험하기
             <img src={rightSvg} alt="" width={20} height={20} />
-          </button>
+          </Link>
         </section>
 
         <footer className="flex flex-col items-start gap-3 bg-white" style={{ padding: "80px 156px" }}>
