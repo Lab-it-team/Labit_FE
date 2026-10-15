@@ -2,7 +2,6 @@ import { useState } from "react";
 import { useLocation, useNavigate } from "react-router";
 import LessonHeader from "@/components/lesson/LessonHeader";
 import LessonFooter from "@/components/lesson/LessonFooter";
-import ContentTab from "@/components/lesson/ContentTab";
 import CourseModal from "@/components/lesson/CourseModal";
 import AiFab from "@/components/lesson/AiFab";
 import { useSwipeNavigation } from "@/hooks/useSwipeNavigation";
@@ -444,7 +443,6 @@ function AtomNumberCard() {
 export default function AtomConcept() {
   const navigate = useNavigate();
   const location = useLocation();
-  const [activeTab, setActiveTab] = useState<"learn" | "practice">("learn");
   const [currentPage, setCurrentPage] = useState(() => {
     const page = (location.state as { page?: number } | null)?.page;
     return page && page >= 1 && page <= TOTAL_PAGES ? page : 1;
@@ -485,15 +483,8 @@ export default function AtomConcept() {
       />
       {showCourseModal && <CourseModal onClose={() => setShowCourseModal(false)} />}
 
-      <main className="flex-1 flex flex-col items-center pt-[80px] pb-[80px] px-4 sm:px-10 md:px-20 lg:px-[270px]">
+      <main className="flex-1 flex flex-col items-center pt-[80px] pb-[80px] px-4 sm:px-10 md:px-20">
         <div className="w-full max-w-[900px] flex flex-col gap-14 pt-10">
-          <ContentTab
-            active={activeTab}
-            onChange={(v) => {
-              if (v === "practice") return;
-              setActiveTab(v);
-            }}
-          />
           {currentPage === 1 && <ElementAtomMoleculeCard />}
           {currentPage === 2 && <AtomShellCard />}
           {currentPage === 3 && <AtomNumberCard />}
@@ -503,7 +494,7 @@ export default function AtomConcept() {
       <AiFab
         showTooltip={true}
         onClick={() => {}}
-        className="fixed bottom-[90px] right-10 z-30"
+        className="fixed bottom-[90px] right-10 z-10"
       />
 
       <LessonFooter

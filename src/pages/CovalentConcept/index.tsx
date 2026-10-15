@@ -433,7 +433,7 @@ export default function CovalentConcept() {
       />
       {showCourseModal && <CourseModal onClose={() => setShowCourseModal(false)} />}
 
-      <main className="flex-1 flex flex-col items-center pt-[80px] pb-[80px] px-4 sm:px-10 md:px-20 lg:px-[270px]">
+      <main className="flex-1 flex flex-col items-center pt-[80px] pb-[80px] px-4 sm:px-10 md:px-20">
         <div className="w-full max-w-[900px] flex flex-col gap-14 pt-10">
           <ContentTab
             active={activeTab}
@@ -450,7 +450,7 @@ export default function CovalentConcept() {
       <AiFab
         showTooltip={true}
         onClick={() => {}}
-        className="fixed bottom-[90px] right-10 z-30"
+        className="fixed bottom-[90px] right-10 z-10"
       />
 
       <LessonFooter

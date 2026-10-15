@@ -255,7 +255,8 @@ export default function CanvasDropZone({
       style={{
         boxSizing: "border-box",
         position: "relative",
-        width,
+        width: "100%",
+        maxWidth: width,
         height,
         background: bg,
         border,

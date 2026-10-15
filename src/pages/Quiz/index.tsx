@@ -11,12 +11,14 @@ import CourseModal from "@/components/lesson/CourseModal";
 import AiFab from "@/components/lesson/AiFab";
 import LoginRequiredModal from "@/components/common/LoginRequiredModal";
 import { useAuthStore } from "@/stores/authStore";
+import { useIsCompact } from "@/hooks/useIsCompact";
 import { useQuizzes, useSubmitQuiz } from "@/queries/quiz";
 import { getResultDetail } from "@/features/quiz/api";
 import type { QuizAnswerDetail } from "@/types";
 
 export default function Quiz() {
   const navigate = useNavigate();
+  const isCompact = useIsCompact();
   const isLoggedIn = !!useAuthStore((s) => s.accessToken);
   const user = useAuthStore((s) => s.user);
 
@@ -296,37 +298,42 @@ export default function Quiz() {
       )}
 
       <header className="fixed top-0 left-0 right-0 z-20 bg-white border-b border-border-light">
-        <div className="flex items-center justify-between px-10 h-[60px]">
+        <div className="flex items-center justify-between gap-4 px-10 h-[60px]">
           <div className="flex items-center gap-1 flex-1">
             <button
               type="button"
               onClick={() => navigate("/home")}
+              title="홈"
               className="flex items-center gap-1 px-2.5 py-2 rounded-lg hover:bg-neutral-10 transition-colors"
             >
               <img src={homeSvg} alt="" width={20} height={20} />
-              <span className="text-label-xl font-semibold text-text-normal">홈</span>
+              {!isCompact && <span className="text-label-xl font-semibold text-text-normal whitespace-nowrap">홈</span>}
             </button>
             <button
               type="button"
               onClick={() => setShowCourseModal(true)}
+              title="학습 목록"
               className="flex items-center gap-1 px-2.5 py-2 rounded-lg hover:bg-neutral-10 transition-colors"
             >
               <img src={listSvg} alt="" width={24} height={24} />
-              <span className="text-label-xl font-semibold text-text-normal">학습 목록</span>
+              {!isCompact && <span className="text-label-xl font-semibold text-text-normal whitespace-nowrap">학습 목록</span>}
             </button>
             <button
               type="button"
               onClick={() => navigate(-1)}
+              title="이전"
               className="flex items-center gap-1 px-2.5 py-2 rounded-lg hover:bg-neutral-10 transition-colors"
             >
               <img src={leftSvg} alt="" width={24} height={24} />
-              <span className="text-label-xl font-semibold text-text-normal">이전</span>
+              {!isCompact && <span className="text-label-xl font-semibold text-text-normal whitespace-nowrap">이전</span>}
             </button>
           </div>
 
-          <div className="flex items-center gap-1 shrink-0">
-            <span className="text-body-md font-medium text-text-strong">{showSummary ? "퀴즈 결과" : "단원 퀴즈"}</span>
-          </div>
+          {!isCompact && (
+            <div className="flex items-center gap-1 shrink-0">
+              <span className="text-body-md font-medium text-text-strong whitespace-nowrap">{showSummary ? "퀴즈 결과" : "단원 퀴즈"}</span>
+            </div>
+          )}
 
           <div className="flex items-center gap-4 flex-1 justify-end">
             {user?.profileImageUrl ? (
@@ -375,7 +382,7 @@ export default function Quiz() {
         </div>
       </header>
 
-      <main className="flex-1 flex flex-col items-center pt-[121px] pb-[80px] px-4 sm:px-10 md:px-20 lg:px-[270px]">
+      <main className="flex-1 flex flex-col items-center pt-[121px] pb-[80px] px-4 sm:px-10 md:px-20">
         <div className="w-full max-w-[900px] flex flex-col items-center gap-[60px]">
           <div className="flex flex-col items-center gap-1">
             {showSummary ? (
@@ -690,7 +697,7 @@ export default function Quiz() {
       <AiFab
         showTooltip={true}
         onClick={() => {}}
-        className="fixed bottom-[90px] right-10 z-30"
+        className="fixed bottom-[90px] right-10 z-10"
       />
     </div>
   );

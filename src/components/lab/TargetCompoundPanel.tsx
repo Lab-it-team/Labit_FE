@@ -1,3 +1,5 @@
+import { useIsCompact } from "@/hooks/useIsCompact";
+
 interface TargetCompoundPanelProps {
   formula: string;
   name: string;
@@ -19,6 +21,7 @@ export default function TargetCompoundPanel({
   hasInput,
   highlighted = false,
 }: TargetCompoundPanelProps) {
+  const isCompact = useIsCompact();
   return (
     <div
       style={{
@@ -29,7 +32,8 @@ export default function TargetCompoundPanel({
         alignItems: 'flex-start',
         padding: '16px 0',
         gap: 12,
-        width: 900,
+        width: '100%',
+        maxWidth: 900,
         height: 137,
         background: highlighted ? 'var(--color-static-white)' : 'var(--color-bg-elevate)',
         borderRadius: 12,
@@ -46,9 +50,8 @@ export default function TargetCompoundPanel({
           display: 'flex',
           flexDirection: 'column',
           alignItems: 'center',
-          padding: '12px 60px',
+          padding: isCompact ? '12px 20px' : '12px 60px',
           gap: 8,
-          width: 193,
           height: 105,
           borderRight: '1px solid var(--color-border-strong)',
           flexShrink: 0,
@@ -83,9 +86,8 @@ export default function TargetCompoundPanel({
           flexDirection: 'row',
           justifyContent: 'center',
           alignItems: 'center',
-          padding: '0 60px',
+          padding: isCompact ? '0 12px' : '0 60px',
           gap: 0,
-          width: 468,
           height: 105,
           flexShrink: 0,
         }}

@@ -139,7 +139,8 @@ export default function CovalentCanvasDropZone({
       style={{
         boxSizing: "border-box",
         position: "relative",
-        width,
+        width: "100%",
+        maxWidth: width,
         height,
         background: bg,
         border,
