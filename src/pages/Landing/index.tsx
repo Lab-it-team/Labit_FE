@@ -91,6 +91,55 @@ function StatItem({ big, label, last = false }: { big: string; label: string; la
   );
 }
 
+const STEP_CARDS = [
+  { n: "01", t: "직관적 개념 학습", d: "불필요한 텍스트를 줄이고,\n이미지와 모션을 통해 핵심 개념을 먼저 이해합니다." },
+  { n: "02", t: "인터랙티브 실습", d: "학습한 개념을 바탕으로 원자와 이온을\n직접 드래그하며 결합을 완성해 봅니다." },
+  { n: "03", t: "오답 분석 피드백", d: "단원 퀴즈를 통해 성취도를 확인하고,\n틀린 이유를 정확하게 파악합니다." },
+];
+
+function StepFlowCards() {
+  const [activeIndex, setActiveIndex] = useState(0);
+  return (
+    <div className="flex items-stretch gap-6 w-full max-w-[1128px]">
+      {STEP_CARDS.map(({ n, t, d }, i) => {
+        const isActive = activeIndex === i;
+        return (
+          <div
+            key={n}
+            role="button"
+            tabIndex={0}
+            aria-pressed={isActive}
+            className="flex-1 flex flex-col items-start gap-8 p-8 rounded-3xl bg-white transition-colors duration-200"
+            style={{
+              minHeight: 244,
+              border: `1px solid ${isActive ? "var(--color-primary-normal)" : "var(--color-border-light)"}`,
+              boxShadow: "0px 0px 8px rgba(0, 0, 0, 0.05)",
+              cursor: "pointer",
+            }}
+            onMouseEnter={() => setActiveIndex(i)}
+            onMouseLeave={() => setActiveIndex(0)}
+            onClick={() => setActiveIndex(i)}
+            onKeyDown={(e) => {
+              if (e.key === "Enter" || e.key === " ") {
+                e.preventDefault();
+                setActiveIndex(i);
+              }
+            }}
+          >
+            <span className="text-display-sm" style={{ color: isActive ? "var(--color-primary-normal)" : "var(--color-text-disabled)" }}>
+              {n}
+            </span>
+            <div className="flex flex-col items-start gap-2.5">
+              <h3 className="text-heading-md text-text-normal m-0">{t}</h3>
+              <p className="text-body-sm font-medium text-text-sub m-0" style={{ whiteSpace: "pre-line" }}>{d}</p>
+            </div>
+          </div>
+        );
+      })}
+    </div>
+  );
+}
+
 function useBondToggle() {
   const [hovered, setHovered] = useState(false);
   const [active, setActive] = useState(false);
@@ -306,21 +355,7 @@ export default function Landing() {
             <h2 className="text-display-sm text-text-strong m-0 text-center">개념부터 실습까지 이어지는 단계적 학습</h2>
             <p className="text-body-md font-medium text-text-sub m-0 text-center">파편화된 지식이 아닌, 매끄러운 흐름 속에서 과학의 뼈대를 세웁니다.</p>
           </div>
-          <div className="flex items-stretch gap-6 w-full max-w-[1128px]">
-            {[
-              { n: "01", t: "직관적 개념 학습", d: "불필요한 텍스트를 줄이고,\n이미지와 모션을 통해 핵심 개념을 먼저 이해합니다." },
-              { n: "02", t: "인터랙티브 실습", d: "학습한 개념을 바탕으로 원자와 이온을\n직접 드래그하며 결합을 완성해 봅니다." },
-              { n: "03", t: "오답 분석 피드백", d: "단원 퀴즈를 통해 성취도를 확인하고,\n틀린 이유를 정확하게 파악합니다." },
-            ].map(({ n, t, d }) => (
-              <div key={n} className="flex-1 flex flex-col items-start gap-8 p-8 rounded-3xl bg-white">
-                <span className="text-display-sm" style={{ color: "var(--color-text-disabled)" }}>{n}</span>
-                <div className="flex flex-col items-start gap-2.5">
-                  <h3 className="text-heading-md text-text-normal m-0">{t}</h3>
-                  <p className="text-body-sm font-medium text-text-sub m-0" style={{ whiteSpace: "pre-line" }}>{d}</p>
-                </div>
-              </div>
-            ))}
-          </div>
+          <StepFlowCards />
         </section>
 
         <section
@@ -332,7 +367,19 @@ export default function Landing() {
             <h2 className="text-display-sm text-text-strong m-0 text-center">나의 오개념을 바로잡아주는 친절한 피드백</h2>
             <p className="text-body-md font-medium text-text-sub m-0 text-center">단순히 정답만 알려주지 않습니다. AI가 당신이 헷갈린 개념을 콕 집어 설명해 줍니다.</p>
           </div>
-          <div className="w-full max-w-[1128px] rounded-3xl bg-white" style={{ height: 363, boxShadow: "1px 4px 8px rgba(14, 48, 91, 0.03)" }} />
+          <div
+            className="w-full max-w-[1128px] rounded-3xl bg-white"
+            style={{ padding: 24, boxShadow: "1px 4px 8px rgba(14, 48, 91, 0.03)" }}
+          >
+            <video
+              src="/videos/ai-feedback-demo.mov"
+              className="w-full h-auto block rounded-2xl"
+              autoPlay
+              loop
+              muted
+              playsInline
+            />
+          </div>
         </section>
 
         <section
