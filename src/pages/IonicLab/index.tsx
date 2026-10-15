@@ -466,7 +466,7 @@ export default function IonicLab() {
       rawX = pointerRef.current.x - rect.left - PIECE_W / 2;
       rawY = pointerRef.current.y - rect.top  - ionH / 2;
     }
-    const dropX = Math.max(0, Math.min(rawX, CANVAS_W - PIECE_W));
+    const dropX = Math.max(0, Math.min(rawX, rect.width - PIECE_W));
     const dropY = Math.max(0, Math.min(rawY, canvasHeight - ionH));
     const dropId = data.source === "palette" ? mkId() : data.pieceId;
 
@@ -792,9 +792,9 @@ export default function IonicLab() {
             <div
               style={{
                 boxSizing: "border-box", display: "flex", flexDirection: "column",
-                alignItems: "flex-start", padding: 20, gap: 12, width: 588,
+                alignItems: "flex-start", padding: 20, gap: 12, width: "100%", maxWidth: 588,
                 background: "var(--color-static-white)", border: "1px solid var(--color-border-normal)",
-                borderRadius: 12, flexGrow: isCompact ? 0 : 1, flexShrink: 0,
+                borderRadius: 12, flexGrow: isCompact ? 0 : 1, flexShrink: isCompact ? 1 : 0,
                 position: (onboardingStep === 3 && demoSubPhase !== "grab") || onboardingStep === 4 ? "relative" : undefined,
                 zIndex: (onboardingStep === 3 && demoSubPhase !== "grab") || onboardingStep === 4 ? 40 : undefined,
               }}
@@ -855,6 +855,7 @@ export default function IonicLab() {
                 isWrongCompound={isWrongCompound}
                 checkKey={checkKey}
                 draggingPieceId={draggingPieceId}
+                width={CANVAS_W}
                 height={canvasHeight}
                 hintVisible={showHint}
                 hintText={hintText}

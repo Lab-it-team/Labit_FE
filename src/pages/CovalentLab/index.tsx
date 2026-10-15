@@ -281,7 +281,7 @@ export default function CovalentLab() {
       dropId = mkId();
     }
 
-    centerX = Math.max(size / 2, Math.min(centerX, CANVAS_W - size / 2));
+    centerX = Math.max(size / 2, Math.min(centerX, rect.width - size / 2));
     centerY = Math.max(size / 2, Math.min(centerY, CANVAS_H - size / 2));
 
     updateAtoms((prev) => {
@@ -453,9 +453,9 @@ export default function CovalentLab() {
               <div
                 style={{
                   boxSizing: "border-box", display: "flex", flexDirection: "column",
-                  alignItems: "flex-start", padding: 20, gap: 12, width: 588,
+                  alignItems: "flex-start", padding: 20, gap: 12, width: "100%", maxWidth: 588,
                   background: "var(--color-static-white)", border: "1px solid var(--color-border-normal)",
-                  borderRadius: 12, flexShrink: 0,
+                  borderRadius: 12, flexShrink: isCompact ? 1 : 0,
                 }}
               >
                 <div style={{ display: "flex", flexDirection: "row", justifyContent: "space-between", alignItems: "center", width: "100%", height: 34 }}>
