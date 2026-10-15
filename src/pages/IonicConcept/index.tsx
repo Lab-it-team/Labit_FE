@@ -243,7 +243,7 @@ function IonBondIntroCard() {
           <StepArrow direction="left" active={step > 1} onClick={() => setStep((s) => Math.max(1, s - 1))} />
 
           {step === 1 && (
-            <div className="flex flex-row items-center justify-center gap-[60px] flex-1 py-4">
+            <div className="flex flex-row items-center justify-center gap-2 sm:gap-[60px] flex-1 py-4">
               <AtomStateBadge symbol="Na" borderColor={PINK} valenceCount={1} electronCount={11} secondary={<StatusCaption text="최외각 1개 → 불안정" />} />
               <PlusIconLarge />
               <AtomStateBadge symbol="Cl" borderColor={BLUE} valenceCount={7} electronCount={17} secondary={<StatusCaption text="전자 1개 부족 → 불안정" />} />
@@ -251,7 +251,7 @@ function IonBondIntroCard() {
           )}
 
           {step === 2 && (
-            <div className="flex flex-row items-center justify-center gap-[60px] flex-1 py-4">
+            <div className="flex flex-row items-center justify-center gap-2 sm:gap-[60px] flex-1 py-4">
               <AtomStateBadge symbol="Na" borderColor={PINK} valenceCount={0} electronCount={11} secondary={<StatusCaption text="전자 1개를 넘김 →" />} />
               <TransitElectron />
               <AtomStateBadge symbol="Cl" borderColor={BLUE} valenceCount={7} electronCount={17} secondary={<StatusCaption text="← 전자 1개를 받음" />} />
@@ -259,7 +259,7 @@ function IonBondIntroCard() {
           )}
 
           {step === 3 && (
-            <div className="flex flex-row items-center justify-center gap-[60px] flex-1 py-4">
+            <div className="flex flex-row items-center justify-center gap-2 sm:gap-[60px] flex-1 py-4">
               <AtomStateBadge symbol="Na" borderColor={PINK} valenceCount={0} electronCount={10} secondary={<ChargeBadge label="+1 양이온" color={PINK} bg={PINK_BG} />} />
               <span className="text-label-md text-text-sub shrink-0">⇌ 정전기적 인력 ⇌</span>
               <AtomStateBadge symbol="Cl" borderColor={BLUE} valenceCount={8} electronCount={18} secondary={<ChargeBadge label="−1 음이온" color={BLUE} bg={BLUE_BG} />} />
@@ -567,7 +567,7 @@ export default function IonicConcept() {
       )}
 
       {/* Main Content */}
-      <main className="flex-1 flex flex-col items-center pt-[80px] pb-[80px] px-4 sm:px-10 md:px-20 lg:px-[270px]">
+      <main className="flex-1 flex flex-col items-center pt-[80px] pb-[80px] px-4 sm:px-10 md:px-20">
         <div className="w-full max-w-[900px] flex flex-col gap-14 pt-10">
           <ContentTab
             active={activeTab}
@@ -589,7 +589,7 @@ export default function IonicConcept() {
       <AiFab
         showTooltip={true}
         onClick={() => {}}
-        className="fixed bottom-[90px] right-10 z-30"
+        className="fixed bottom-[90px] right-10 z-10"
       />
 
       <LessonFooter

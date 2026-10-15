@@ -33,6 +33,7 @@ import {
   type ElementSymbol,
 } from "@/data/covalentElements";
 import { useAuthStore } from "@/stores/authStore";
+import { useIsCompact } from "@/hooks/useIsCompact";
 import lockSvg from "@/assets/icons/lock.svg";
 
 const CANVAS_W = 546; // 카드 폭(588) - 좌우 padding(20*2) - 좌우 border(1*2) = 캔버스가 카드 안에 딱 맞는 폭
@@ -93,6 +94,7 @@ function withEul(word: string): string {
 export default function CovalentLab() {
   const navigate = useNavigate();
   const isLoggedIn = !!useAuthStore((s) => s.accessToken);
+  const isCompact = useIsCompact();
 
   const [activeTab, setActiveTab] = useState<"learn" | "practice">("practice");
   const [showProgressBadge, setShowProgressBadge] = useState(true);
@@ -354,11 +356,13 @@ export default function CovalentLab() {
             alignItems: "center",
             paddingTop: 60,
             paddingBottom: 24,
+            paddingLeft: isCompact ? 16 : 0,
+            paddingRight: isCompact ? 16 : 0,
             gap: 48,
             marginTop: 60,
           }}
         >
-          <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 42, width: 900 }}>
+          <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 42, width: "100%", maxWidth: 900 }}>
             <ContentTab
               active={activeTab}
               onChange={(v) => {
@@ -367,8 +371,8 @@ export default function CovalentLab() {
               }}
             />
 
-            <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 24, width: 900, alignSelf: "stretch" }}>
-              <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 12, width: 900, alignSelf: "stretch" }}>
+            <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 24, width: "100%", alignSelf: "stretch" }}>
+              <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 12, width: "100%", alignSelf: "stretch" }}>
                 <h1 className="text-heading-md text-text-strong m-0">전자쌍을 공유해 분자 만들기</h1>
                 <p className="text-body-md text-text-sub m-0">
                   {recipeText(neededElements, molecule)}로 {withEul(molecule.name)} 만들어보세요!
@@ -426,10 +430,19 @@ export default function CovalentLab() {
             </div>
           </div>
 
-          <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 16, width: 900 }}>
+          <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 16, width: "100%", maxWidth: 900 }}>
             <MoleculeTargetPanel formula={molecule.formula} name={molecule.name} isComplete={isComplete} hasInput={placedAtoms.length > 0} />
 
-            <div style={{ display: "flex", flexDirection: "row", alignItems: "flex-start", gap: 16, width: 900 }}>
+            <div
+              style={{
+                display: "flex",
+                flexDirection: isCompact ? "column" : "row",
+                alignItems: isCompact ? "center" : "flex-start",
+                gap: 16,
+                width: "100%",
+                maxWidth: 900,
+              }}
+            >
               <ElementPalette
                 elements={ALL_ELEMENTS}
                 placedCounts={placedCounts}
@@ -478,7 +491,7 @@ export default function CovalentLab() {
         </div>
       </DndContext>
 
-      <AiFab showTooltip={false} className="fixed bottom-[90px] right-10 z-30" />
+      <AiFab showTooltip={false} className="fixed bottom-[90px] right-10 z-10" />
 
       {showCourseModal && <CourseModal onClose={() => setShowCourseModal(false)} />}
       {showLoginModal && (

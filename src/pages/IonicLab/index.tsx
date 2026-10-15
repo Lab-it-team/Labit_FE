@@ -31,6 +31,7 @@ import { CATIONS, ANIONS } from "@/data/ions";
 import type { Ion } from "@/data/ions";
 import { cardHeight } from "@/components/lab/puzzlePaths";
 import { useAuthStore } from "@/stores/authStore";
+import { useIsCompact } from "@/hooks/useIsCompact";
 import lockSvg from "@/assets/icons/lock.svg";
 
 // ── Puzzle geometry (matches puzzlePaths.ts) ──────────────────────────────
@@ -234,6 +235,7 @@ function snapDroppedPiece(pieces: PlacedPiece[], dropId: string, dropX: number, 
 export default function IonicLab() {
   const navigate    = useNavigate();
   const isLoggedIn  = !!useAuthStore((s) => s.accessToken);
+  const isCompact   = useIsCompact();
   const [activeTab,          setActiveTab]          = useState<"learn" | "practice">("practice");
   const [showProgressBadge,  setShowProgressBadge]  = useState(true);
   const [currentProblem,     setCurrentProblem]     = useState(() => {
@@ -272,7 +274,7 @@ export default function IonicLab() {
   const [draggingPaletteId,  setDraggingPaletteId]  = useState<string | null>(null);
   const [draggingPieceId,    setDraggingPieceId]    = useState<string | null>(null);
   const [onboardingStep,     setOnboardingStep]     = useState<0 | 1 | 2 | 3 | 4 | null>(() => {
-    if (isLoggedIn || localStorage.getItem(ONBOARDING_STORAGE_KEY)) return null;
+    if (isLoggedIn || isCompact || localStorage.getItem(ONBOARDING_STORAGE_KEY)) return null;
     return 0;
   });
   const [demoPhase,          setDemoPhase]          = useState<"cation" | "anion">("cation");
@@ -612,12 +614,14 @@ export default function IonicLab() {
             alignItems: "center",
             paddingTop: 60,
             paddingBottom: 24,
+            paddingLeft: isCompact ? 16 : 0,
+            paddingRight: isCompact ? 16 : 0,
             gap: 48,
             marginTop: 60,
           }}
         >
         {/* Tab + Title + Step indicators */}
-        <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 42, width: 900 }}>
+        <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 42, width: "100%", maxWidth: 900 }}>
           <ContentTab
             active={activeTab}
             onChange={(v) => {
@@ -626,8 +630,8 @@ export default function IonicLab() {
             }}
           />
 
-          <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 24, width: 900, alignSelf: "stretch" }}>
-            <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 12, width: 900, alignSelf: "stretch" }}>
+          <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 24, width: "100%", alignSelf: "stretch" }}>
+            <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 12, width: "100%", alignSelf: "stretch" }}>
               <h1 className="text-heading-md text-text-strong m-0">목표 화합물 만들기</h1>
               <p className="text-body-md text-text-sub m-0">플러스(+)와 마이너스(-)의 합이 '0'이 되도록 퍼즐을 연결해 보세요!</p>
             </div>
@@ -694,7 +698,7 @@ export default function IonicLab() {
         </div>
 
         {/* Target compound + lab area */}
-        <div style={{ position: "relative", display: "flex", flexDirection: "column", alignItems: "center", gap: 16, width: 900 }}>
+        <div style={{ position: "relative", display: "flex", flexDirection: "column", alignItems: "center", gap: 16, width: "100%", maxWidth: 900 }}>
           {onboardingStep === 2 && (
             <GuideTooltip
               stepLabel="STEP 2"
@@ -747,7 +751,17 @@ export default function IonicLab() {
           />
 
           {/* Ion list + canvas */}
-          <div style={{ position: "relative", display: "flex", flexDirection: "row", alignItems: "flex-start", gap: 16, width: 900 }}>
+          <div
+            style={{
+              position: "relative",
+              display: "flex",
+              flexDirection: isCompact ? "column" : "row",
+              alignItems: isCompact ? "center" : "flex-start",
+              gap: 16,
+              width: "100%",
+              maxWidth: 900,
+            }}
+          >
             {onboardingStep === 1 && (
               <GuideTooltip
                 stepLabel="STEP 1"
@@ -780,7 +794,7 @@ export default function IonicLab() {
                 boxSizing: "border-box", display: "flex", flexDirection: "column",
                 alignItems: "flex-start", padding: 20, gap: 12, width: 588,
                 background: "var(--color-static-white)", border: "1px solid var(--color-border-normal)",
-                borderRadius: 12, flexGrow: 1,
+                borderRadius: 12, flexGrow: isCompact ? 0 : 1, flexShrink: 0,
                 position: (onboardingStep === 3 && demoSubPhase !== "grab") || onboardingStep === 4 ? "relative" : undefined,
                 zIndex: (onboardingStep === 3 && demoSubPhase !== "grab") || onboardingStep === 4 ? 40 : undefined,
               }}
@@ -856,7 +870,7 @@ export default function IonicLab() {
         <div style={{ position: "fixed", inset: 0, zIndex: 35, background: "var(--color-bg-overlay)" }} />
       )}
 
-      <AiFab showTooltip={false} className="fixed bottom-[90px] right-10 z-30" />
+      <AiFab showTooltip={false} className="fixed bottom-[90px] right-10 z-10" />
 
       {showCourseModal && <CourseModal onClose={() => setShowCourseModal(false)} />}
       {showLoginModal && (
