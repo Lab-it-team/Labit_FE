@@ -83,10 +83,10 @@ function OutlineChip({ children, dark = false }: { children: React.ReactNode; da
 function StatItem({ big, label, last = false }: { big: string; label: string; last?: boolean }) {
   return (
     <div
-      className={`flex-1 flex flex-col items-center gap-1 py-0 ${last ? "" : "border-r border-border-light"}`}
+      className={`lg:flex-1 flex flex-col items-center gap-1 py-0 ${last ? "" : "lg:border-r lg:border-border-light"}`}
     >
-      <span className="text-display-sm text-text-normal">{big}</span>
-      <span className="text-body-xl font-medium text-text-sub">{label}</span>
+      <span className="text-display-sm text-text-normal text-center">{big}</span>
+      <span className="text-body-xl font-medium text-text-sub text-center">{label}</span>
     </div>
   );
 }
@@ -100,7 +100,7 @@ const STEP_CARDS = [
 function StepFlowCards() {
   const [activeIndex, setActiveIndex] = useState(0);
   return (
-    <div className="flex items-stretch gap-6 w-full max-w-[1128px]">
+    <div className="flex flex-col lg:flex-row items-stretch gap-6 w-full max-w-[1128px]">
       {STEP_CARDS.map(({ n, t, d }, i) => {
         const isActive = activeIndex === i;
         return (
@@ -109,7 +109,7 @@ function StepFlowCards() {
             role="button"
             tabIndex={0}
             aria-pressed={isActive}
-            className="flex-1 flex flex-col items-start gap-8 p-8 rounded-3xl bg-white transition-colors duration-200"
+            className="lg:flex-1 flex flex-col items-start gap-8 p-8 rounded-3xl bg-white transition-colors duration-200"
             style={{
               minHeight: 244,
               border: `1px solid ${isActive ? "var(--color-primary-normal)" : "var(--color-border-light)"}`,
@@ -272,7 +272,7 @@ export default function Landing() {
             <Deco src={decoMoleculeBottom} left="0%" top="55%" width="clamp(180px, 22.9vw, 302px)" height="clamp(200px, 25.4vw, 335px)" animation="deco-float-c" dur="9.8s" delay="-3.5s" />
           </div>
 
-          <div className="relative flex flex-col items-center gap-4" style={{ zIndex: 1 }}>
+          <div className="relative flex flex-col items-center gap-4 px-4 sm:px-10" style={{ zIndex: 1 }}>
             <Chip>중학교 과학 인터랙티브 학습 서비스</Chip>
             <div className="flex flex-col items-center gap-6 max-w-[431px]">
               <div className="flex flex-col items-center">
@@ -305,8 +305,8 @@ export default function Landing() {
             </div>
           </div>
 
-          <div className="relative w-full flex items-center justify-center gap-1 py-20 bg-bg-normal border-b border-border-light" style={{ zIndex: 1, marginTop: 60 }}>
-            <div className="flex items-center w-full max-w-[1206px]">
+          <div className="relative w-full flex items-center justify-center gap-1 px-4 sm:px-10 py-20 bg-bg-normal border-b border-border-light" style={{ zIndex: 1, marginTop: 60 }}>
+            <div className="grid grid-cols-2 lg:flex lg:items-center gap-y-8 w-full max-w-[1206px]">
               <StatItem big="드래그앤드롭" label="직접 조작하는 실습" />
               <StatItem big="AI기반" label="오개념 맞춤 피드백" />
               <StatItem big="3단계" label="개념 → 실습 → 퀴즈" />
@@ -315,7 +315,7 @@ export default function Landing() {
           </div>
         </section>
 
-        <section className="flex flex-col items-center gap-[100px]" style={{ padding: "156px 156px", background: "var(--color-element-drag-fill-blue)" }}>
+        <section className="flex flex-col items-center gap-[100px] px-4 sm:px-10 md:px-16 lg:px-24 xl:px-[156px] py-16 sm:py-20 md:py-24 lg:py-32 xl:py-[156px]" style={{ background: "var(--color-element-drag-fill-blue)" }}>
           <div className="flex flex-col items-center gap-3 max-w-[1128px]">
             <OutlineChip>개념 학습</OutlineChip>
             <h2 className="text-display-sm text-text-strong m-0 text-center">추상적인 개념을 직관적인 모형으로</h2>
@@ -323,8 +323,8 @@ export default function Landing() {
               텍스트만으로는 헷갈리던 분자 구조와 전자 이동 과정을 시각화하여 명확하게 보여줍니다.
             </p>
           </div>
-          <div className="flex items-start gap-6 w-full max-w-[1128px]">
-            <div className="flex-1 flex flex-col items-start gap-10 p-10 rounded-3xl bg-white" style={{ boxShadow: "1px 5px 6px rgba(14, 48, 91, 0.04)" }}>
+          <div className="flex flex-col lg:flex-row items-stretch lg:items-start gap-6 w-full max-w-[1128px]">
+            <div className="lg:flex-1 flex flex-col items-start gap-10 p-10 rounded-3xl bg-white" style={{ boxShadow: "1px 5px 6px rgba(14, 48, 91, 0.04)" }}>
               <IonicMiniIllustration />
               <div className="flex flex-col items-start gap-2.5">
                 <h3 className="text-heading-md text-text-normal m-0">이온 결합</h3>
@@ -335,7 +335,7 @@ export default function Landing() {
                 </p>
               </div>
             </div>
-            <div className="flex-1 flex flex-col items-start gap-10 p-10 rounded-3xl bg-white" style={{ boxShadow: "1px 5px 6px rgba(14, 48, 91, 0.04)" }}>
+            <div className="lg:flex-1 flex flex-col items-start gap-10 p-10 rounded-3xl bg-white" style={{ boxShadow: "1px 5px 6px rgba(14, 48, 91, 0.04)" }}>
               <CovalentMiniIllustration />
               <div className="flex flex-col items-start gap-2.5">
                 <h3 className="text-heading-md text-text-normal m-0">공유 결합</h3>
@@ -349,7 +349,7 @@ export default function Landing() {
           </div>
         </section>
 
-        <section className="flex flex-col items-center gap-[100px]" style={{ padding: "156px 156px", background: "var(--color-bg-normal)" }}>
+        <section className="flex flex-col items-center gap-[100px] px-4 sm:px-10 md:px-16 lg:px-24 xl:px-[156px] py-16 sm:py-20 md:py-24 lg:py-32 xl:py-[156px]" style={{ background: "var(--color-bg-normal)" }}>
           <div className="flex flex-col items-center gap-3 max-w-[1128px]">
             <OutlineChip>단계별 학습 흐름</OutlineChip>
             <h2 className="text-display-sm text-text-strong m-0 text-center">개념부터 실습까지 이어지는 단계적 학습</h2>
@@ -359,8 +359,8 @@ export default function Landing() {
         </section>
 
         <section
-          className="flex flex-col items-center gap-[100px]"
-          style={{ padding: "156px 156px", background: "linear-gradient(180deg, var(--color-bg-normal) 0%, var(--color-element-drag-fill-blue) 40.67%)" }}
+          className="flex flex-col items-center gap-[100px] px-4 sm:px-10 md:px-16 lg:px-24 xl:px-[156px] py-16 sm:py-20 md:py-24 lg:py-32 xl:py-[156px]"
+          style={{ background: "linear-gradient(180deg, var(--color-bg-normal) 0%, var(--color-element-drag-fill-blue) 40.67%)" }}
         >
           <div className="flex flex-col items-center gap-3 max-w-[1128px]">
             <OutlineChip>개념 학습</OutlineChip>
@@ -383,21 +383,21 @@ export default function Landing() {
         </section>
 
         <section
-          className="flex flex-col items-center gap-[100px]"
-          style={{ padding: "156px 156px", background: "linear-gradient(180deg, var(--color-primary-normal) 0%, var(--color-primary-strong) 100%)" }}
+          className="flex flex-col items-center gap-[100px] px-4 sm:px-10 md:px-16 lg:px-24 xl:px-[156px] py-16 sm:py-20 md:py-24 lg:py-32 xl:py-[156px]"
+          style={{ background: "linear-gradient(180deg, var(--color-primary-normal) 0%, var(--color-primary-strong) 100%)" }}
         >
           <div className="flex flex-col items-center gap-3 max-w-[1128px]">
             <OutlineChip dark>학습 대상</OutlineChip>
             <h2 className="text-display-sm text-static-white m-0 text-center">누구를 위한 서비스인가요?</h2>
             <p className="text-body-md font-medium text-static-white m-0 text-center">파편화된 지식이 아닌, 매끄러운 흐름 속에서 과학의 뼈대를 세웁니다.</p>
           </div>
-          <div className="flex items-stretch gap-6 w-full max-w-[1128px]">
+          <div className="flex flex-col lg:flex-row items-stretch gap-6 w-full max-w-[1128px]">
             {[
               { l: "핵심 타겟", t: "중학교 학생", d: "이온, 화학 결합 등 처음 접하는 추상적인 개념을\n확실하게 내 것으로 만들고 싶은 학생" },
               { l: "추천 대상", t: "자기주도 학습자", d: "학교 수업만으로는 부족하여 집에서 직접 먼저 보며\n원리를 복습하고 싶은 학습자" },
               { l: "확장 예정", t: "고등학생 (예정)", d: "통합과학 및 화학의 기초를 다시 한번 탄탄하게\n다지고 싶은 예비 고등학생" },
             ].map(({ l, t, d }) => (
-              <div key={t} className="flex-1 flex flex-col items-start gap-8 p-8 rounded-3xl bg-white">
+              <div key={t} className="lg:flex-1 flex flex-col items-start gap-8 p-8 rounded-3xl bg-white">
                 <span className="text-label-xl font-semibold" style={{ color: "var(--color-text-sub)" }}>{l}</span>
                 <div className="flex flex-col items-start gap-2.5">
                   <h3 className="text-heading-md text-text-normal m-0">{t}</h3>
@@ -408,7 +408,7 @@ export default function Landing() {
           </div>
         </section>
 
-        <section className="flex flex-col items-center gap-[60px]" style={{ padding: "156px" }}>
+        <section className="flex flex-col items-center gap-[60px] px-4 sm:px-10 md:px-16 lg:px-24 xl:px-[156px] py-16 sm:py-20 md:py-24 lg:py-32 xl:py-[156px]">
           <div className="flex flex-col items-center gap-6 max-w-[668px]">
             <h2
               className="text-display-lg m-0 text-center"
@@ -435,7 +435,7 @@ export default function Landing() {
           </Link>
         </section>
 
-        <footer className="flex flex-col items-start gap-3 bg-white" style={{ padding: "80px 156px" }}>
+        <footer className="flex flex-col items-start gap-3 bg-white px-4 sm:px-10 md:px-16 lg:px-24 xl:px-[156px] py-12 sm:py-16 xl:py-20">
           <span className="text-body-md font-medium text-text-normal">랩잇(Labit)</span>
           <span className="text-caption-sm text-text-sub">© 2026 Labit Project. All rights reserved.</span>
         </footer>

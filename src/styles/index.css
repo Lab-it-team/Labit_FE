@@ -191,6 +191,8 @@
     font-family: var(--font-sans);
     color: var(--color-text-normal);
     background: var(--color-common-0);
+    word-break: keep-all;
+    overflow-wrap: break-word;
   }
 
   ::selection {
