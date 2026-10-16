@@ -1,3 +1,5 @@
+import { useIsCompact } from "@/hooks/useIsCompact";
+
 interface MoleculeTargetPanelProps {
   formula: string;
   name: string;
@@ -7,6 +9,7 @@ interface MoleculeTargetPanelProps {
 
 export default function MoleculeTargetPanel({ formula, name, isComplete, hasInput }: MoleculeTargetPanelProps) {
   const statusColor = isComplete ? "var(--color-status-positive)" : hasInput ? "var(--color-status-negative)" : "var(--color-text-disabled)";
+  const isPhone = useIsCompact(640);
   const statusLabel = isComplete ? `안정된 ${name} 분자` : hasInput ? "불안정" : "원자를 놓아보세요";
 
   return (
@@ -18,7 +21,7 @@ export default function MoleculeTargetPanel({ formula, name, isComplete, hasInpu
         justifyContent: "center",
         alignItems: "center",
         padding: "16px 0",
-        gap: 32,
+        gap: isPhone ? 16 : 32,
         width: "100%",
         maxWidth: 900,
         height: 137,
@@ -34,7 +37,7 @@ export default function MoleculeTargetPanel({ formula, name, isComplete, hasInpu
           display: "flex",
           flexDirection: "column",
           alignItems: "center",
-          padding: "12px 60px",
+          padding: isPhone ? "12px 16px" : "12px 60px",
           gap: 8,
           borderRight: "1px solid var(--color-border-strong)",
           flexShrink: 0,
@@ -47,13 +50,13 @@ export default function MoleculeTargetPanel({ formula, name, isComplete, hasInpu
         </div>
       </div>
 
-      <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 8 }}>
+      <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 8, minWidth: 0, paddingRight: isPhone ? 12 : 0 }}>
         <span
           style={{
             fontFamily: "var(--font-sans)",
             fontWeight: 700,
-            fontSize: 24,
-            lineHeight: "30px",
+            fontSize: isPhone ? 18 : 24,
+            lineHeight: isPhone ? "24px" : "30px",
             color: statusColor,
             transition: "color 0.2s",
             whiteSpace: "nowrap",
@@ -61,7 +64,7 @@ export default function MoleculeTargetPanel({ formula, name, isComplete, hasInpu
         >
           {statusLabel}
         </span>
-        <span className="text-body-xxs text-text-normal text-center whitespace-nowrap">
+        <span className="text-body-xxs text-text-normal text-center">
           원자를 가까이 붙이면 전자쌍을 공유하며 결합해요
         </span>
       </div>

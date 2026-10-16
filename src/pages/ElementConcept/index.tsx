@@ -391,8 +391,8 @@ function MetalNonmetalCard() {
       </p>
 
       {/* 결합 종류 칩 플로우 */}
-      <div className="flex flex-row items-center gap-4 w-full">
-        <div className="flex-1 flex items-center justify-center gap-2 border border-border-light rounded-xl p-2">
+      <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 sm:gap-4 w-full">
+        <div className="flex-1 flex flex-wrap items-center justify-center gap-2 border border-border-light rounded-xl p-2">
           <CategoryChip category="metal" label="금속" />
           <PlusIcon />
           <CategoryChip category="nonmetal" label="비금속" />
@@ -400,7 +400,7 @@ function MetalNonmetalCard() {
           <span className="text-label-xl font-semibold text-text-normal">이온 결합</span>
           <span className="text-label-md text-text-sub">(예: NaCl, MgO)</span>
         </div>
-        <div className="flex-1 flex items-center justify-center gap-2 border border-border-light rounded-xl p-2">
+        <div className="flex-1 flex flex-wrap items-center justify-center gap-2 border border-border-light rounded-xl p-2">
           <CategoryChip category="nonmetal" label="비금속" />
           <PlusIcon />
           <CategoryChip category="nonmetal" label="비금속" />

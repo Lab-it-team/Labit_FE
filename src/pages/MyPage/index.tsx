@@ -69,7 +69,7 @@ export default function MyPage() {
   return (
     <div className="flex min-h-screen flex-col bg-static-white">
       {/* 메인 헤더 */}
-      <header className="fixed left-0 right-0 top-0 z-10 flex h-[60px] items-center justify-between border-b border-border-normal bg-static-white px-10">
+      <header className="fixed left-0 right-0 top-0 z-10 flex h-[60px] items-center justify-between border-b border-border-normal bg-static-white px-4 md:px-10">
         <button type="button" onClick={() => navigate('/home')} className="flex items-center">
           <img src={logoFullSvg} alt="Labit" />
         </button>
@@ -77,7 +77,7 @@ export default function MyPage() {
       </header>
 
       {/* 서브 헤더 */}
-      <div className="mt-[60px] flex h-[62px] items-center bg-neutral-5 px-10">
+      <div className="mt-[60px] flex h-[62px] items-center bg-neutral-5 px-4 md:px-10">
         <button
           type="button"
           onClick={() => navigate("/home")}
@@ -91,7 +91,7 @@ export default function MyPage() {
       </div>
 
       {/* 메인 컨텐츠 */}
-      <main className="flex-1 bg-neutral-5 px-[270px] py-[60px] flex flex-col gap-[60px]">
+      <main className="flex-1 bg-neutral-5 px-4 sm:px-10 lg:px-24 xl:px-[270px] py-10 md:py-[60px] flex flex-col gap-10 md:gap-[60px]">
         {/* 헤드라인 */}
         <div className="flex flex-col gap-2">
           <h1 className="text-heading-md font-bold text-text-strong">마이페이지</h1>

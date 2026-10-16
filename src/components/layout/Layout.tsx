@@ -7,7 +7,7 @@ export default function Layout() {
   const navigate = useNavigate()
   return (
     <div className="flex min-h-screen flex-col">
-      <header className="fixed left-0 right-0 top-0 z-10 flex h-[60px] items-center justify-between border-b border-border-light bg-static-white px-10">
+      <header className="fixed left-0 right-0 top-0 z-10 flex h-[60px] items-center justify-between border-b border-border-light bg-static-white px-4 md:px-10">
         <button type="button" onClick={() => navigate('/home')} className="flex items-center">
           <img src={logoFullSvg} alt="Labit" />
         </button>
@@ -16,7 +16,7 @@ export default function Layout() {
 
       <div className="flex flex-1 pt-[60px]">
         <Sidebar />
-        <main className="ml-[270px] min-h-[calc(100vh-60px)] flex-1 bg-neutral-5">
+        <main className="min-w-0 md:ml-[270px] min-h-[calc(100vh-60px)] flex-1 bg-neutral-5 pb-[72px] md:pb-0">
           <Outlet />
         </main>
       </div>

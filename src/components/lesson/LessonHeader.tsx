@@ -75,15 +75,15 @@ export default function LessonHeader({
     {showQuitModal && <QuitLessonModal onClose={() => setShowQuitModal(false)} onQuit={() => navigate('/')} />}
     {showReferenceModal && <LearningReferenceModal onClose={() => setShowReferenceModal(false)} />}
     <header className="fixed top-0 left-0 right-0 z-20 bg-white border-b border-border-light">
-      <div className="flex items-center justify-between gap-4 px-10 h-[60px]">
+      <div className="flex items-center justify-between gap-2 sm:gap-4 px-3 sm:px-10 h-[60px]">
 
         {/* 왼쪽 */}
-        <div className="flex items-center gap-1 flex-1">
+        <div className="flex items-center gap-0 sm:gap-1 flex-1 min-w-0">
           <button
             type="button"
             onClick={() => { if (isLoggedIn) navigate('/home'); else setShowQuitModal(true); }}
             title="홈"
-            className="flex items-center gap-1 px-2.5 py-2 rounded-lg hover:bg-neutral-10 transition-colors"
+            className="flex items-center gap-1 px-2 sm:px-2.5 py-2 rounded-lg hover:bg-neutral-10 transition-colors"
           >
             <img src={homeSvg} alt="" width={20} height={20} />
             {!isCompact && <span className="text-label-xl font-semibold text-text-normal whitespace-nowrap">홈</span>}
@@ -92,7 +92,7 @@ export default function LessonHeader({
             type="button"
             onClick={onListClick}
             title="학습 목록"
-            className="flex items-center gap-1 px-2.5 py-2 rounded-lg hover:bg-neutral-10 transition-colors"
+            className="flex items-center gap-1 px-2 sm:px-2.5 py-2 rounded-lg hover:bg-neutral-10 transition-colors"
           >
             <img src={listSvg} alt="" width={24} height={24} />
             {!isCompact && <span className="text-label-xl font-semibold text-text-normal whitespace-nowrap">학습 목록</span>}
@@ -101,7 +101,7 @@ export default function LessonHeader({
             type="button"
             onClick={() => { if (prevPath) navigate(prevPath); else navigate(-1); }}
             title="이전"
-            className="flex items-center gap-1 px-2.5 py-2 rounded-lg hover:bg-neutral-10 transition-colors"
+            className="flex items-center gap-1 px-2 sm:px-2.5 py-2 rounded-lg hover:bg-neutral-10 transition-colors"
           >
             <img src={leftSvg} alt="" width={24} height={24} />
             {!isCompact && <span className="text-label-xl font-semibold text-text-normal whitespace-nowrap">이전</span>}
@@ -117,7 +117,7 @@ export default function LessonHeader({
         )}
 
         {/* 오른쪽 */}
-        <div className="flex items-center gap-4 flex-1 justify-end">
+        <div className="flex items-center gap-2 sm:gap-4 flex-1 justify-end">
           {isLoggedIn ? (
             <div ref={profileRef} className="relative shrink-0">
               <button
@@ -159,7 +159,8 @@ export default function LessonHeader({
               className="flex items-center px-3 py-2 h-[38px] rounded-full shrink-0 bg-[#FEE500] hover:opacity-90 transition-opacity"
             >
               <span className="text-label-xl font-semibold whitespace-nowrap text-[#191919]">
-                카카오로 로그인
+                <span className="sm:hidden">로그인</span>
+                <span className="hidden sm:inline">카카오로 로그인</span>
               </span>
             </button>
           )}

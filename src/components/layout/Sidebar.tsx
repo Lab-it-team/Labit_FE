@@ -24,12 +24,12 @@ function ListIcon() {
 
 export default function Sidebar() {
   return (
-    <aside className="fixed bottom-0 left-0 top-[60px] flex w-[270px] flex-col gap-0.5 overflow-y-auto border-r border-border-light bg-static-white p-5">
+    <aside className="fixed bottom-0 left-0 right-0 z-10 flex flex-row gap-0.5 border-t border-border-light bg-static-white p-2 pb-[calc(0.5rem+env(safe-area-inset-bottom))] md:right-auto md:top-[60px] md:w-[270px] md:flex-col md:overflow-y-auto md:border-t-0 md:border-r md:p-5">
       <NavLink
         to="/"
         end
         className={({ isActive }) =>
-          `flex w-full items-center gap-2 rounded-xl px-5 py-4 text-left text-label-xl font-semibold transition-colors ${
+          `flex w-full items-center justify-center md:justify-start gap-2 rounded-xl px-5 py-3 md:py-4 text-left text-label-xl font-semibold transition-colors ${
             isActive
               ? 'bg-bg-normal text-text-strong'
               : 'text-neutral-50 hover:bg-neutral-10'
@@ -42,7 +42,7 @@ export default function Sidebar() {
       <NavLink
         to="/history"
         className={({ isActive }) =>
-          `flex w-full items-center gap-2 rounded-xl px-5 py-4 text-left text-label-xl font-semibold transition-colors ${
+          `flex w-full items-center justify-center md:justify-start gap-2 rounded-xl px-5 py-3 md:py-4 text-left text-label-xl font-semibold transition-colors ${
             isActive
               ? 'bg-bg-normal text-text-strong'
               : 'text-neutral-50 hover:bg-neutral-10'

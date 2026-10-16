@@ -22,6 +22,7 @@ export default function TargetCompoundPanel({
   highlighted = false,
 }: TargetCompoundPanelProps) {
   const isCompact = useIsCompact();
+  const isPhone = useIsCompact(640);
   return (
     <div
       style={{
@@ -50,7 +51,7 @@ export default function TargetCompoundPanel({
           display: 'flex',
           flexDirection: 'column',
           alignItems: 'center',
-          padding: isCompact ? '12px 20px' : '12px 60px',
+          padding: isPhone ? '12px 12px' : isCompact ? '12px 20px' : '12px 60px',
           gap: 8,
           height: 105,
           borderRight: '1px solid var(--color-border-strong)',
@@ -86,10 +87,11 @@ export default function TargetCompoundPanel({
           flexDirection: 'row',
           justifyContent: 'center',
           alignItems: 'center',
-          padding: isCompact ? '0 12px' : '0 60px',
+          padding: isPhone ? '0 4px' : isCompact ? '0 12px' : '0 60px',
           gap: 0,
           height: 105,
-          flexShrink: 0,
+          flexShrink: isPhone ? 1 : 0,
+          minWidth: 0,
         }}
       >
         <CalcColumn value={cationSum}   label="양이온 합" active={cationSum !== 0} hasAnyInput={hasInput} highlight={false} activeColor="var(--color-pink-500)" />
@@ -143,9 +145,9 @@ function CalcColumn({ value, label, active, hasAnyInput, highlight, activeColor 
         justifyContent: 'center',
         alignItems: 'center',
         gap: 2,
-        width: 100,
+        flex: '0 1 100px',
+        minWidth: 56,
         height: 105,
-        flexShrink: 0,
       }}
     >
       <span
