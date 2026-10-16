@@ -17,6 +17,7 @@ import ToolBtn from "@/components/lab/ToolBtn";
 import type { PlacedPiece } from "@/components/lab/CanvasDropZone";
 import type { Ion } from "@/data/ions";
 import { getIonicCompound } from "@/features/ionic-lab/api";
+import { useIsCompact } from "@/hooks/useIsCompact";
 
 const PIECE_W = 120;
 const NOTCH_D = 20;
@@ -132,6 +133,7 @@ function snapDroppedPiece(pieces: PlacedPiece[], dropId: string, dropX: number, 
 type CompletedCompound = { formula: string; name_ko: string | null };
 
 export default function IonicSandboxPanel() {
+  const isCompact = useIsCompact();
   const [placedPieces, setPlacedPieces] = useState<PlacedPiece[]>([]);
   const [completed, setCompleted] = useState<CompletedCompound[]>([]);
   const [activeDragIon, setActiveDragIon] = useState<Ion | null>(null);
@@ -243,7 +245,7 @@ export default function IonicSandboxPanel() {
       rawX = pointerRef.current.x - rect.left - PIECE_W / 2;
       rawY = pointerRef.current.y - rect.top - ionH / 2;
     }
-    const dropX = Math.max(0, Math.min(rawX, CANVAS_W - PIECE_W));
+    const dropX = Math.max(0, Math.min(rawX, rect.width - PIECE_W));
     const dropY = Math.max(0, Math.min(rawY, CANVAS_H - ionH));
     const dropId = data.source === "palette" ? mkId() : data.pieceId;
 
@@ -367,8 +369,8 @@ export default function IonicSandboxPanel() {
     <DndContext sensors={sensors} onDragStart={handleDragStart} onDragOver={handleDragOver} onDragCancel={handleDragCancel} onDragEnd={handleDragEnd}>
       <DragOverlay dropAnimation={null}>{activeDragIon ? <PuzzleGhost ion={activeDragIon} /> : null}</DragOverlay>
 
-      <div style={{ display: "flex", flexDirection: "row", alignItems: "flex-start", gap: 16, width: "100%" }}>
-        <IonTabList draggingIonId={draggingPaletteId} height={PALETTE_H} width={312} />
+      <div style={{ display: "flex", flexDirection: isCompact ? "column" : "row", alignItems: isCompact ? "stretch" : "flex-start", gap: 16, width: "100%", overflowX: isCompact ? "auto" : undefined }}>
+        <IonTabList draggingIonId={draggingPaletteId} height={isCompact ? 320 : PALETTE_H} width={312} />
 
         <div
           style={{
@@ -378,8 +380,9 @@ export default function IonicSandboxPanel() {
             alignItems: "flex-start",
             padding: 16,
             gap: 10,
-            flex: 1,
-            minWidth: 0,
+            flex: isCompact ? "none" : 1,
+            width: isCompact ? "100%" : undefined,
+            minWidth: PIECE_W + 32,
             alignSelf: "stretch",
             background: "var(--color-static-white)",
             border: "1px solid var(--color-border-normal)",
@@ -438,7 +441,7 @@ export default function IonicSandboxPanel() {
           />
         </div>
 
-        <div style={{ width: SIDEBAR_W, flexShrink: 0, display: "flex", flexDirection: "column", gap: 12, alignSelf: "stretch" }}>
+        <div style={{ width: isCompact ? "100%" : SIDEBAR_W, flexShrink: 0, display: "flex", flexDirection: "column", gap: 12, alignSelf: "stretch" }}>
           <div
             style={{
               boxSizing: "border-box",

@@ -394,9 +394,9 @@ function AtomNumberCard() {
       </div>
 
       {/* 공식 3종 */}
-      <div className="flex flex-row gap-4 w-full">
+      <div className="flex flex-col sm:flex-row gap-4 w-full">
         {FORMULAS.map((f) => (
-          <div key={f.terms[0].text} className="flex-1 flex flex-row items-center justify-center gap-2 border border-border-strong rounded-xl p-3">
+          <div key={f.terms[0].text} className="flex-1 flex flex-row flex-wrap items-center justify-center gap-2 border border-border-strong rounded-xl p-3">
             {f.terms.map((term, i) => (
               <div key={term.text} className="flex flex-row items-center gap-2">
                 {i > 0 && <OpMark op={f.ops[i - 1]} />}
@@ -419,7 +419,7 @@ function AtomNumberCard() {
 
       {/* 계산 예시 */}
       <div className="flex flex-col items-center gap-4 w-full">
-        <div className="flex flex-row justify-center items-center gap-6 border border-border-strong rounded-xl py-8 w-full">
+        <div className="flex flex-row flex-wrap justify-center items-center gap-x-6 gap-y-4 border border-border-strong rounded-xl py-8 px-4 w-full">
           {STAT_GROUPS.map((group, gi) => (
             <div key={gi} className="flex flex-row items-center gap-6">
               {gi > 0 && <span className="w-px self-stretch bg-border-normal" />}

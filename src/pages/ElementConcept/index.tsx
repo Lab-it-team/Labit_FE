@@ -149,15 +149,16 @@ function ElementCard({
         borderColor: state === "highlighted" ? style.color : undefined,
         opacity: state === "dimmed" ? 0.3 : 1,
         position: "relative",
+        containerType: "inline-size",
         "--el-color": style.color,
       } as React.CSSProperties}
     >
       <span
-        style={{ position: "absolute", left: 8, top: 7, fontFamily: "var(--font-sans)", fontWeight: 600, fontSize: 14, lineHeight: "12px", letterSpacing: "-0.01em", color: style.color }}
+        style={{ position: "absolute", left: "11%", top: "9%", fontFamily: "var(--font-sans)", fontWeight: 600, fontSize: "clamp(7px, 16cqw, 14px)", lineHeight: 1, letterSpacing: "-0.01em", color: style.color }}
       >
         {element.number}
       </span>
-      <span className="font-display text-content-xl" style={{ color: style.color }}>
+      <span className="font-display text-content-xl" style={{ color: style.color, fontSize: "clamp(11px, 32cqw, 28px)", lineHeight: 1 }}>
         {element.symbol}
       </span>
     </button>
@@ -226,7 +227,7 @@ function ElementPopover({
 function PeriodicTableFrame({ renderCard }: { renderCard: (period: number, group: number) => ReactNode }) {
   return (
     <div className="w-full overflow-x-auto">
-      <div className="border border-border-light rounded-lg w-full p-2.5" style={{ minWidth: 680 }}>
+      <div className="border border-border-light rounded-lg w-full p-2.5" style={{ minWidth: 468 }}>
         <div style={{ display: "grid", gridTemplateColumns: "76px repeat(8, 1fr)", rowGap: 14, columnGap: 14 }}>
           <div style={{ position: "relative", width: 76, aspectRatio: "1" }}>
             <svg width="100%" height="100%" viewBox="0 0 76 76" preserveAspectRatio="none" style={{ position: "absolute", inset: 0 }}>
