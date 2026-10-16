@@ -215,7 +215,7 @@ export default function IonTabList({ draggingIonId, height = 556, width = 296, h
       </div>
 
       {/* Scrollable ion list */}
-      <div style={{ flex: 1, overflowY: highlightIonId ? "visible" : "auto", overflowX: "hidden", width: "100%", display: "flex", flexDirection: "column", gap: 16 }}>
+      <div style={{ flex: 1, overflowY: highlightIonId ? "visible" : "auto", overflowX: highlightIonId ? "visible" : "auto", width: "100%", display: "flex", flexDirection: "column", gap: 16 }}>
         <div style={{ display: "flex", flexDirection: "row", alignItems: "center", gap: 4, flexShrink: 0 }}>
           <img src={tipsSvg} width={24} height={24} style={{ flexShrink: 0 }} alt="" />
           <span className="text-body-xxs text-text-normal whitespace-nowrap">

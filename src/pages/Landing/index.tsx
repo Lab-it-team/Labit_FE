@@ -83,9 +83,9 @@ function OutlineChip({ children, dark = false }: { children: React.ReactNode; da
 function StatItem({ big, label, last = false }: { big: string; label: string; last?: boolean }) {
   return (
     <div
-      className={`lg:flex-1 flex flex-col items-center gap-1 py-0 ${last ? "" : "lg:border-r lg:border-border-light"}`}
+      className={`min-w-0 lg:flex-1 flex flex-col items-center gap-1 py-0 ${last ? "" : "lg:border-r lg:border-border-light"}`}
     >
-      <span className="text-display-sm text-text-normal text-center">{big}</span>
+      <span className="max-w-full text-display-sm text-text-normal text-center [overflow-wrap:anywhere]">{big}</span>
       <span className="text-body-xl font-medium text-text-sub text-center">{label}</span>
     </div>
   );

@@ -369,7 +369,7 @@ export default function IonicSandboxPanel() {
     <DndContext sensors={sensors} onDragStart={handleDragStart} onDragOver={handleDragOver} onDragCancel={handleDragCancel} onDragEnd={handleDragEnd}>
       <DragOverlay dropAnimation={null}>{activeDragIon ? <PuzzleGhost ion={activeDragIon} /> : null}</DragOverlay>
 
-      <div style={{ display: "flex", flexDirection: isCompact ? "column" : "row", alignItems: isCompact ? "stretch" : "flex-start", gap: 16, width: "100%" }}>
+      <div style={{ display: "flex", flexDirection: isCompact ? "column" : "row", alignItems: isCompact ? "stretch" : "flex-start", gap: 16, width: "100%", overflowX: isCompact ? "auto" : undefined }}>
         <IonTabList draggingIonId={draggingPaletteId} height={isCompact ? 320 : PALETTE_H} width={312} />
 
         <div
@@ -382,7 +382,7 @@ export default function IonicSandboxPanel() {
             gap: 10,
             flex: isCompact ? "none" : 1,
             width: isCompact ? "100%" : undefined,
-            minWidth: 0,
+            minWidth: PIECE_W + 32,
             alignSelf: "stretch",
             background: "var(--color-static-white)",
             border: "1px solid var(--color-border-normal)",
